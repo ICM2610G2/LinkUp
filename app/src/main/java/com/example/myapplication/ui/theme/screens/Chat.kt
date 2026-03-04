@@ -66,7 +66,7 @@ fun Chat() {
             ),
             ChatMessage(
                 id = 4,
-                sender = "Tú",
+                sender = "Tu",
                 text = "Jaja ya casi llego, no me ganen",
                 time = "14:28",
                 isMe = true
@@ -138,7 +138,7 @@ fun Chat() {
                             )
                         },
                         trailingIcon = {
-                            IconButton(onClick = { /* open gallery */ }) {
+                            IconButton(onClick = { /* galleria */ }) {
                                 Icon(
                                     imageVector = Icons.Default.Photo,
                                     contentDescription = "Foto",
@@ -161,7 +161,7 @@ fun Chat() {
                                 messages.add(
                                     ChatMessage(
                                         id = messages.size + 1,
-                                        sender = "Tú",
+                                        sender = "Tu",
                                         text = inputText,
                                         time = now,
                                         isMe = true
