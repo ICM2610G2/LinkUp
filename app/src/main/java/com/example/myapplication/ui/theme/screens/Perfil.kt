@@ -1,35 +1,234 @@
 package com.example.myapplication.ui.theme.screens
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Chat
-import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.ui.theme.MyApplicationTheme
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+
+@Composable
+fun Perfil() {
+
+    val accent = Color(0xFFF2823D)
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .navigationBarsPadding() // respeta la barra inferior
+            .padding(16.dp)
+    )
+   {
+
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+
+            Box(
+                modifier = Modifier
+                    .size(90.dp)
+                    .background(accent, shape = CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Imagen de perfil",
+                    tint = Color.White,
+                    modifier = Modifier.size(44.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(14.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "Nombre de Usuario",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Correo Electrónico",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFFBDBDBD)
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = "ID: 8414852",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = accent,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+
+        MenuItem(
+            icon = Icons.Default.Settings,
+            title = "Configuración",
+            accent = accent
+        )
+
+        MenuItem(
+            icon = Icons.Default.Timeline,
+            title = "Historial de carreras",
+            subtitle = "Ver todas tus carreras",
+            accent = accent
+        )
+
+        MenuItem(
+            icon = Icons.Default.CameraAlt,
+            title = "Fotos guardadas",
+            subtitle = "Revisa todos tus recuerdos",
+            accent = accent
+        )
+
+        MenuItem(
+            icon = Icons.Default.LocationOn,
+            title = "Sensores del dispositivo",
+            subtitle = "Acelerómetro, GPS, Magnetómetro",
+            accent = accent
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+       Card(
+           modifier = Modifier
+               .fillMaxWidth()
+               .padding(start = 8.dp, end = 8.dp, top = 10.dp, bottom = 90.dp),
+           shape = RoundedCornerShape(16.dp),
+           colors = CardDefaults.cardColors(containerColor = Color(0xFF2A0A0A))
+       ) {
+           Row(
+               modifier = Modifier
+                   .fillMaxWidth()
+                   .padding(16.dp),
+               horizontalArrangement = Arrangement.Center,
+               verticalAlignment = Alignment.CenterVertically
+           ) {
+               Text(
+                   text = "Cerrar sesión",
+                   color = Color(0xFFFF6B6B),
+                   style = MaterialTheme.typography.bodyLarge,
+                   fontWeight = FontWeight.Bold
+               )
+           }
+       }
+    }
+}
 
 
 @Composable
-fun Perfil() {}
+private fun MenuItem(
+    icon: ImageVector,
+    title: String,
+    subtitle: String? = null,
+    accent: Color
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF121212))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            // Círculo del ícono
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(accent.copy(alpha = 0.18f), CircleShape)
+                    .border(1.dp, accent.copy(alpha = 0.25f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = title,
+                    tint = accent,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // Textos
+            Column(
+                modifier = Modifier.weight(1f) // ocupa el espacio del centro
+            ) {
+                Text(
+                    text = title,
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                if (subtitle != null) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = subtitle,
+                        color = Color(0xFF9E9E9E),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+
+            Text(
+                text = "›",
+                color = Color(0xFF7A7A7A),
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PerfilPreview() {
+    MyApplicationTheme {
+        Perfil()
+    }
+}
