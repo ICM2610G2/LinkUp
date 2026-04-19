@@ -1,6 +1,9 @@
 package com.example.myapplication.ui.theme.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,6 +24,7 @@ import com.example.myapplication.ui.theme.screens.Perfil
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
+    paddingValues: PaddingValues = PaddingValues(),
     startDestination: String = BottomNavItem.Home.route
 ) {
 
@@ -29,7 +33,8 @@ fun AppNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        modifier = Modifier.padding(paddingValues)
     ) {
        // Composable para cada pantalla, con su ruta y contenido.
 

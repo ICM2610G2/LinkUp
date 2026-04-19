@@ -26,8 +26,7 @@ fun MainScaffold() {
             BottomBar(navController = navController)
         }
     ) { innerPadding ->
-
-        AppNavGraph(navController = navController)
+        AppNavGraph(navController = navController, innerPadding)
     }
 }
 
@@ -38,7 +37,7 @@ fun MainScaffold() {
  * @param navController: se usa para navegar a la ruta del item tocado.
  */
 @Composable
-private fun BottomBar(navController: NavHostController) {
+fun BottomBar(navController: NavHostController) {
 
     /**
      * currentBackStackEntryAsState():
@@ -86,8 +85,8 @@ private fun BottomBar(navController: NavHostController) {
                 },
 
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFFF2823D),
-                    selectedTextColor = Color(0xFFF2823D),
+                    selectedIconColor = Color(0xFFFF9800),
+                    selectedTextColor = Color(0xFFFF9800),
                     unselectedIconColor = Color.Gray,
                     unselectedTextColor = Color.Gray,
                     indicatorColor = Color.Transparent
