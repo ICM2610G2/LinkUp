@@ -9,5 +9,6 @@ data class ChatMessage(
     @DrawableRes val imageRes: Int? = null,
     val time: String,
     val isMe: Boolean = false,
-    val isImageVerified: Boolean = false
+    val isImageVerified: Boolean = false,
+    val initial: String
 )

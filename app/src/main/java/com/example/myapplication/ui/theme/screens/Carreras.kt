@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.theme.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.runtime.Composable
 
 import androidx.compose.foundation.background
@@ -26,15 +27,15 @@ fun Carreras(){
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0B0B0B))
+            .background(Color(0xFF0A0A0A))
             .padding(horizontal = 16.dp),
         contentPadding = PaddingValues(bottom = 100.dp)
     ) {
-        item { Spacer(modifier = Modifier.height(24.dp)) }
+        item { Spacer(modifier = Modifier.height(16.dp)) }
         item { CarreraActivaBadge() }
-        item { Spacer(modifier = Modifier.height(12.dp)) }
+        item { Spacer(modifier = Modifier.height(8.dp)) }
         item { HeaderRuta() }
-        item { Spacer(modifier = Modifier.height(24.dp)) }
+        item { Spacer(modifier = Modifier.height(20.dp)) }
         item { ProgresoSection() }
         item { Spacer(modifier = Modifier.height(24.dp)) }
         item { PuntosDeControlSection() }
@@ -72,24 +73,41 @@ fun HeaderRuta() {
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.AccessTime,
+                    null,
+                    tint = Color.White.copy(alpha = 0.6f),
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("32 min", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.Place,
+                    null,
+                    tint = Color.White.copy(alpha = 0.6f),
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("5 puntos", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Group,
+                    null,
+                    tint = Color.White.copy(alpha = 0.6f),
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("4 jugadores", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
 
-            Icon(Icons.Default.AccessTime, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
-            Spacer(modifier = Modifier.width(4.dp))
-            Text("32 min", color = Color.Gray, fontSize = 14.sp)
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Icon(Icons.Default.Place, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
-            Spacer(modifier = Modifier.width(4.dp))
-            Text("5 puntos", color = Color.Gray, fontSize = 14.sp)
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Icon(Icons.Default.Group, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
-            Spacer(modifier = Modifier.width(4.dp))
-            Text("4 jugadores", color = Color.Gray, fontSize = 14.sp)
+            }
         }
     }
 }
@@ -101,10 +119,9 @@ fun ProgresoSection() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Progreso", color = Color.White)
-            Text("2/5", color = Color(0xFFFF9800), fontWeight = FontWeight.Bold)
+            Text("Progreso", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+            Text("2/5", color = Color(0xFFFF9800), fontWeight = FontWeight.Bold, fontSize = 14.sp)
         }
-
         Spacer(modifier = Modifier.height(8.dp))
 
         LinearProgressIndicator(
@@ -114,7 +131,7 @@ fun ProgresoSection() {
                         .height(8.dp)
                         .clip(RoundedCornerShape(50)),
         color = Color(0xFFFF9800),
-        trackColor = Color(0xFF2A2A2A),
+        trackColor = Color(0xFF1A1A1A),
         strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
         )
     }
@@ -124,7 +141,11 @@ fun ProgresoSection() {
 fun PuntosDeControlSection() {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.LocationOn, null, tint = Color(0xFFFF9800))
+            Icon(Icons.Default.LocationOn,
+                null,
+                tint = Color(0xFFFF9800),
+                modifier = Modifier.size(16.dp)
+            )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 "Puntos de control",
@@ -133,14 +154,25 @@ fun PuntosDeControlSection() {
                 fontSize = 18.sp
             )
         }
+        Spacer(modifier = Modifier.height(12.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+        val checkpoints = listOf(
+            Triple("Museo del Oro", "14:23", true),
+            Triple("Iglesia de San Francisco", "14:41", true),
+            Triple("Plaza de Bolívar", "", false),
+            Triple("La Candelaria", "", false),
+            Triple("Torre Colpatria", "", false)
+        )
 
-        PuntoItem("Museo del Oro", "14:23", completado = true)
-        PuntoItem("Iglesia de San Francisco", "14:41", completado = true)
-        PuntoItem("Plaza de Bolívar", "", siguiente = true)
-        PuntoItem("La Candelaria", "")
-        PuntoItem("Torre Colpatria", "")
+        checkpoints.forEachIndexed { index, (nombre, hora, completado) ->
+            PuntoItem(
+                titulo = nombre,
+                hora = hora,
+                completado = completado,
+                siguiente = !completado && index == 2,
+                tieneConector = index < checkpoints.size - 1
+            )
+        }
     }
 }
 
@@ -149,63 +181,104 @@ fun PuntoItem(
     titulo: String,
     hora: String,
     completado: Boolean = false,
-    siguiente: Boolean = false
+    siguiente: Boolean = false,
+    tieneConector: Boolean = false
 ) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1C)),
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Top
     ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(36.dp)
                     .background(
-                        if (completado) Color(0xFFFF9800) else Color(0xFF2A2A2A),
+                        if (completado) Color(0xFFFF9800) else Color(0xFF252525),
                         CircleShape
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 if (completado) {
-                    Icon(Icons.Default.Check, null, tint = Color.White)
+                    Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(18.dp))
                 }
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    titulo,
-                    color = if (completado) Color.White else Color.Gray,
-                    fontWeight = FontWeight.Medium
+            if (tieneConector) {
+                Box(
+                    modifier = Modifier
+                        .width(2.dp)
+                        .height(24.dp)
+                        .background(
+                            if (completado) Color(0xFFFF9800) else Color(0x1AFFFFFF)
+                        )
                 )
-                if (hora.isNotEmpty()) {
-                    Text(
-                        hora,
-                        color = Color.Gray,
-                        fontSize = 12.sp
-                    )
-                }
             }
-            if (siguiente) {
-                Button(
-                    onClick = { },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFF9800)
-                    ),
-                    shape = RoundedCornerShape(50)
-                ) {
-                    Text("Siguiente")
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = if (tieneConector) 0.dp else 0.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        titulo,
+                        color = if (completado) Color.White else Color.White.copy(alpha = 0.4f),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp
+                    )
+
+                    if (hora.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(hora, color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Default.CameraAlt,
+                                    null,
+                                    tint = Color(0xFF22C55E),
+                                    modifier = Modifier.size(12.dp)
+                                )
+                                Spacer(modifier = Modifier.width(2.dp))
+                                Text("Foto ✓", color = Color(0xFF22C55E), fontSize = 10.sp)
+                            }
+                        }
+                    }
+                }
+
+                if (siguiente) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color(0xFFFF9800), RoundedCornerShape(50))
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            "Siguiente",
+                            color = Color.White,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
+    }
+
+    if (tieneConector) {
+        Spacer(modifier = Modifier.height(0.dp))
+    } else {
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
@@ -213,7 +286,11 @@ fun PuntoItem(
 fun ClasificacionSection() {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Star, null, tint = Color(0xFFFF9800))
+            Icon(Icons.Default.Star,
+                null,
+                tint = Color(0xFFFF9800),
+                modifier = Modifier.size(16.dp)
+            )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 "Clasificación",
@@ -223,10 +300,12 @@ fun ClasificacionSection() {
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        RankingItem(1, "Camila R.", "CR")
-        RankingItem(2, "Andrés M.", "AM")
+        RankingItem(1, "Camila R.", "CR", avatarColor = Color(0xFFFF9800), esYo = false)
+        RankingItem(2, "Andrés M.", "AM", avatarColor = Color(0xFF4B4B4B), esYo = false)
+        RankingItem(3, "TÚ", "TÚ", avatarColor = Color(0xFFFFA500), esYo = true)
+        RankingItem(4, "Laura P.", "LP", avatarColor = Color(0xFF3A3A3A), esYo = false)
     }
 }
 
@@ -234,43 +313,59 @@ fun ClasificacionSection() {
 fun RankingItem(
     posicion: Int,
     nombre: String,
-    iniciales: String
+    iniciales: String,
+    avatarColor: Color,
+    esYo: Boolean
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1C)),
-        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp)
+            .padding(vertical = 4.dp),
+        border = if (esYo) {
+            BorderStroke(1.dp, Color(0xFFFF9800))
+        } else {
+            BorderStroke(1.dp, Color(0x0DFFFFFF))
+        }
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp),
+            modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 posicion.toString(),
-                color = Color.White,
-                fontWeight = FontWeight.Bold
+                color = Color.White.copy(alpha = 0.6f),
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                modifier = Modifier.width(20.dp)
             )
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             Box(
                 modifier = Modifier
                     .size(36.dp)
-                    .background(Color(0xFFFF9800), CircleShape),
+                    .background(avatarColor, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text(iniciales, color = Color.White)
+                Text(
+                    iniciales,
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             Text(
                 nombre,
                 color = Color.White,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
                 modifier = Modifier.weight(1f)
             )
             Text(
                 "3 pts",
-                color = Color.Gray
+                color = Color.White.copy(alpha = 0.6f),
+                fontSize = 12.sp
             )
         }
     }

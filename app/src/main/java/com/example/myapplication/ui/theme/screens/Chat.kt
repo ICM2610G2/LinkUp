@@ -37,14 +37,13 @@ import java.util.*
 
 @Composable
 fun Chat() {
-
     val context = LocalContext.current
-
     val messages = remember {
         mutableStateListOf(
             ChatMessage(
                 id = 1,
                 sender = "Camila R.",
+                initial = "CR",
                 text = "¡Ya llegué al Museo del Oro! 🏆",
                 time = "14:23",
                 isMe = false
@@ -52,6 +51,7 @@ fun Chat() {
             ChatMessage(
                 id = 2,
                 sender = "Camila R.",
+                initial = "CR",
                 imageRes = context.resources.getIdentifier("museum_sample", "drawable", context.packageName)/*tryGetDrawable(context, "museum_sample")*/,
                 text = null,
                 time = "14:23",
@@ -61,6 +61,7 @@ fun Chat() {
             ChatMessage(
                 id = 3,
                 sender = "Andrés M.",
+                initial = "AM",
                 text = "Voy para allá, estoy a 200m ✈️",
                 time = "14:25",
                 isMe = false
@@ -68,6 +69,7 @@ fun Chat() {
             ChatMessage(
                 id = 4,
                 sender = "Tu",
+                initial = "TÚ",
                 text = "Jaja ya casi llego, no me ganen",
                 time = "14:28",
                 isMe = true
@@ -75,6 +77,7 @@ fun Chat() {
             ChatMessage(
                 id = 5,
                 sender = "Laura G.",
+                initial = "LG",
                 text = "Felicidades!!!",
                 time = "14:30",
                 isMe = false
@@ -84,130 +87,70 @@ fun Chat() {
 
     var inputText by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().background(Color(0xFF0A0A0A))) {
         TopBar()
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(1.dp)
-                .background(Color(0x1AFFFFFF))
+                .background(Color(0x0DFFFFFF))
         )
         Box(modifier = Modifier.weight(1f)) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 12.dp),
+                    .padding(horizontal = 16.dp),
                 reverseLayout = true,                                   // LazyColumn invertida para que los mensajes nuevos aparescan debajo
                 verticalArrangement = Arrangement.Top,
-                contentPadding = PaddingValues(top = 12.dp, bottom = 88.dp)
+                contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
             ) {
                 itemsIndexed(items = messages.asReversed()) { index, message ->         // mostrar los mensajes en orden al reves
                     ChatRow(message = message)
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-            }
-
-            // Area de texto
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .background(Color.Transparent)
-                    .padding(12.dp).padding(bottom = 80.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    TextField(
-                        value = inputText,
-                        onValueChange = { inputText = it },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(54.dp),
-                        placeholder = { Text("Escribe un mensaje...", color = Color(0x80FFFFFF)) },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color(0xFF121214),
-                            unfocusedContainerColor = Color(0xFF121214),
-                            cursorColor = Color(0xFFFFA000),
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
-                        ),
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.AttachFile,
-                                contentDescription = "Adjuntar",
-                                tint = Color(0x80FFFFFF),
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        trailingIcon = {
-                            IconButton(onClick = { Log.i("MyApp", "Adjuntar imagen") }) {
-                                Icon(
-                                    imageVector = Icons.Default.Photo,
-                                    contentDescription = "Foto",
-                                    tint = Color(0x80FFFFFF)
-                                )
-                            }
-                        },
-                        shape = RoundedCornerShape(28.dp),
-                        singleLine = true
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    // Boton de enviar
-                    IconButton(
-                        onClick = {
-                            if (inputText.isNotBlank()) {
-                                // Agrega a la lista de chats
-                                val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                                messages.add(
-                                    ChatMessage(
-                                        id = messages.size + 1,
-                                        sender = "Tu",
-                                        text = inputText,
-                                        time = now,
-                                        isMe = true
-                                    )
-                                )
-                                Log.i("MyApp", "Se envió el mensaje")
-                                inputText = ""
-                            }
-                        },
-                        modifier = Modifier
-                            .size(54.dp)
-                            .background(color = Color(0xFFFF9800), shape = CircleShape)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Send,
-                            contentDescription = "Enviar",
-                            tint = Color.White
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
+
+        // Area de texto
+        ChatInputArea(
+            inputText = inputText,
+            onInputChange = { inputText = it },
+            onSend = {
+                if (inputText.isNotBlank()) {
+                    val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+                    messages.add(
+                        ChatMessage(
+                            id = messages.size + 1,
+                            sender = "Tú",
+                            initial = "TÚ",
+                            text = inputText,
+                            time = now,
+                            isMe = true
+                        )
+                    )
+                    Log.i("MyApp", "Mensaje enviado: $inputText")
+                    inputText = ""
+                }
+            }
+        )
     }
 }
 
 @Composable
 fun TopBar() {
-    val orange = Color(0xFFFF9800)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF121214))
-            .padding(horizontal = 12.dp, vertical = 12.dp).padding(top = 30.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .background(Color(0xFF1A1A1A))
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(44.dp)
                 .clip(CircleShape)
-                .background(orange),
+                .background(Color(0xFFFF9800)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -218,20 +161,31 @@ fun TopBar() {
             )
         }
 
-        Column(modifier = Modifier.padding(start = 12.dp)) {
-            Text("Ruta Centro Histórico", color = Color.White, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(2.dp))
-            Text("4 participantes · En curso", color = Color(0xB3FFFFFF), fontSize = 12.sp)
+        Column(modifier = Modifier.weight(1f)) {
+            Text("Ruta Centro Histórico",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp)
+            Text("4 participantes · En curso",
+                color = Color.White.copy(alpha = 0.6f),
+                fontSize = 12.sp)
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        IconButton(onClick = { Log.i("MyApp", "Menu") }) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "Más",
-                tint = Color(0xB3FFFFFF)
-            )
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            listOf("CR", "AM", "LP").forEach { iniciales ->
+                Box(
+                    modifier = Modifier
+                        .background(Color(0xFF252525), RoundedCornerShape(50))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        iniciales,
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
         }
     }
 }
@@ -244,85 +198,110 @@ fun ChatRow(message: ChatMessage) {
     val textColorOther = Color(0xE6FFFFFF)
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.Top
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = if (message.isMe) Arrangement.End else Arrangement.Start
     ) {
         if (message.isMe) {
-            Spacer(modifier = Modifier.weight(1f))
-            Column(horizontalAlignment = Alignment.End) {       // A la derecha
-                Bubble(isMe = true, bubbleColor = bubbleColorMe) {
-                    if (message.text != null) {
-                        Text(
-                            text = message.text,
-                            color = textColorMe,
-                            fontSize = 15.sp,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    } else if (message.imageRes != null) {
-                        ImageMessageCard(
-                            caption = null,
-                            drawableRes = message.imageRes,
-                            verified = message.isImageVerified
-                        )
-                    }
-                }
+            Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(1f)) {       // A la derecha
+                Bubble(message = message)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(message.time, color = Color(0x80FFFFFF), fontSize = 11.sp)
+                Text(message.time, color = Color.White.copy(alpha = 0.4f), fontSize = 10.sp)
             }
             Spacer(modifier = Modifier.width(8.dp))
-            AvatarInitials(initial = "Tú", isMe = true)
+            AvatarInitials(initial = "TÚ", isMe = true)
         } else {
-            AvatarInitials(initial = message.sender, isMe = false)
+            AvatarInitials(initial = message.initial, isMe = false)
             Spacer(modifier = Modifier.width(8.dp))
-            Column {
-                Text(message.sender, color = Color(0xB3FFFFFF), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)     // Nombre remitente
+            Column(modifier = Modifier.weight(1f)) {
+                Text(message.sender,
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 10.sp
+                )     // Nombre remitente
                 Spacer(modifier = Modifier.height(4.dp))
-                Bubble(isMe = false, bubbleColor = bubbleColorOther) {
-                    if (message.text != null) {
-                        Text(
-                            text = message.text,
-                            color = textColorOther,
-                            fontSize = 15.sp,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    } else if (message.imageRes != null) {
-                        ImageMessageCard(
-                            caption = "Museo del Oro",
-                            drawableRes = message.imageRes,
-                            verified = message.isImageVerified
-                        )
-                    }
-                }
+                Bubble(message = message)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(message.time, color = Color(0x80FFFFFF), fontSize = 11.sp)
+                Text(message.time,
+                    color = Color.White.copy(alpha = 0.4f),
+                    fontSize = 10.sp)
             }
-            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
 
 @Composable
-fun Bubble(isMe: Boolean, bubbleColor: Color, content: @Composable () -> Unit) {
-    val shape = if (isMe) {
-        RoundedCornerShape(16.dp, 0.dp, 16.dp, 16.dp)
+fun Bubble(message: ChatMessage) {
+    if (message.text != null) {
+        Box(
+            modifier = Modifier
+                .background(
+                    if (message.isMe) Color(0xFFFF9800) else Color(0xFF1A1A1A),
+                    RoundedCornerShape(
+                        topStart = if (message.isMe) 16.dp else 0.dp,
+                        topEnd = if (message.isMe) 0.dp else 16.dp,
+                        bottomStart = 16.dp,
+                        bottomEnd = 16.dp
+                    )
+                )
+                .padding(horizontal = 16.dp, vertical = 10.dp)
+        ) {
+            Text(message.text, color = Color.White, fontSize = 14.sp)
+        }
     } else {
-        RoundedCornerShape(0.dp, 16.dp, 16.dp, 16.dp)
-    }
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.width(220.dp)
+        ) {
+            Column {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp)
+                        .background(Color(0xFF1B1B1C)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Photo,
+                        null,
+                        tint = Color.White.copy(alpha = 0.4f),
+                        modifier = Modifier.size(44.dp)
+                    )
+                }
 
-    Surface(
-        color = bubbleColor,
-        shape = shape,
-        tonalElevation = 2.dp,
-        modifier = Modifier.defaultMinSize(minWidth = 50.dp)
-    ) {
-        content()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFF252525))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .background(Color(0xFFEF4444), CircleShape)
+                    )
+                    Text(
+                        "Museo del Oro",
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontSize = 10.sp,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        "Foto verificada",
+                        color = Color(0xFF22C55E),
+                        fontSize = 10.sp
+                    )
+                }
+            }
+        }
     }
 }
 
 @Composable
 fun AvatarInitials(initial: String, isMe: Boolean) {
-    val bg = if (isMe) Color(0xFFFF9800) else Color(0xFF2B2B2B)
+    val bg = if (isMe) Color(0xFFFF9800) else Color(0xFF252525)
     val text = if (initial == "Tu") "TU"
                 else initial.split(" ").getOrNull(0)?.firstOrNull()?.toString() ?: "?"
     Box(
@@ -332,83 +311,60 @@ fun AvatarInitials(initial: String, isMe: Boolean) {
             .background(bg),
         contentAlignment = Alignment.Center
     ) {
-        Text(text, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        Text(initial,
+            color = Color.White,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold)
     }
 }
 
 @Composable
-fun ImageMessageCard(caption: String?, @DrawableRes drawableRes: Int?, verified: Boolean) {
-    val cardWidth = 210.dp
-    Column(
+fun ChatInputArea(
+    inputText: String,
+    onInputChange: (String) -> Unit,
+    onSend: () -> Unit
+) {
+    Row(
         modifier = Modifier
-            .width(cardWidth)
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFF111113))
-            .border(1.dp, Color(0x1FFFFFFF), RoundedCornerShape(12.dp))
+            .fillMaxWidth()
+            .background(Color(0xFF1A1A1A))
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(bottom = 80.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        if (drawableRes != null) {
-            Image(
-                painter = painterResource(id = drawableRes),
-                contentDescription = caption ?: "image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .height(120.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-            )
-        } else {
-            // placeholder
-            Box(
-                modifier = Modifier
-                    .height(120.dp)
-                    .fillMaxWidth()
-                    .background(Color(0xFF1B1B1C)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Photo,
-                    contentDescription = "placeholder",
-                    tint = Color(0x66FFFFFF),
-                    modifier = Modifier.size(44.dp)
-                )
-            }
-        }
-
-        // titulo + tag de verificado
-        Row(
+        IconButton(
+            onClick = { Log.i("MyApp", "Adjuntar imagen clicked") },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .size(44.dp)
+                .background(Color(0xFF252525), CircleShape)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                if (!caption.isNullOrEmpty()) {
-                    Text(
-                        text = caption,
-                        color = Color.White,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                } else {
-                    Text(
-                        text = "Foto",
-                        color = Color.White,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Foto verificada", color = Color(0xFF2ED47A), fontSize = 12.sp)
-            }
-
-            if (verified) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = "verified",
-                    tint = Color(0xFF2ED47A),
-                    modifier = Modifier.size(18.dp)
-                )
-            }
+            Icon(Icons.Default.Photo, null, tint = Color.White.copy(alpha = 0.6f), modifier = Modifier.size(20.dp))
+        }
+        TextField(
+            value = inputText,
+            onValueChange = onInputChange,
+            modifier = Modifier.weight(1f).height(54.dp),
+            placeholder = { Text("Escribe un mensaje...", color = Color.White.copy(alpha = 0.4f), fontSize = 14.sp) },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFF252525),
+                unfocusedContainerColor = Color(0xFF252525),
+                cursorColor = Color(0xFFFF9800),
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            ),
+            shape = RoundedCornerShape(50),
+            singleLine = true
+        )
+        IconButton(
+            onClick = onSend,
+            modifier = Modifier
+                .size(44.dp)
+                .background(Color(0xFFFF9800), CircleShape)
+        ) {
+            Icon(Icons.Default.Send, null, tint = Color.White, modifier = Modifier.size(20.dp))
         }
     }
 }

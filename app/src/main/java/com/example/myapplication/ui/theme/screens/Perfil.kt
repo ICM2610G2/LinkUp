@@ -1,7 +1,11 @@
 package com.example.myapplication.ui.theme.screens
 
+import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,194 +33,361 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Smartphone
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun Perfil() {
-
-    val accent = Color(0xFFFF9800)
-
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0B0B0B))
-            .navigationBarsPadding() // respeta la barra inferior
-            .padding(16.dp)
-    )
-   {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(90.dp)
-                    .background(accent, shape = CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Imagen de perfil",
-                    tint = Color.White,
-                    modifier = Modifier.size(44.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(14.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = "Nombre de Usuario",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = "Correo Electrónico",
-                    fontSize = 14.sp,
-                    color = Color(0xFFBDBDBD)
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                    text = "ID: 8414852",
-                    fontSize = 14.sp,
-                    color = accent,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-
-        MenuItem(
-            icon = Icons.Default.Settings,
-            title = "Configuración",
-            accent = accent
+            .background(Color(0xFF0A0A0A)),
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            end = 16.dp,
+            top = 16.dp,
+            bottom = 100.dp
         )
-
-        MenuItem(
-            icon = Icons.Default.Timeline,
-            title = "Historial de carreras",
-            subtitle = "Ver todas tus carreras",
-            accent = accent
-        )
-
-        MenuItem(
-            icon = Icons.Default.CameraAlt,
-            title = "Fotos guardadas",
-            subtitle = "Revisa todos tus recuerdos",
-            accent = accent
-        )
-
-        MenuItem(
-            icon = Icons.Default.LocationOn,
-            title = "Sensores del dispositivo",
-            subtitle = "Acelerómetro, GPS, Magnetómetro",
-            accent = accent
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-       Card(
-           modifier = Modifier
-               .fillMaxWidth()
-               .padding(start = 8.dp, end = 8.dp, top = 10.dp, bottom = 90.dp),
-           shape = RoundedCornerShape(16.dp),
-           colors = CardDefaults.cardColors(containerColor = Color(0xFF2A0A0A))
-       ) {
-           Row(
-               modifier = Modifier
-                   .fillMaxWidth()
-                   .padding(16.dp),
-               horizontalArrangement = Arrangement.Center,
-               verticalAlignment = Alignment.CenterVertically
-           ) {
-               Text(
-                   text = "Cerrar sesión",
-                   color = Color(0xFFFF6B6B),
-                   fontSize = 16.sp,
-                   fontWeight = FontWeight.Bold
-               )
-           }
-       }
+    ) {
+        item { PerfilHeader() }
+        item { Spacer(modifier = Modifier.height(20.dp)) }
+        item { StatsGridSection() }
+        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item { NivelXpSection() }
+        item { Spacer(modifier = Modifier.height(20.dp)) }
+        item { InsigniasSection() }
+        item { Spacer(modifier = Modifier.height(20.dp)) }
+        item { MenuSection() }
+        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item { CerrarSesionButton() }
     }
 }
 
+@Composable
+fun PerfilHeader() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(64.dp)
+                .background(Color(0xFFFF9800), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "JD",
+                color = Color.White,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                "Juan David",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                "@juandavid · Bogotá, Colombia",
+                color = Color.White.copy(alpha = 0.6f),
+                fontSize = 12.sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(Color(0xFF1A1A1A), RoundedCornerShape(50))
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(Color(0xFFFF9800), CircleShape)
+                        )
+                        Text(
+                            "Nivel 12",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+                Text(
+                    "Explorador",
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 12.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun StatsGridSection() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        StatGridItem("24", "Carreras", Icons.Default.EmojiEvents, modifier = Modifier.weight(1f))
+        StatGridItem("87", "Fotos", Icons.Default.CameraAlt, modifier = Modifier.weight(1f))
+        StatGridItem("42", "Lugares", Icons.Default.Place, modifier = Modifier.weight(1f))
+        StatGridItem("7", "Racha", Icons.Default.Bolt, modifier = Modifier.weight(1f))
+    }
+}
+@Composable
+fun StatGridItem(valor: String, label: String, icon: ImageVector, modifier: Modifier = Modifier) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier,
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x0DFFFFFF))
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(icon, null, tint = Color(0xFFFF9800), modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(valor, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(label, color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp)
+        }
+    }
+}
+
+@Composable
+fun NivelXpSection() {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth(),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x0DFFFFFF))
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "Nivel 12",
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    "2,450 / 3,000 XP",
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 12.sp
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            LinearProgressIndicator(
+                progress = { 0.82f },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(50)),
+                color = Color(0xFFFF9800),
+                trackColor = Color(0xFF252525),
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                "550 XP para el siguiente nivel",
+                color = Color.White.copy(alpha = 0.6f),
+                fontSize = 10.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun InsigniasSection() {
+    val insignias = listOf(
+        Pair("🗺️", "Explorador") to true,
+        Pair("⚡", "Velocista") to true,
+        Pair("📷", "Fotógrafo") to true,
+        Pair("🌙", "Nocturno") to false,
+        Pair("👑", "Leyenda") to false
+    )
+
+    Column {
+        Text(
+            "Insignias",
+            color = Color.White,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            insignias.forEach { (info, obtenida) ->
+                InsigniaItem(
+                    emoji = info.first,
+                    nombre = info.second,
+                    obtenida = obtenida
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun InsigniaItem(emoji: String, nombre: String, obtenida: Boolean) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = if (obtenida) Color(0xFF1A1A1A) else Color(0x661A1A1A)
+        ),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.width(64.dp),
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            if (obtenida) Color(0x4DFF9800) else Color(0x0DFFFFFF)
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                emoji,
+                fontSize = 24.sp,
+                color = if (obtenida) Color.White else Color.White.copy(alpha = 0.4f)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                nombre,
+                color = if (obtenida) Color.White else Color.White.copy(alpha = 0.4f),
+                fontSize = 10.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun MenuSection() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        MenuItem(Icons.Default.EmojiEvents, "Historial de carreras", null)
+        MenuItem(Icons.Default.Photo, "Fotos guardadas", null)
+        MenuItem(Icons.Default.Smartphone, "Sensores del dispositivo", "Acelerómetro, GPS, Magnetómetro")
+        MenuItem(Icons.Default.Settings, "Configuración", null)
+    }
+}
 
 @Composable
 fun MenuItem(
     icon: ImageVector,
-    title: String,
-    subtitle: String? = null,
-    accent: Color
+    titulo: String,
+    subtitulo: String? = null
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 6.dp),
+            .clickable { Log.i("MyApp", "$titulo clicked") },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF121212))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+        border = BorderStroke(1.dp, Color(0x0DFFFFFF))
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
-            // Círculo del ícono
             Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .background(accent.copy(alpha = 0.18f), CircleShape)
-                    .border(1.dp, accent.copy(alpha = 0.25f), CircleShape),
+                    .size(36.dp)
+                    .background(Color(0xFF252525), RoundedCornerShape(10.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
-                    contentDescription = title,
-                    tint = accent,
-                    modifier = Modifier.size(20.dp)
+                    null,
+                    tint = Color(0xFFFF9800),
+                    modifier = Modifier.size(18.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // Textos
             Column(
                 modifier = Modifier.weight(1f) // ocupa el espacio del centro
             ) {
                 Text(
-                    text = title,
+                    text = titulo,
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
 
-                if (subtitle != null) {
+                if (subtitulo != null) {
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = subtitle,
-                        color = Color(0xFF9E9E9E),
-                        fontSize = 12.sp
+                        text = subtitulo,
+                        color = Color.White.copy(alpha = 0.6f),
+                        fontSize = 10.sp
                     )
                 }
             }
+            Icon(
+                Icons.Default.ChevronRight,
+                null,
+                tint = Color.White.copy(alpha = 0.4f),
+                modifier = Modifier.size(16.dp)
+            )
+        }
+    }
+}
 
+@Composable
+fun CerrarSesionButton() {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(0x1AFF3B30)),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { Log.i("MyApp", "Cerrar sesión clicked") },
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x33FF3B30))
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            contentAlignment = Alignment.Center
+        ) {
             Text(
-                text = "›",
-                color = Color(0xFF7A7A7A),
-                fontSize = 22.sp
+                "Cerrar sesión",
+                color = Color(0xFFFF3B30),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }
