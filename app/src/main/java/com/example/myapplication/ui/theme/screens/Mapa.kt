@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.theme.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import com.example.myapplication.R
 import com.example.myapplication.ui.theme.model.GpsPoint
 
@@ -43,7 +44,7 @@ fun Mapa() {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0B0B0F))
+            .background(Color(0xFF0B0B0B))
     ) {
 
         item {
@@ -128,10 +129,10 @@ fun Mapa() {
 @Composable
 fun DestinationCard(modifier: Modifier = Modifier) {
 
-    Surface(
-        modifier = modifier.fillMaxWidth(),
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1F)),
         shape = RoundedCornerShape(16.dp),
-        color = Color(0xFF1A1A1F)
+        modifier = modifier.fillMaxWidth()
     ) {
 
         Row(
@@ -166,10 +167,10 @@ fun DestinationCard(modifier: Modifier = Modifier) {
 @Composable
 fun StatusCard(modifier: Modifier = Modifier) {
 
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        color = Color(0xFF1A1A1F)
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1F)),
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.fillMaxWidth()
     ) {
 
         Column(modifier = Modifier.padding(16.dp)) {
@@ -204,7 +205,7 @@ fun StatusCard(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { },
+                onClick = { Log.i("MyApp", "Validar llegada ") },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFFF9800)
                 ),
@@ -227,10 +228,10 @@ fun InfoBox(
     valueColor: Color = Color.White,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
-        color = Color(0xFF121217)
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF121217)),
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(title, color = Color.Gray, fontSize = 11.sp)
@@ -238,4 +239,5 @@ fun InfoBox(
         }
     }
 }
+
 

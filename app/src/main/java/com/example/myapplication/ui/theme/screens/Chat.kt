@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.theme.screens
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -85,7 +86,12 @@ fun Chat() {
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopBar()
-        Divider(color = Color(0x1AFFFFFF))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(Color(0x1AFFFFFF))
+        )
         Box(modifier = Modifier.weight(1f)) {
             LazyColumn(
                 modifier = Modifier
@@ -138,7 +144,7 @@ fun Chat() {
                             )
                         },
                         trailingIcon = {
-                            IconButton(onClick = { /* galleria */ }) {
+                            IconButton(onClick = { Log.i("MyApp", "Adjuntar imagen") }) {
                                 Icon(
                                     imageVector = Icons.Default.Photo,
                                     contentDescription = "Foto",
@@ -167,6 +173,7 @@ fun Chat() {
                                         isMe = true
                                     )
                                 )
+                                Log.i("MyApp", "Se envió el mensaje")
                                 inputText = ""
                             }
                         },
@@ -219,7 +226,7 @@ fun TopBar() {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        IconButton(onClick = { }) {
+        IconButton(onClick = { Log.i("MyApp", "Menu") }) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
                 contentDescription = "Más",
@@ -316,8 +323,8 @@ fun Bubble(isMe: Boolean, bubbleColor: Color, content: @Composable () -> Unit) {
 @Composable
 fun AvatarInitials(initial: String, isMe: Boolean) {
     val bg = if (isMe) Color(0xFFFF9800) else Color(0xFF2B2B2B)
-    val text = if (initial == "Tu") "TU" else initial.split(" ").getOrNull(0)?.firstOrNull()?.toString()
-        ?: "CR"
+    val text = if (initial == "Tu") "TU"
+                else initial.split(" ").getOrNull(0)?.firstOrNull()?.toString() ?: "?"
     Box(
         modifier = Modifier
             .size(36.dp)

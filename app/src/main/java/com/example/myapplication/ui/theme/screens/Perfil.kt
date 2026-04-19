@@ -29,30 +29,27 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun Perfil() {
 
-    val accent = Color(0xFFF2823D)
+    val accent = Color(0xFFFF9800)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(Color(0xFF0B0B0B))
             .navigationBarsPadding() // respeta la barra inferior
             .padding(16.dp)
     )
    {
-
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-
             Box(
                 modifier = Modifier
                     .size(90.dp)
@@ -74,7 +71,7 @@ fun Perfil() {
             ) {
                 Text(
                     text = "Nombre de Usuario",
-                    style = MaterialTheme.typography.titleLarge,
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
@@ -83,7 +80,7 @@ fun Perfil() {
 
                 Text(
                     text = "Correo Electrónico",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 14.sp,
                     color = Color(0xFFBDBDBD)
                 )
 
@@ -91,7 +88,7 @@ fun Perfil() {
 
                 Text(
                     text = "ID: 8414852",
-                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 14.sp,
                     color = accent,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -147,7 +144,7 @@ fun Perfil() {
                Text(
                    text = "Cerrar sesión",
                    color = Color(0xFFFF6B6B),
-                   style = MaterialTheme.typography.bodyLarge,
+                   fontSize = 16.sp,
                    fontWeight = FontWeight.Bold
                )
            }
@@ -157,7 +154,7 @@ fun Perfil() {
 
 
 @Composable
-private fun MenuItem(
+fun MenuItem(
     icon: ImageVector,
     title: String,
     subtitle: String? = null,
@@ -202,7 +199,7 @@ private fun MenuItem(
                 Text(
                     text = title,
                     color = Color.White,
-                    style = MaterialTheme.typography.bodyLarge,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
 
@@ -211,7 +208,7 @@ private fun MenuItem(
                     Text(
                         text = subtitle,
                         color = Color(0xFF9E9E9E),
-                        style = MaterialTheme.typography.bodySmall
+                        fontSize = 12.sp
                     )
                 }
             }
@@ -219,7 +216,7 @@ private fun MenuItem(
             Text(
                 text = "›",
                 color = Color(0xFF7A7A7A),
-                style = MaterialTheme.typography.titleLarge
+                fontSize = 22.sp
             )
         }
     }

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.remote.creation.compose.state.log
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,27 +30,16 @@ fun Carreras(){
             .padding(horizontal = 16.dp),
         contentPadding = PaddingValues(bottom = 100.dp)
     ) {
-
         item { Spacer(modifier = Modifier.height(24.dp)) }
-
         item { CarreraActivaBadge() }
-
         item { Spacer(modifier = Modifier.height(12.dp)) }
-
         item { HeaderRuta() }
-
         item { Spacer(modifier = Modifier.height(24.dp)) }
-
         item { ProgresoSection() }
-
         item { Spacer(modifier = Modifier.height(24.dp)) }
-
         item { PuntosDeControlSection() }
-
         item { Spacer(modifier = Modifier.height(24.dp)) }
-
         item { ClasificacionSection() }
-
         item { Spacer(modifier = Modifier.height(24.dp)) }
     }
 }
@@ -75,7 +65,6 @@ fun CarreraActivaBadge() {
 
 @Composable
 fun HeaderRuta() {
-
     Column {
         Text(
             text = "Ruta Centro Histórico",
@@ -83,9 +72,7 @@ fun HeaderRuta() {
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
-
         Spacer(modifier = Modifier.height(8.dp))
-
         Row(verticalAlignment = Alignment.CenterVertically) {
 
             Icon(Icons.Default.AccessTime, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
@@ -109,9 +96,7 @@ fun HeaderRuta() {
 
 @Composable
 fun ProgresoSection() {
-
     Column {
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -137,9 +122,7 @@ fun ProgresoSection() {
 
 @Composable
 fun PuntosDeControlSection() {
-
     Column {
-
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.LocationOn, null, tint = Color(0xFFFF9800))
             Spacer(modifier = Modifier.width(8.dp))
@@ -168,7 +151,6 @@ fun PuntoItem(
     completado: Boolean = false,
     siguiente: Boolean = false
 ) {
-
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1C)),
         shape = RoundedCornerShape(20.dp),
@@ -199,13 +181,11 @@ fun PuntoItem(
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-
                 Text(
                     titulo,
                     color = if (completado) Color.White else Color.Gray,
                     fontWeight = FontWeight.Medium
                 )
-
                 if (hora.isNotEmpty()) {
                     Text(
                         hora,
@@ -214,7 +194,6 @@ fun PuntoItem(
                     )
                 }
             }
-
             if (siguiente) {
                 Button(
                     onClick = { },
@@ -232,9 +211,7 @@ fun PuntoItem(
 
 @Composable
 fun ClasificacionSection() {
-
     Column {
-
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Star, null, tint = Color(0xFFFF9800))
             Spacer(modifier = Modifier.width(8.dp))
@@ -259,7 +236,6 @@ fun RankingItem(
     nombre: String,
     iniciales: String
 ) {
-
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1C)),
         shape = RoundedCornerShape(20.dp),
@@ -272,15 +248,12 @@ fun RankingItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Text(
                 posicion.toString(),
                 color = Color.White,
                 fontWeight = FontWeight.Bold
             )
-
             Spacer(modifier = Modifier.width(16.dp))
-
             Box(
                 modifier = Modifier
                     .size(36.dp)
@@ -289,15 +262,12 @@ fun RankingItem(
             ) {
                 Text(iniciales, color = Color.White)
             }
-
             Spacer(modifier = Modifier.width(16.dp))
-
             Text(
                 nombre,
                 color = Color.White,
                 modifier = Modifier.weight(1f)
             )
-
             Text(
                 "3 pts",
                 color = Color.Gray

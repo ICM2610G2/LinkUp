@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.theme.screens
 
 
+import android.util.Log
 import com.example.myapplication.R
 
 import androidx.compose.runtime.Composable
@@ -47,7 +48,7 @@ fun Home () {
 
         item {
             Spacer(modifier = Modifier.height(24.dp))
-            RutasHeader({  })
+            RutasHeader({ Log.i("MyApp", "Crear ruta") })
         }
 
         item {
@@ -57,7 +58,7 @@ fun Home () {
                 puntos = "12",
                 dificultad = "Media",
                 dificultadColor = Color(0xFFFFB300),
-                onClick = {}
+                onClick = {Log.i("MyApp", "La Candelaria")}
             )
         }
 
@@ -68,7 +69,7 @@ fun Home () {
                 puntos = "5",
                 dificultad = "Difícil",
                 dificultadColor = Color(0xFFE53935),
-                onClick = {}
+                onClick = {Log.i("MyApp", "Monserrate")}
             )
         }
 
@@ -263,7 +264,8 @@ fun RutaItem(
                 Text(
                     dificultad,
                     color = Color.White,
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
@@ -296,7 +298,7 @@ fun InvitarCard() {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { },
+                onClick = {Log.i("MyApp", "Compartir NFC") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFFF9800)
