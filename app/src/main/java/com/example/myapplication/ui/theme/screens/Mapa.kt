@@ -1,7 +1,9 @@
 package com.example.myapplication.ui.theme.screens
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.myapplication.R
 import com.example.myapplication.ui.theme.model.GpsPoint
 
@@ -31,9 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.random.Random
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun Mapa() {
+    var mostrarValidarFoto by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -61,8 +65,21 @@ fun Mapa() {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, bottom = 100.dp)
+                .padding(start = 16.dp, end = 16.dp, bottom = 100.dp),
+            onValidarFoto = {
+                Log.i("MyApp", "Validar foto")
+                mostrarValidarFoto = true }
         )
+        if (mostrarValidarFoto) {
+            ValidarFoto(
+                nombreLugar = "Plaza de Bolívar",
+                onCerrar = { mostrarValidarFoto = false },
+                onConfirmar = {
+                    Log.i("MyApp", "Llegada confirmada: Plaza de Bolívar")
+                    mostrarValidarFoto = false
+                }
+            )
+        }
     }
 }
 
@@ -339,7 +356,7 @@ fun BotonesLaterales(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CardInferior(modifier: Modifier = Modifier) {
+fun CardInferior(modifier: Modifier = Modifier, onValidarFoto: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xF21A1A1A)),
         shape = RoundedCornerShape(16.dp),
@@ -401,7 +418,7 @@ fun CardInferior(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Button(
-                onClick = { Log.i("MyApp", "Validar llegada clicked") },
+                onClick = onValidarFoto,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = RoundedCornerShape(12.dp)

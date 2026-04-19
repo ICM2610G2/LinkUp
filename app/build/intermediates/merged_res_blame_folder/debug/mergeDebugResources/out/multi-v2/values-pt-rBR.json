@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.myapplication.app-mergeDebugResources-57:/values-pt-rBR/values-pt-rBR.xml",
+            "outputFile": "com.example.myapplication.app-mergeDebugResources-65:/values-pt-rBR/values-pt-rBR.xml",
             "map": [
                 {
                     "source": "C:\\Users\\DELL\\.gradle\\caches\\9.2.1\\transforms\\a8de81775aae3ed3888f883264e557cc\\workspace\\transformed\\core-1.17.0\\res\\values-pt-rBR\\values-pt-rBR.xml",

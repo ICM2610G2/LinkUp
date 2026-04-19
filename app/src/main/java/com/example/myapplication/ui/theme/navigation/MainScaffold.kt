@@ -1,5 +1,7 @@
 package com.example.myapplication.ui.theme.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.material3.Scaffold
@@ -14,19 +16,26 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScaffold() {
-
-    // rememberNavController() crea y "recuerda" el NavController entre recomposiciones.
     val navController = rememberNavController()
-
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
+    val mostrarBottomBar = currentRoute != "login"
 
     Scaffold(
         bottomBar = {
-            BottomBar(navController = navController)
+            if (mostrarBottomBar) {
+                BottomBar(navController = navController)
+            }
         }
     ) { innerPadding ->
-        AppNavGraph(navController = navController, innerPadding)
+        AppNavGraph(
+            navController = navController,
+            innerPadding,
+            startDestination = "login"
+        )
     }
 }
 

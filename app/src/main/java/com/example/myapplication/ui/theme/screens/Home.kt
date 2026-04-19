@@ -14,6 +14,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
@@ -26,45 +30,119 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun Home () {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF0B0B0B)),
-        contentPadding = PaddingValues(bottom = 100.dp)
-    ) {
-        item { HeaderSection() }
-        item { Spacer(modifier = Modifier.height(16.dp)) }
-        item { CarreraEnCursoCard() }
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
-            RutasHeader({ Log.i("MyApp", "Crear ruta") })
+    var mostrarCrearPunto by remember { mutableStateOf(false) }
+    var mostrarMenuFlotante by remember { mutableStateOf(false) }
+    var mostrarCrearCarrera by remember { mutableStateOf(false) }
+    var mostrarNFC by remember { mutableStateOf(false) }
+    var mostrarAmigos by remember { mutableStateOf(false) }
+    var lugarSeleccionado by remember { mutableStateOf<String?>(null) }
+
+    Box(modifier = Modifier.fillMaxSize()){
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF0B0B0B)),
+            contentPadding = PaddingValues(bottom = 100.dp)
+        ) {
+            item { HeaderSection() }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item { CarreraEnCursoCard() }
+            item {
+                RutasHeader({
+                    Log.i("MyApp", "Crear ruta")
+                    mostrarCrearCarrera = true})
+            }
+            item {
+                RutaItem(
+                    titulo = "La Candelaria",
+                    distancia = "2.5 km",
+                    puntos = "12",
+                    dificultad = "Media",
+                    dificultadColor = Color(0xFFFFB300),
+                    imageRes = R.drawable.la_candelaria,
+                    onClick = {Log.i("MyApp", "La Candelaria")
+                    lugarSeleccionado = "La Candelaria"}
+                )
+            }
+            item {
+                RutaItem(
+                    titulo = "Monserrate",
+                    distancia = "4.8 km",
+                    puntos = "5",
+                    dificultad = "Difícil",
+                    dificultadColor = Color(0xFFE53935),
+                    imageRes = R.drawable.monserrate,
+                    onClick = {Log.i("MyApp", "Monserrate")
+                    lugarSeleccionado = "Monserrate"}
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                InvitarCard(onNFC = {
+                    Log.i("MyApp", "Compartir NFC")
+                    mostrarNFC = true
+                })
+            }
+            item{Spacer(modifier = Modifier.height(24.dp))}
         }
-        item {
-            RutaItem(
-                titulo = "La Candelaria",
-                distancia = "2.5 km",
-                puntos = "12",
-                dificultad = "Media",
-                dificultadColor = Color(0xFFFFB300),
-                imageRes = R.drawable.la_candelaria,
-                onClick = {Log.i("MyApp", "La Candelaria")}
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 16.dp, bottom = 100.dp)
+                .size(56.dp)
+                .background(Color(0xFF2A9D8F), CircleShape)
+                .clickable {
+                    Log.i("MyApp", "Menu flotante clicked")
+                    mostrarMenuFlotante = true
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(Icons.Default.Add, null, tint = Color.White, modifier = Modifier.size(28.dp))
+        }
+
+        // Modales
+        if (mostrarMenuFlotante) {
+            MenuFlotante(
+                onCerrar = { mostrarMenuFlotante = false },
+                onCrearCarrera = { mostrarCrearCarrera = true },
+                onInvitarNFC = { mostrarNFC = true },
+                onVerAmigos = { mostrarAmigos = true }
             )
         }
-        item {
-            RutaItem(
-                titulo = "Monserrate",
-                distancia = "4.8 km",
-                puntos = "5",
-                dificultad = "Difícil",
-                dificultadColor = Color(0xFFE53935),
-                imageRes = R.drawable.monserrate,
-                onClick = {Log.i("MyApp", "Monserrate")}
+
+        if (mostrarCrearCarrera) {
+            CrearCarrera(
+                onCerrar = { mostrarCrearCarrera = false },
+                onIniciar = {
+                    Log.i("MyApp", "Carrera iniciada desde Home")
+                    mostrarCrearCarrera = false
+                }
             )
         }
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
-            InvitarCard()
-            Spacer(modifier = Modifier.height(24.dp))
+
+        if (mostrarCrearPunto) {
+            CrearPunto(
+                onCerrar = { mostrarCrearPunto = false },
+                onPublicar = {
+                    Log.i("MyApp", "Punto publicado desde Home")
+                    mostrarCrearPunto = false
+                }
+            )
+        }
+
+        if (mostrarNFC) {
+            InvitarNFC(onCerrar = { mostrarNFC = false })
+        }
+
+        if (mostrarAmigos) {
+            ListaAmigos(onCerrar = { mostrarAmigos = false })
+        }
+
+        if (lugarSeleccionado != null) {
+            GaleriaLugar(
+                nombreLugar = lugarSeleccionado!!,
+                onCerrar = { lugarSeleccionado = null }
+            )
         }
     }
 }
@@ -330,7 +408,7 @@ fun RutaItem(
 }
 
 @Composable
-fun InvitarCard() {
+fun InvitarCard(onNFC: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1C)),
         shape = RoundedCornerShape(20.dp),
@@ -339,7 +417,6 @@ fun InvitarCard() {
             .padding(horizontal = 16.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-
             Text(
                 "Invita a tus amigos",
                 color = Color.White,
@@ -354,7 +431,7 @@ fun InvitarCard() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = {Log.i("MyApp", "Compartir NFC") },
+                onClick = onNFC,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFFF9800)

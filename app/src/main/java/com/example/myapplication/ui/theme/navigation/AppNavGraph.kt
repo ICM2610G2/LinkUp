@@ -1,5 +1,7 @@
 package com.example.myapplication.ui.theme.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -19,45 +21,41 @@ import com.example.myapplication.ui.theme.screens.Home
 import com.example.myapplication.ui.theme.screens.Mapa
 import com.example.myapplication.ui.theme.screens.Carreras
 import com.example.myapplication.ui.theme.screens.Chat
+import com.example.myapplication.ui.theme.screens.Login
 import com.example.myapplication.ui.theme.screens.Perfil
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    paddingValues: PaddingValues = PaddingValues(),
-    startDestination: String = BottomNavItem.Home.route
+    paddingValues: PaddingValues,
+    startDestination: String = "login"
 ) {
-
-    //  NavHost: Es el contenedor que muestra la pantalla correspondiente a la ruta actual.
-     // Cada vez que se navega se cambia el destino y se renderiza el composable asociado.
 
     NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = Modifier.padding(paddingValues)
     ) {
-       // Composable para cada pantalla, con su ruta y contenido.
-
+        composable("login") {
+            Login(onLoginSuccess = {
+                navController.navigate(BottomNavItem.Home.route) {
+                    popUpTo("login") { inclusive = true }
+                }
+            })
+        }
         composable(BottomNavItem.Home.route) {
-            // Muestra la pantalla Home
             Home()
         }
-
         composable(BottomNavItem.Mapa.route) {
-            // Muestra la pantalla Mapa
             Mapa()
         }
-
         composable(BottomNavItem.Carreras.route) {
-            // Muestra la pantalla Carreras
             Carreras()
         }
-
         composable(BottomNavItem.Chat.route) {
-            // Muestra la pantalla Chat
             Chat()
         }
-
         composable(BottomNavItem.Perfil.route) {
             // Muestra la pantalla Perfil
             Perfil()
