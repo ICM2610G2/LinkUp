@@ -46,8 +46,13 @@ dependencies {
     // Material 3 (si no lo tienes)
     implementation("androidx.compose.material3:material3:1.2.1")
 
+
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
     // Iconos (para los íconos de la barra)
     implementation("androidx.compose.material:material-icons-extended:1.6.8")
+
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -84,4 +89,5 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.37.3")
     implementation("org.osmdroid:osmdroid-android:6.1.20")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }

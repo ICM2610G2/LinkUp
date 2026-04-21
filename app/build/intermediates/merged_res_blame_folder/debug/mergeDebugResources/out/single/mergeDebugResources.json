@@ -1,86 +1,90 @@
 [
     {
-        "merged": "com.example.myapplication.app-debug-67:/mipmap-mdpi_ic_launcher.webp.flat",
-        "source": "com.example.myapplication.app-main-69:/mipmap-mdpi/ic_launcher.webp"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\xml_data_extraction_rules.xml.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\xml\\data_extraction_rules.xml"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/mipmap-xhdpi_ic_launcher.webp.flat",
-        "source": "com.example.myapplication.app-main-69:/mipmap-xhdpi/ic_launcher.webp"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\mipmap-xhdpi\\ic_launcher.webp"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/drawable_ic_launcher_background.xml.flat",
-        "source": "com.example.myapplication.app-main-69:/drawable/ic_launcher_background.xml"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\drawable_bogota_bg.jpg.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\drawable\\bogota_bg.jpg"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/mipmap-mdpi_ic_launcher_round.webp.flat",
-        "source": "com.example.myapplication.app-main-69:/mipmap-mdpi/ic_launcher_round.webp"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\mipmap-xxhdpi\\ic_launcher.webp"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/xml_backup_rules.xml.flat",
-        "source": "com.example.myapplication.app-main-69:/xml/backup_rules.xml"
+        "merged": "com.example.myapplication.app-debug-70:/xml_file_paths.xml.flat",
+        "source": "com.example.myapplication.app-main-72:/xml/file_paths.xml"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
-        "source": "com.example.myapplication.app-main-69:/mipmap-xxhdpi/ic_launcher_round.webp"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\mipmap-xhdpi\\ic_launcher_round.webp"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/drawable_monserrate.jpeg.flat",
-        "source": "com.example.myapplication.app-main-69:/drawable/monserrate.jpeg"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\drawable_monserrate.jpeg.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\drawable\\monserrate.jpeg"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/mipmap-xxhdpi_ic_launcher.webp.flat",
-        "source": "com.example.myapplication.app-main-69:/mipmap-xxhdpi/ic_launcher.webp"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\mipmap-xxhdpi\\ic_launcher_round.webp"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/drawable_ic_launcher_foreground.xml.flat",
-        "source": "com.example.myapplication.app-main-69:/drawable/ic_launcher_foreground.xml"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\drawable_ic_launcher_background.xml.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\drawable\\ic_launcher_background.xml"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/mipmap-xxxhdpi_ic_launcher.webp.flat",
-        "source": "com.example.myapplication.app-main-69:/mipmap-xxxhdpi/ic_launcher.webp"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\drawable_ic_launcher_foreground.xml.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\drawable\\ic_launcher_foreground.xml"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/mipmap-xhdpi_ic_launcher_round.webp.flat",
-        "source": "com.example.myapplication.app-main-69:/mipmap-xhdpi/ic_launcher_round.webp"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\mipmap-hdpi\\ic_launcher_round.webp"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
-        "source": "com.example.myapplication.app-main-69:/mipmap-xxxhdpi/ic_launcher_round.webp"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\mipmap-xxxhdpi\\ic_launcher_round.webp"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/xml_data_extraction_rules.xml.flat",
-        "source": "com.example.myapplication.app-main-69:/xml/data_extraction_rules.xml"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\xml_backup_rules.xml.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\xml\\backup_rules.xml"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/mipmap-hdpi_ic_launcher.webp.flat",
-        "source": "com.example.myapplication.app-main-69:/mipmap-hdpi/ic_launcher.webp"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\mipmap-hdpi\\ic_launcher.webp"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/drawable_map_background.jpg.flat",
-        "source": "com.example.myapplication.app-main-69:/drawable/map_background.jpg"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/drawable_museum_sample.jpg.flat",
-        "source": "com.example.myapplication.app-main-69:/drawable/museum_sample.jpg"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\mipmap-mdpi\\ic_launcher.webp"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "com.example.myapplication.app-main-69:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\mipmap-xxxhdpi\\ic_launcher.webp"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/mipmap-hdpi_ic_launcher_round.webp.flat",
-        "source": "com.example.myapplication.app-main-69:/mipmap-hdpi/ic_launcher_round.webp"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\drawable_museum_sample.jpg.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\drawable\\museum_sample.jpg"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/drawable_la_candelaria.jpeg.flat",
-        "source": "com.example.myapplication.app-main-69:/drawable/la_candelaria.jpeg"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\drawable_map_background.jpg.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\drawable\\map_background.jpg"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/drawable_bogota_bg.jpg.flat",
-        "source": "com.example.myapplication.app-main-69:/drawable/bogota_bg.jpg"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\mipmap-mdpi\\ic_launcher_round.webp"
     },
     {
-        "merged": "com.example.myapplication.app-debug-67:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "com.example.myapplication.app-main-69:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\drawable_la_candelaria.jpeg.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\drawable\\la_candelaria.jpeg"
+    },
+    {
+        "merged": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-debug-70:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\galix\\.gradle\\daemon\\9.2.1\\com.example.myapplication.app-main-72:\\mipmap-anydpi-v26\\ic_launcher.xml"
     }
 ]
