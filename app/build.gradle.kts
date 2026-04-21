@@ -41,7 +41,7 @@ android {
 
 dependencies {
     // Navigation para Compose
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+    //implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Material 3 (si no lo tienes)
     implementation("androidx.compose.material3:material3:1.2.1")
@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
@@ -78,4 +79,9 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.3.0")
     implementation("androidx.camera:camera-lifecycle:1.3.0")
     implementation("androidx.camera:camera-view:1.3.0")
+
+    implementation("com.github.MKergall:osmbonuspack:6.8.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.37.3")
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 }
