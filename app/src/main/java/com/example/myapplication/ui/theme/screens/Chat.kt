@@ -329,7 +329,7 @@ fun ChatInputArea(
             .fillMaxWidth()
             .background(Color(0xFF1A1A1A))
             .padding(horizontal = 16.dp, vertical = 12.dp)
-            .padding(bottom = 80.dp),
+            /*.padding(bottom = 80.dp)*/,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {

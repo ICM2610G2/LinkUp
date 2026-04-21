@@ -1,12 +1,19 @@
 package com.example.myapplication.ui.theme.screens
 
 import android.annotation.SuppressLint
+import android.content.Context.SENSOR_SERVICE
+import android.content.pm.PackageManager
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Build
+import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.myapplication.R
-import com.example.myapplication.ui.theme.model.GpsPoint
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,55 +34,259 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlin.random.Random
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.ui.theme.model.Destino
+import com.example.myapplication.ui.theme.model.MapsViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Polyline
+import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
 
-@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun LocationPermission() {
+    val locationPermissionState = rememberPermissionState(
+        android.Manifest.permission.ACCESS_FINE_LOCATION
+    )
+    if (locationPermissionState.status.isGranted) {
+        GPSContents()
+    }
+}
+
+@Composable
+fun GPSContents() {
+    //("Not yet implemented")
+}
+
+//@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-fun Mapa() {
+fun Mapa(
+    modifier: Modifier = Modifier,
+    viewModel: MapsViewModel = viewModel()
+) {
+    LocationPermission()
+
+    val context = LocalContext.current
+    val state by viewModel.state.collectAsState()
+
+    var place by remember { mutableStateOf("") }
+    var isDarkMode by remember { mutableStateOf(true) }
+
+    // Sensor de luminosidad
+    val sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
+    val lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+
+    val sensorListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent?) {
+            if (event?.sensor?.type == Sensor.TYPE_LIGHT) {
+                val lux = event.values[0]
+                Log.i("MapApp", lux.toString())
+                isDarkMode = lux < 20.0f
+            }
+        }
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+    }
+
+    DisposableEffect(Unit) {
+        sensorManager.registerListener(sensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        onDispose { sensorManager.unregisterListener(sensorListener) }
+    }
+
+    Location { viewModel.onLocationUpdate(it) }
+
     var mostrarValidarFoto by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0A0A0A))
     ) {
-        MapaFondo()
-        MarcadorDestino(
-            modifier = Modifier.align(Alignment.Center).offset(y = (-60).dp)
+        // ── Mapa OSM ──────────────────────────────────────────────────────────
+        AndroidView(
+            modifier = modifier.matchParentSize(),
+            factory = { ctx ->
+                Configuration.getInstance().userAgentValue = ctx.packageName
+
+                val mapView = MapView(ctx)
+                mapView.setTileSource(TileSourceFactory.MAPNIK)
+                mapView.setMultiTouchControls(true)
+                mapView.controller.setZoom(18.0)
+
+                val startPoint = GeoPoint(4.627293, -74.063228)
+                mapView.controller.setCenter(startPoint)
+
+                // Marcador del usuario (índice 0 en el tag)
+                val userMarker = Marker(mapView)
+                userMarker.position = startPoint
+                // tag: [userMarker, searchMarker?, longClickMarker?, destinoMarkers...]
+                mapView.tag = mutableListOf<Any?>(userMarker, null, null)
+                mapView.overlays.add(userMarker)
+
+                // Marcadores de destinos fijos
+                viewModel.destinos.forEach { destino ->
+                    val m = Marker(mapView)
+                    m.position = destino.punto
+                    m.title = destino.nombre
+                    // Icono personalizado si tienes uno, si no usa el por defecto
+                    // m.icon = ContextCompat.getDrawable(ctx, R.drawable.ic_destino)
+                    m.setOnMarkerClickListener { _, _ ->
+                        viewModel.onDestinoClick(destino)
+                        true   // consumimos el click → no muestra el label por defecto
+                    }
+                    mapView.overlays.add(m)
+                }
+
+                // Long-click en el mapa
+                val overlayEvents = MapEventsOverlay(object : MapEventsReceiver {
+                    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean = false
+                    override fun longPressHelper(p: GeoPoint?): Boolean {
+                        //p?.let { viewModel.onLongClick(GeoPoint(it.latitude, it.longitude)) }
+                        return true
+                    }
+                })
+                mapView.overlays.add(overlayEvents)
+                mapView
+            },
+            update = { mapView ->
+                //@Suppress("UNCHECKED_CAST")
+                val tags = mapView.tag as MutableList<Any?>
+                val userMarker = tags[0] as Marker
+                var changed = false
+
+                // Modo oscuro/claro
+                if (isDarkMode) {
+                    val inverse = ColorMatrix(floatArrayOf(
+                        -1f, 0f, 0f, 0f, 255f,
+                        0f, -1f, 0f, 0f, 255f,
+                        0f, 0f, -1f, 0f, 255f,
+                        0f, 0f, 0f, 1f, 0f
+                    ))
+                    mapView.overlayManager.tilesOverlay.setColorFilter(ColorMatrixColorFilter(inverse))
+                } else {
+                    mapView.overlayManager.tilesOverlay.setColorFilter(null)
+                }
+                changed = true
+
+                // Posición del usuario
+                state.userLocation?.let {
+                    if (userMarker.position != it) {
+                        userMarker.position = it
+                        userMarker.title = state.userAddress
+                        mapView.controller.setCenter(it)
+                        changed = true
+                    }
+                }
+
+                // Marcador de búsqueda
+                /*state.searchedLocation?.let { loc ->
+                    val searchMarker = tags[1] as? Marker
+                        ?: Marker(mapView).also {
+                            mapView.overlays.add(it)
+                            tags[1] = it
+                        }
+                    if (searchMarker.position != loc) {
+                        searchMarker.position = loc
+                        searchMarker.title = state.searchedAddress
+                        mapView.controller.setCenter(loc)
+                        changed = true
+                    }
+                }*/
+
+                // Marcador de long-click
+                /*state.longClickLocation?.let { loc ->
+                    val longClickMarker = tags[2] as? Marker
+                        ?: Marker(mapView).also {
+                            mapView.overlays.add(it)
+                            tags[2] = it
+                        }
+                    if (longClickMarker.position != loc) {
+                        longClickMarker.position = loc
+                        longClickMarker.title = state.longClickAddress
+                        changed = true
+                    }
+                }*/
+
+                // Overlay de ruta
+                state.roadOverlay?.let { overlay ->
+                    mapView.overlays.removeIf { it is Polyline }
+                    mapView.overlays.add(overlay)
+                    changed = true
+                }
+
+                // Si no hay overlay activo, limpia polylines
+                if (state.roadOverlay == null) {
+                    if (mapView.overlays.any { it is Polyline }) {
+                        mapView.overlays.removeIf { it is Polyline }
+                        changed = true
+                    }
+                }
+
+                if (changed) mapView.invalidate()
+            }
         )
-        MarcadorUsuario(
-            modifier = Modifier.align(Alignment.Center).offset(y = 80.dp)
-        )
-        PuntosVisitados()
-        DestinoCard(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(start = 16.dp, end = 80.dp, top = 60.dp)
-        )
+
+        // ── DestinoCard: visible solo cuando hay destino seleccionado ─────────
+        if (state.selectedDestino != null) {
+            DestinoCard(
+                destino = state.selectedDestino!!,
+                distanciaMetros = state.distanciaAlDestino,
+                onCerrar = { viewModel.onCerrarDestino() },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 14.dp, end = 92.dp, top = 14.dp)
+            )
+        }
+
+        // ── Botones laterales ─────────────────────────────────────────────────
         BotonesLaterales(
+            mostrandoRutaCompleta = state.mostrandoRutaCompleta,
+            onToggleRutaCompleta = { viewModel.onToggleRutaCompleta() },
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 60.dp, end = 16.dp)
+                .padding(top = 10.dp, end = 14.dp)
         )
-        CardInferior(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .navigationBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, bottom = 100.dp),
-            onValidarFoto = {
-                Log.i("MyApp", "Validar foto")
-                mostrarValidarFoto = true }
-        )
+
+        // ── CardInferior: visible solo cuando hay destino seleccionado ────────
+        if (state.selectedDestino != null) {
+            CardInferior(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
+                    .padding(start = 10.dp, end = 14.dp, bottom = 20.dp),
+                onValidarFoto = {
+                    Log.i("MyApp", "Validar foto")
+                    mostrarValidarFoto = true
+                }
+            )
+        }
+
         if (mostrarValidarFoto) {
             ValidarFoto(
-                nombreLugar = "Plaza de Bolívar",
+                nombreLugar = state.selectedDestino?.nombre ?: "Destino",
                 onCerrar = { mostrarValidarFoto = false },
                 onConfirmar = {
-                    Log.i("MyApp", "Llegada confirmada: Plaza de Bolívar")
+                    Log.i("MyApp", "Llegada confirmada: ${state.selectedDestino?.nombre}")
                     mostrarValidarFoto = false
                 }
             )
@@ -83,176 +294,25 @@ fun Mapa() {
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// DestinoCard — ahora recibe datos dinámicos del destino seleccionado
+// ─────────────────────────────────────────────────────────────────────────────
 @Composable
-fun MapaFondo() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .drawBehind {
-                dibujarMapa(this)
-            }
-    )
-}
-
-fun dibujarMapa(scope: DrawScope) {
-    val naranja = Color(0xFFFF9800)
-    val naranjaClaro = Color(0xFFFFA500)
-    val gridSize = 80.dp.value * scope.density
-
-    // Grid de fondo
-    var x = 0f
-    while (x < scope.size.width) {
-        scope.drawLine(
-            color = naranja.copy(alpha = 0.15f),
-            start = Offset(x, 0f),
-            end = Offset(x, scope.size.height),
-            strokeWidth = 1f
-        )
-        x += gridSize
+fun DestinoCard(
+    destino: Destino,
+    distanciaMetros: Double?,
+    onCerrar: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // Formatea la distancia en metros o km
+    val distTexto = when {
+        distanciaMetros == null -> "—"
+        distanciaMetros < 1000 -> "${distanciaMetros.toInt()} m"
+        else -> "${"%.1f".format(distanciaMetros / 1000)} km"
     }
-    var y = 0f
-    while (y < scope.size.height) {
-        scope.drawLine(
-            color = naranja.copy(alpha = 0.15f),
-            start = Offset(0f, y),
-            end = Offset(scope.size.width, y),
-            strokeWidth = 1f
-        )
-        y += gridSize
-    }
+    // Estimación de tiempo caminando (~5 km/h = 83 m/min)
+    val minutos = if (distanciaMetros != null) (distanciaMetros / 83).toInt().coerceAtLeast(1) else null
 
-    // Calles principales verticales
-    scope.drawLine(naranjaClaro.copy(alpha = 0.6f), Offset(scope.size.width * 0.5f, 0f), Offset(scope.size.width * 0.5f, scope.size.height), strokeWidth = 3f)
-    scope.drawLine(naranjaClaro.copy(alpha = 0.4f), Offset(scope.size.width * 0.3f, 0f), Offset(scope.size.width * 0.3f, scope.size.height), strokeWidth = 3f)
-    scope.drawLine(naranjaClaro.copy(alpha = 0.4f), Offset(scope.size.width * 0.7f, 0f), Offset(scope.size.width * 0.7f, scope.size.height), strokeWidth = 3f)
-
-    // Calles principales horizontales
-    scope.drawLine(naranjaClaro.copy(alpha = 0.6f), Offset(0f, scope.size.height * 0.5f), Offset(scope.size.width, scope.size.height * 0.5f), strokeWidth = 3f)
-    scope.drawLine(naranjaClaro.copy(alpha = 0.4f), Offset(0f, scope.size.height * 0.3f), Offset(scope.size.width, scope.size.height * 0.3f), strokeWidth = 3f)
-    scope.drawLine(naranjaClaro.copy(alpha = 0.4f), Offset(0f, scope.size.height * 0.7f), Offset(scope.size.width, scope.size.height * 0.7f), strokeWidth = 3f)
-
-    // Círculos de la plaza
-    val cx = scope.size.width * 0.5f
-    val cy = scope.size.height * 0.35f
-    scope.drawCircle(naranja.copy(alpha = 0.5f), radius = 60.dp.value * scope.density, center = Offset(cx, cy), style = Stroke(width = 2f))
-    scope.drawCircle(naranja.copy(alpha = 0.3f), radius = 40.dp.value * scope.density, center = Offset(cx, cy), style = Stroke(width = 1f))
-}
-@Composable
-fun MarcadorDestino(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.size(64.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .size(64.dp)
-                .background(Color(0xFFFF9800), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(Color(0xFFFFA500), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Layers, null, tint = Color.White, modifier = Modifier.size(28.dp))
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .align(Alignment.TopEnd)
-                .background(Color.White, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("!", color = Color(0xFFFF9800), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        }
-    }
-}
-
-@Composable
-fun MarcadorUsuario(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.size(48.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .background(Color(0x4D22C55E), CircleShape)
-        )
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .background(Color(0xFF22C55E), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(Icons.Default.Navigation, null, tint = Color.White, modifier = Modifier.size(24.dp))
-        }
-    }
-}
-@Composable
-fun PuntosVisitados() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 120.dp, top = 220.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(Color(0xFF16A34A), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(16.dp))
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 200.dp, top = 120.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(Color(0xFF16A34A), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(16.dp))
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 220.dp, top = 260.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .background(Color(0xFF6B7280), CircleShape)
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 140.dp, top = 100.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .background(Color(0xFF6B7280), CircleShape)
-            )
-        }
-    }
-}
-
-@Composable
-fun DestinoCard(modifier: Modifier = Modifier) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xF21A1A1A)),
         shape = RoundedCornerShape(16.dp),
@@ -260,23 +320,61 @@ fun DestinoCard(modifier: Modifier = Modifier) {
         border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(
-                "DESTINO",
-                color = Color.White.copy(alpha = 0.6f),
-                fontSize = 10.sp
-            )
+
+            // Encabezado con título y botón cerrar
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("DESTINO", color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp)
+                IconButton(
+                    onClick = onCerrar,
+                    modifier = Modifier.size(20.dp)
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = Color.White.copy(alpha = 0.6f), modifier = Modifier.size(16.dp))
+                }
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(
-                "Plaza de Bolívar",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)) {
 
-            Spacer(modifier = Modifier.height(4.dp))
+                //Spacer(modifier = Modifier.height(8.dp))
+                Column(modifier = Modifier.weight(75f)) {
+                    // Nombre del destino
+                    Text(
+                        destino.nombre,
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
 
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    // Descripción breve
+                    Text(
+                        destino.descripcion,
+                        color = Color.White.copy(alpha = 0.55f),
+                        fontSize = 11.sp
+                    )
+                }
+
+                // Imagen del sitio
+                Image(
+                    painter = painterResource(id = destino.imagenRes),
+                    contentDescription = destino.nombre,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.weight(25f)
+                        .height(70.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                )
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Distancia y tiempo estimado
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -290,24 +388,35 @@ fun DestinoCard(modifier: Modifier = Modifier) {
                             .size(6.dp)
                             .background(Color(0xFFFF9800), CircleShape)
                     )
-                    Text("350m", color = Color(0xFFFF9800), fontSize = 12.sp)
+                    Text(distTexto, color = Color(0xFFFF9800), fontSize = 12.sp)
                 }
-                Text("~ 4 min", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+                if (minutos != null) {
+                    Text("~ $minutos min", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+                }
             }
         }
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// BotonesLaterales — último botón activa/desactiva ruta completa
+// ─────────────────────────────────────────────────────────────────────────────
 @Composable
-fun BotonesLaterales(modifier: Modifier = Modifier) {
+fun BotonesLaterales(
+    mostrandoRutaCompleta: Boolean,
+    onToggleRutaCompleta: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        // Botón estado del usuario (caminando / validado)
         Card(
             colors = CardDefaults.cardColors(containerColor = Color(0xF21A1A1A)),
             shape = RoundedCornerShape(16.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF)),
+            modifier = Modifier.align(Alignment.End)
         ) {
             Column(
                 modifier = Modifier.padding(10.dp),
@@ -331,30 +440,57 @@ fun BotonesLaterales(modifier: Modifier = Modifier) {
             }
         }
 
+        // Brújula
         Card(
             colors = CardDefaults.cardColors(containerColor = Color(0xF21A1A1A)),
             shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.clickable { Log.i("MyApp", "Brújula clicked") },
-            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
+            modifier = Modifier.align(Alignment.End).clickable { Log.i("MyApp", "Brújula clicked") },
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF)),
         ) {
             Box(modifier = Modifier.padding(10.dp)) {
                 Icon(Icons.Default.Explore, null, tint = Color(0xFFFF9800), modifier = Modifier.size(20.dp))
             }
         }
 
+        // Capas
         Card(
             colors = CardDefaults.cardColors(containerColor = Color(0xF21A1A1A)),
             shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.clickable { Log.i("MyApp", "Capas clicked") },
+            modifier = Modifier.align(Alignment.End).clickable { Log.i("MyApp", "Capas clicked") },
             border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
         ) {
             Box(modifier = Modifier.padding(10.dp)) {
                 Icon(Icons.Default.Layers, null, tint = Color.White, modifier = Modifier.size(20.dp))
             }
         }
+
+        // ── Botón ruta completa (ÚLTIMO botón) ────────────────────────────────
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = if (mostrandoRutaCompleta) Color(0xFFFF9800) else Color(0xF21A1A1A)
+            ),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.align(Alignment.End).clickable { onToggleRutaCompleta() },
+            border = androidx.compose.foundation.BorderStroke(
+                1.dp,
+                if (mostrandoRutaCompleta) Color(0xFFFF9800) else Color(0x1AFFFFFF)
+            )
+        ) {
+            Box(modifier = Modifier.padding(10.dp)) {
+                Icon(
+                    Icons.Default.Route,
+                    contentDescription = "Ruta completa",
+                    tint = if (mostrandoRutaCompleta) Color.White else Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// CardInferior — sin cambios en su estructura interna
+// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun CardInferior(modifier: Modifier = Modifier, onValidarFoto: () -> Unit) {
     Card(
@@ -420,7 +556,9 @@ fun CardInferior(modifier: Modifier = Modifier, onValidarFoto: () -> Unit) {
             Button(
                 onClick = onValidarFoto,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
-                modifier = Modifier.fillMaxWidth().height(50.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Icon(Icons.Default.CameraAlt, null, tint = Color.White)
@@ -463,4 +601,50 @@ fun VisualizacionBrujula() {
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun Location(onLocationUpdate: (GeoPoint) -> Unit) {
+    val context = LocalContext.current
+    val locationClient = LocationServices.getFusedLocationProviderClient(context)
+    val locationPermission = android.Manifest.permission.ACCESS_FINE_LOCATION
+    val permission = rememberPermissionState(locationPermission)
 
+    SideEffect {
+        permission.launchPermissionRequest()
+    }
+
+    val locationRequest = remember { createLocationRequest() }
+
+    if (permission.status.isGranted) {
+        val locationCallback = remember {
+            object : LocationCallback() {
+                override fun onLocationResult(result: LocationResult) {
+                    result.lastLocation?.let { loc ->
+                        onLocationUpdate(GeoPoint(loc.latitude, loc.longitude))
+                    }
+                }
+            }
+        }
+
+        DisposableEffect(Unit) {
+            if (ContextCompat.checkSelfPermission(context, locationPermission) == PackageManager.PERMISSION_GRANTED) {
+                locationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+            }
+            onDispose { locationClient.removeLocationUpdates(locationCallback) }
+        }
+    }
+}
+
+fun createLocationRequest(): LocationRequest {
+    return LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
+        .setWaitForAccurateLocation(true)
+        .setMinUpdateIntervalMillis(5000)
+        .build()
+}
+
+@Preview
+@Composable
+fun mapaPreview() {
+    //BotonesLaterales(true, viewModel())
+    //CardInferior { }
+}
