@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #Tue Apr 21 23:50:29 COT 2026
 base.0=C\:\\Users\\Nicolas\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
 base.1=C\:\\Users\\Nicolas\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
@@ -10,6 +11,18 @@ base.6=C\:\\Users\\Nicolas\\LinkUp\\app\\build\\intermediates\\dex\\debug\\merge
 base.7=C\:\\Users\\Nicolas\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\5\\classes.dex
 base.8=C\:\\Users\\Nicolas\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
 base.9=C\:\\Users\\Nicolas\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes3.dex
+=======
+#Tue Apr 21 20:31:02 COT 2026
+base.0=C\:\\Users\\galix\\Downloads\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+base.1=C\:\\Users\\galix\\Downloads\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+base.2=C\:\\Users\\galix\\Downloads\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\11\\classes.dex
+base.3=C\:\\Users\\galix\\Downloads\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\14\\classes.dex
+base.4=C\:\\Users\\galix\\Downloads\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\2\\classes.dex
+base.5=C\:\\Users\\galix\\Downloads\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\5\\classes.dex
+base.6=C\:\\Users\\galix\\Downloads\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
+base.7=C\:\\Users\\galix\\Downloads\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes3.dex
+base.8=C\:\\Users\\galix\\Downloads\\LinkUp\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes4.dex
+>>>>>>> 0d3ecbd77c6ec322bdd7dfd15199c6371177efbe
 path.0=classes.dex
 path.1=0/classes.dex
 path.10=classes4.dex
