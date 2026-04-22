@@ -27,8 +27,9 @@
     <string msgid="8875138169939072951" name="abc_shareactionprovider_share_with">"ចែករំលែក​ជា​មួយ"</string>
     <string msgid="9055268688411532828" name="abc_shareactionprovider_share_with_application">"ចែក​រំលែក​ជា​មួយ <ns1:g id="APPLICATION_NAME">%s</ns1:g>"</string>
     <string msgid="1656852541809559762" name="abc_toolbar_collapse_description">"បង្រួម"</string>
-    <string msgid="8719607706653693137" name="androidx_compose_foundation_autofill">"បំពេញស្វ័យប្រវត្តិ"</string>
-    <string msgid="1150566100598813236" name="androidx_compose_ui_autofill">"បំពេញស្វ័យប្រវត្តិ"</string>
+    <string msgid="8397015543330865059" name="android.credentials.TYPE_PASSWORD_CREDENTIAL">"ពាក្យសម្ងាត់"</string>
+    <string msgid="3929015085059320822" name="androidx.credentials.TYPE_PUBLIC_KEY_CREDENTIAL">"កូដសម្ងាត់"</string>
+    <string msgid="389117264260014992" name="autofill">"បំពេញ​ស្វ័យ​ប្រវត្តិ"</string>
     <string msgid="881409763997275156" name="call_notification_answer_action">"ឆ្លើយ"</string>
     <string msgid="8793775615905189152" name="call_notification_answer_video_action">"វីដេអូ"</string>
     <string msgid="3229508546291798546" name="call_notification_decline_action">"បដិសេធ"</string>
@@ -56,9 +57,25 @@
     <string name="common_open_on_phone">បើកតាមទូរស័ព្ទ</string>
     <string name="common_signin_button_text">ចូល</string>
     <string name="common_signin_button_text_long">ចូលដោយប្រើ Google</string>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"ប្រើពាក្យសម្ងាត់"</string>
+    <string msgid="3260749812566568062" name="copy_toast_msg">"បាន​ចម្លង​តំណ​ទៅឃ្លីបបត"</string>
     <string msgid="8038256446254964252" name="default_error_message">"ការបញ្ចូល​មិនត្រឹមត្រូវ"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"មាន​បញ្ហា​ដែល​មិន​ស្គាល់"</string>
     <string msgid="6312721426453364202" name="default_popup_window_title">"វិនដូ​លោតឡើង"</string>
     <string msgid="1890207353314751437" name="dropdown_menu">"ម៉ឺនុយធ្លាក់ចុះ"</string>
+    <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"ចម្លង​តំណ"</string>
+    <string msgid="3413186855122069269" name="fallback_menu_item_open_in_browser">"បើក​នៅក្នុង​កម្មវិធី​រុករកតាម​អ៊ីនធឺណិត"</string>
+    <string msgid="7145444925855055364" name="fallback_menu_item_share_link">"តំណចែករំលែក"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"ប៉ះ​ឧបករណ៍​ចាប់ស្នាម​ម្រាមដៃ"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"មិន​អាច​ប្រើហាតវែរ​ស្នាមម្រាមដៃបាន​ទេ។"</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"ឧបករណ៍នេះ​មិនមាន​ឧបករណ៍ចាប់​ស្នាមម្រាមដៃទេ"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"ផ្ទៀងផ្ទាត់​មិនត្រឹមត្រូវ​ច្រើនដងពេក​។ សូម​ព្យាយាម​ម្ដង​ទៀត​នៅ​ពេល​ក្រោយ​។"</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"មិន​មាន​ការ​ថតបញ្ចូល​ស្នាម​ម្រាមដៃទេ។"</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"ប្រតិបត្តិការ​ស្នាម​ម្រាម​ដៃ​ត្រូវ​បាន​បោះ​បង់​ដោយ​អ្នក​ប្រើប្រាស់។"</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"មិនអាចសម្គាល់បានទេ"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"គ្មាន​ការកំណត់​កូដ PIN លំនាំ ឬពាក្យសម្ងាត់​ទេ។"</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"ឧបករណ៍នេះ​មិនអាចប្រើកូដ PIN លំនាំ ឬពាក្យ​សម្ងាត់បានទេ។"</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"អ្នកប្រើប្រាស់​បានបោះបង់​ការផ្ទៀងផ្ទាត់ហើយ។"</string>
     <string msgid="6827826412747255547" name="in_progress">"កំពុងដំណើរការ"</string>
     <string msgid="7933458017204019916" name="indeterminate">"បានធីកខ្លះ"</string>
     <string msgid="2988463736136100848" name="m3c_bottom_sheet_collapse_description">"បង្រួម​សន្លឹកខាងក្រោម"</string>
@@ -101,15 +118,10 @@
     <string msgid="3177828188723359358" name="m3c_dropdown_menu_collapsed">"បាន​បង្រួម"</string>
     <string msgid="2360841780724299882" name="m3c_dropdown_menu_expanded">"បាន​ពង្រីក"</string>
     <string msgid="8687821690726149911" name="m3c_dropdown_menu_toggle">"បិទ/បើកម៉ឺនុយ​ធ្លាក់​ចុះ"</string>
-    <string msgid="6072492480528318635" name="m3c_floating_toolbar_collapse">"បង្រួមរបារឧបករណ៍"</string>
-    <string msgid="6880757017246780255" name="m3c_floating_toolbar_expand">"ពង្រីករបារឧបករណ៍"</string>
     <string msgid="6152806324422087846" name="m3c_search_bar_search">"ស្វែងរក"</string>
     <string msgid="6152755701819882931" name="m3c_snackbar_dismiss">"ច្រានចោល"</string>
-    <string msgid="3868801555855510515" name="m3c_snackbar_pane_title">"ជូន​ដំណឹង"</string>
     <string msgid="7655536806087401899" name="m3c_suggestions_available">"ការណែនាំខាងក្រោម"</string>
-    <string msgid="409352516511718051" name="m3c_time_input_dialog_title">"បញ្ចូលម៉ោង"</string>
     <string msgid="2786685010796619560" name="m3c_time_picker_am">"AM"</string>
-    <string msgid="7412665527536641863" name="m3c_time_picker_dialog_title">"ជ្រើសរើស​ពេលវេលា"</string>
     <string msgid="2349193472625211372" name="m3c_time_picker_hour">"ម៉ោង"</string>
     <string msgid="9179527532316922345" name="m3c_time_picker_hour_24h_suffix">"%1$d ម៉ោង"</string>
     <string msgid="8876759303332837035" name="m3c_time_picker_hour_selection">"ជ្រើសរើសម៉ោង"</string>
@@ -121,17 +133,10 @@
     <string msgid="7661234488295443182" name="m3c_time_picker_minute_text_field">"រយៈពេលប៉ុន្មាននាទី"</string>
     <string msgid="5865171949528594571" name="m3c_time_picker_period_toggle_description">"ជ្រើសរើស AM ឬ PM"</string>
     <string msgid="6616362054113087709" name="m3c_time_picker_pm">"PM"</string>
-    <string msgid="4145073906612931838" name="m3c_time_picker_toggle_keyboard">"ប្ដូរ​ទៅ​មុខងារបញ្ចូល​អក្សរសម្រាប់​ការ​បញ្ចូល​ម៉ោង"</string>
-    <string msgid="8841786098195101324" name="m3c_time_picker_toggle_touch">"ប្ដូរ​ទៅ​មុខងារ​នាឡិកា​សម្រាប់​ការ​បញ្ចូល​ម៉ោង"</string>
     <string msgid="1805687647081129904" name="m3c_tooltip_long_press_label">"បង្ហាញ​កំណត់​ពន្យល់"</string>
     <string msgid="5460405025248574620" name="m3c_tooltip_pane_description">"កំណត់​ពន្យល់"</string>
-    <string msgid="6564222473543418073" name="m3c_wide_navigation_rail_close_rail">"បិទខ្សែ"</string>
-    <string msgid="8350283435461615411" name="m3c_wide_navigation_rail_pane_title">"ខ្សែរុករក"</string>
-    <string msgid="8471891128988107974" name="mc2_snackbar_pane_title">"ជូន​ដំណឹង"</string>
     <string msgid="542007171693138492" name="navigation_menu">"ម៉ឺនុយរុករក"</string>
     <string msgid="6610465462668679431" name="not_selected">"មិនបាន​ជ្រើសរើស"</string>
-    <string msgid="1303870564366209730" name="place_autocomplete_clear_button">"សម្អាតការស្វែងរក"</string>
-    <string msgid="2809095107724486040" name="place_autocomplete_search_hint">"ស្វែងរក"</string>
     <string msgid="5941395253238309765" name="range_end">"ចំណុចបញ្ចប់"</string>
     <string msgid="7097486360902471446" name="range_start">"ចំណុចចាប់ផ្ដើម"</string>
     <string msgid="6264217191555673260" name="search_menu_title">"ស្វែងរក"</string>

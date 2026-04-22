@@ -27,8 +27,9 @@
     <string msgid="8875138169939072951" name="abc_shareactionprovider_share_with">"ਇਸ ਨਾਲ ਸਾਂਝਾ ਕਰੋ"</string>
     <string msgid="9055268688411532828" name="abc_shareactionprovider_share_with_application">"<ns1:g id="APPLICATION_NAME">%s</ns1:g> ਨਾਲ ਸਾਂਝਾ ਕਰੋ"</string>
     <string msgid="1656852541809559762" name="abc_toolbar_collapse_description">"ਸਮੇਟੋ"</string>
-    <string msgid="8719607706653693137" name="androidx_compose_foundation_autofill">"ਆਟੋਫਿਲ"</string>
-    <string msgid="1150566100598813236" name="androidx_compose_ui_autofill">"ਆਟੋਫਿਲ"</string>
+    <string msgid="8397015543330865059" name="android.credentials.TYPE_PASSWORD_CREDENTIAL">"ਪਾਸਵਰਡ"</string>
+    <string msgid="3929015085059320822" name="androidx.credentials.TYPE_PUBLIC_KEY_CREDENTIAL">"ਪਾਸਕੀ"</string>
+    <string msgid="389117264260014992" name="autofill">"ਆਟੋਫਿਲ"</string>
     <string msgid="881409763997275156" name="call_notification_answer_action">"ਜਵਾਬ ਦਿਓ"</string>
     <string msgid="8793775615905189152" name="call_notification_answer_video_action">"ਵੀਡੀਓ"</string>
     <string msgid="3229508546291798546" name="call_notification_decline_action">"ਕਾਲ ਕੱਟੋ"</string>
@@ -56,9 +57,25 @@
     <string name="common_open_on_phone">ਫ਼ੋਨ \'ਤੇ ਖੋਲ੍ਹੋ</string>
     <string name="common_signin_button_text">ਸਾਈਨ-ਇਨ ਕਰੋ</string>
     <string name="common_signin_button_text_long">Google ਨਾਲ ਸਾਈਨ-ਇਨ ਕਰੋ</string>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"ਪਾਸਵਰਡ ਵਰਤੋ"</string>
+    <string msgid="3260749812566568062" name="copy_toast_msg">"ਲਿੰਕ ਕਲਿੱਪਬੋਰਡ \'ਤੇ ਕਾਪੀ ਹੋ ਗਿਆ"</string>
     <string msgid="8038256446254964252" name="default_error_message">"ਅਵੈਧ ਇਨਪੁੱਟ"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"ਅਗਿਆਤ ਗੜਬੜ"</string>
     <string msgid="6312721426453364202" name="default_popup_window_title">"ਪੌਪ-ਅੱਪ ਵਿੰਡੋ"</string>
     <string msgid="1890207353314751437" name="dropdown_menu">"ਡ੍ਰੌਪ-ਡਾਊਨ ਮੀਨੂ"</string>
+    <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"ਲਿੰਕ ਕਾਪੀ ਕਰੋ"</string>
+    <string msgid="3413186855122069269" name="fallback_menu_item_open_in_browser">"ਬ੍ਰਾਊਜ਼ਰ ਵਿੱਚ ਖੋਲ੍ਹੋ"</string>
+    <string msgid="7145444925855055364" name="fallback_menu_item_share_link">"ਲਿੰਕ ਸਾਂਝਾ ਕਰੋ"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"ਫਿੰਗਰਪ੍ਰਿੰਟ ਸੈਂਸਰ ਨੂੰ ਸਪਰਸ਼ ਕਰੋ"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"ਫਿੰਗਰਪ੍ਰਿੰਟ ਹਾਰਡਵੇਅਰ ਉਪਲਬਧ ਨਹੀਂ ਹੈ।"</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"ਇਸ ਡੀਵਾਈਸ ਵਿੱਚ ਫਿੰਗਰਪ੍ਰਿੰਟ ਸੈਂਸਰ ਨਹੀਂ ਹੈ"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"ਬਹੁਤ ਜ਼ਿਆਦਾ ਕੋਸ਼ਿਸ਼ਾਂ। ਕਿਰਪਾ ਕਰਕੇ ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"ਕੋਈ ਫਿੰਗਰਪ੍ਰਿੰਟ ਦਰਜ ਨਹੀਂ ਕੀਤਾ ਗਿਆ।"</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"ਫਿੰਗਰਪ੍ਰਿੰਟ ਦੇ ਪੁਸ਼ਟੀਕਰਨ ਦੀ ਕਾਰਵਾਈ ਵਰਤੋਂਕਾਰ ਵੱਲੋਂ ਰੱਦ ਕੀਤੀ ਗਈ।"</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"ਪਛਾਣ ਨਹੀਂ ਹੋਈ"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"ਕੋਈ ਪਿੰਨ, ਪੈਟਰਨ ਜਾਂ ਪਾਸਵਰਡ ਸੈੱਟ ਨਹੀਂ ਕੀਤਾ ਗਿਆ।"</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"ਇਹ ਡੀਵਾਈਸ ਪਿੰਨ, ਪੈਟਰਨ ਜਾਂ ਪਾਸਵਰਡ ਦਾ ਸਮਰਥਨ ਨਹੀਂ ਕਰਦਾ।"</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"ਵਰਤੋਂਕਾਰ ਵੱਲੋਂ ਪ੍ਰਮਾਣੀਕਰਨ ਨੂੰ ਰੱਦ ਕੀਤਾ ਗਿਆ।"</string>
     <string msgid="6827826412747255547" name="in_progress">"ਜਾਰੀ ਹੈ"</string>
     <string msgid="7933458017204019916" name="indeterminate">"ਅੰਸ਼ਕ ਤੌਰ ਤੇ ਜਾਂਚ ਕੀਤੀ ਗਈ"</string>
     <string msgid="2988463736136100848" name="m3c_bottom_sheet_collapse_description">"ਹੇਠਲੀ ਸ਼ੀਟ ਨੂੰ ਸਮੇਟੋ"</string>
@@ -101,15 +118,10 @@
     <string msgid="3177828188723359358" name="m3c_dropdown_menu_collapsed">"ਸਮੇਟਿਆ ਗਿਆ"</string>
     <string msgid="2360841780724299882" name="m3c_dropdown_menu_expanded">"ਵਿਸਤਾਰ ਕੀਤਾ ਗਿਆ"</string>
     <string msgid="8687821690726149911" name="m3c_dropdown_menu_toggle">"ਡ੍ਰੌਪ-ਡਾਊਨ ਮੀਨੂ ਨੂੰ ਟੌਗਲ ਕਰੋ"</string>
-    <string msgid="6072492480528318635" name="m3c_floating_toolbar_collapse">"ਟੂਲਬਾਰ ਨੂੰ ਸਮੇਟੋ"</string>
-    <string msgid="6880757017246780255" name="m3c_floating_toolbar_expand">"ਟੂਲਬਾਰ ਦਾ ਵਿਸਤਾਰ ਕਰੋ"</string>
     <string msgid="6152806324422087846" name="m3c_search_bar_search">"ਖੋਜੋ"</string>
     <string msgid="6152755701819882931" name="m3c_snackbar_dismiss">"ਖਾਰਜ ਕਰੋ"</string>
-    <string msgid="3868801555855510515" name="m3c_snackbar_pane_title">"ਅਲਰਟ"</string>
     <string msgid="7655536806087401899" name="m3c_suggestions_available">"ਸੁਝਾਅ ਹੇਠਾਂ ਹਨ"</string>
-    <string msgid="409352516511718051" name="m3c_time_input_dialog_title">"ਸਮਾਂ ਦਾਖਲ ਕਰੋ"</string>
     <string msgid="2786685010796619560" name="m3c_time_picker_am">"AM"</string>
-    <string msgid="7412665527536641863" name="m3c_time_picker_dialog_title">"ਸਮਾਂ ਚੁਣੋ"</string>
     <string msgid="2349193472625211372" name="m3c_time_picker_hour">"ਘੰਟਾ"</string>
     <string msgid="9179527532316922345" name="m3c_time_picker_hour_24h_suffix">"%1$d ਘੰਟੇ"</string>
     <string msgid="8876759303332837035" name="m3c_time_picker_hour_selection">"ਘੰਟਾ ਚੁਣੋ"</string>
@@ -121,17 +133,10 @@
     <string msgid="7661234488295443182" name="m3c_time_picker_minute_text_field">"ਮਿੰਟਾਂ ਲਈ"</string>
     <string msgid="5865171949528594571" name="m3c_time_picker_period_toggle_description">"AM ਜਾਂ PM ਚੁਣੋ"</string>
     <string msgid="6616362054113087709" name="m3c_time_picker_pm">"PM"</string>
-    <string msgid="4145073906612931838" name="m3c_time_picker_toggle_keyboard">"ਸਮਾਂ ਸ਼ਾਮਲ ਕਰਨ ਲਈ ਲਿਖਤ ਇਨਪੁੱਟ ਮੋਡ \'ਤੇ ਸਵਿੱਚ ਕਰੋ"</string>
-    <string msgid="8841786098195101324" name="m3c_time_picker_toggle_touch">"ਸਮਾਂ ਸ਼ਾਮਲ ਕਰਨ ਲਈ ਘੜੀ ਮੋਡ \'ਤੇ ਸਵਿੱਚ ਕਰੋ"</string>
     <string msgid="1805687647081129904" name="m3c_tooltip_long_press_label">"ਟੂਲ-ਟਿੱਪ ਦਿਖਾਓ"</string>
     <string msgid="5460405025248574620" name="m3c_tooltip_pane_description">"ਟੂਲ-ਟਿੱਪ"</string>
-    <string msgid="6564222473543418073" name="m3c_wide_navigation_rail_close_rail">"ਰੇਲ ਬੰਦ ਕਰੋ"</string>
-    <string msgid="8350283435461615411" name="m3c_wide_navigation_rail_pane_title">"ਨੈਵੀਗੇਸ਼ਨ ਰੇਲ"</string>
-    <string msgid="8471891128988107974" name="mc2_snackbar_pane_title">"ਅਲਰਟ"</string>
     <string msgid="542007171693138492" name="navigation_menu">"ਨੈਵੀਗੇਸ਼ਨ ਮੀਨੂ"</string>
     <string msgid="6610465462668679431" name="not_selected">"ਚੁਣੀ ਨਹੀਂ ਗਈ"</string>
-    <string msgid="1303870564366209730" name="place_autocomplete_clear_button">"ਖੋਜ ਕਲੀਅਰ ਕਰੋ"</string>
-    <string msgid="2809095107724486040" name="place_autocomplete_search_hint">"ਖੋਜੋ"</string>
     <string msgid="5941395253238309765" name="range_end">"ਰੇਂਜ ਸਮਾਪਤ"</string>
     <string msgid="7097486360902471446" name="range_start">"ਰੇਂਜ ਸ਼ੁਰੂ"</string>
     <string msgid="6264217191555673260" name="search_menu_title">"ਖੋਜ"</string>

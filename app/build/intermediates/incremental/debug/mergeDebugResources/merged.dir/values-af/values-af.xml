@@ -27,8 +27,9 @@
     <string msgid="8875138169939072951" name="abc_shareactionprovider_share_with">"Deel met"</string>
     <string msgid="9055268688411532828" name="abc_shareactionprovider_share_with_application">"Deel met <ns1:g id="APPLICATION_NAME">%s</ns1:g>"</string>
     <string msgid="1656852541809559762" name="abc_toolbar_collapse_description">"Vou in"</string>
-    <string msgid="8719607706653693137" name="androidx_compose_foundation_autofill">"Outovul"</string>
-    <string msgid="1150566100598813236" name="androidx_compose_ui_autofill">"Outovul"</string>
+    <string msgid="8397015543330865059" name="android.credentials.TYPE_PASSWORD_CREDENTIAL">"Wagwoord"</string>
+    <string msgid="3929015085059320822" name="androidx.credentials.TYPE_PUBLIC_KEY_CREDENTIAL">"Wagwoordsleutel"</string>
+    <string msgid="389117264260014992" name="autofill">"Outovul"</string>
     <string msgid="881409763997275156" name="call_notification_answer_action">"Antwoord"</string>
     <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Video"</string>
     <string msgid="3229508546291798546" name="call_notification_decline_action">"Wys af"</string>
@@ -56,9 +57,25 @@
     <string name="common_open_on_phone">Maak oop op foon</string>
     <string name="common_signin_button_text">Meld aan</string>
     <string name="common_signin_button_text_long">Meld aan met Google</string>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Gebruik wagwoord"</string>
+    <string msgid="3260749812566568062" name="copy_toast_msg">"Skakel is na knipbord gekopieer"</string>
     <string msgid="8038256446254964252" name="default_error_message">"Ongeldige invoer"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Onbekende fout"</string>
     <string msgid="6312721426453364202" name="default_popup_window_title">"Opspringvenster"</string>
     <string msgid="1890207353314751437" name="dropdown_menu">"Aftrekkieslys"</string>
+    <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"Kopieer skakel"</string>
+    <string msgid="3413186855122069269" name="fallback_menu_item_open_in_browser">"Maak in blaaier oop"</string>
+    <string msgid="7145444925855055364" name="fallback_menu_item_share_link">"Deel skakel"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Raak die vingerafdruksensor"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"Vingerafdrukhardeware is nie beskikbaar nie."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"Hierdie toetstel het nie \'n vingerafdruksensor nie"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Te veel pogings. Probeer later weer."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Geen vingerafdrukke is geregistreer nie."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"Vingerafdrukhandeling is deur gebruiker gekanselleer."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Nie herken nie"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"Geen PIN, patroon of wagwoord is gestel nie."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"Hierdie toestel ondersteun nie PIN, patroon of wagwoord nie."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"Gebruiker het stawing gekanselleer."</string>
     <string msgid="6827826412747255547" name="in_progress">"Besig"</string>
     <string msgid="7933458017204019916" name="indeterminate">"Gedeeltelik gemerk"</string>
     <string msgid="2988463736136100848" name="m3c_bottom_sheet_collapse_description">"Vou onderste blad in"</string>
@@ -101,15 +118,10 @@
     <string msgid="3177828188723359358" name="m3c_dropdown_menu_collapsed">"Ingevou"</string>
     <string msgid="2360841780724299882" name="m3c_dropdown_menu_expanded">"Uitgevou"</string>
     <string msgid="8687821690726149911" name="m3c_dropdown_menu_toggle">"Wissel aftrekkieslys"</string>
-    <string msgid="6072492480528318635" name="m3c_floating_toolbar_collapse">"Vou nutsbalk in"</string>
-    <string msgid="6880757017246780255" name="m3c_floating_toolbar_expand">"Vou nutsbalk uit"</string>
     <string msgid="6152806324422087846" name="m3c_search_bar_search">"Soek"</string>
     <string msgid="6152755701819882931" name="m3c_snackbar_dismiss">"Maak toe"</string>
-    <string msgid="3868801555855510515" name="m3c_snackbar_pane_title">"Opletberig"</string>
     <string msgid="7655536806087401899" name="m3c_suggestions_available">"Voorstelle hieronder"</string>
-    <string msgid="409352516511718051" name="m3c_time_input_dialog_title">"Voer tyd in"</string>
     <string msgid="2786685010796619560" name="m3c_time_picker_am">"vm."</string>
-    <string msgid="7412665527536641863" name="m3c_time_picker_dialog_title">"Kies tyd"</string>
     <string msgid="2349193472625211372" name="m3c_time_picker_hour">"Uur"</string>
     <string msgid="9179527532316922345" name="m3c_time_picker_hour_24h_suffix">"%1$d uur"</string>
     <string msgid="8876759303332837035" name="m3c_time_picker_hour_selection">"Kies uur"</string>
@@ -121,17 +133,10 @@
     <string msgid="7661234488295443182" name="m3c_time_picker_minute_text_field">"vir minute"</string>
     <string msgid="5865171949528594571" name="m3c_time_picker_period_toggle_description">"Kies vm. of nm."</string>
     <string msgid="6616362054113087709" name="m3c_time_picker_pm">"nm."</string>
-    <string msgid="4145073906612931838" name="m3c_time_picker_toggle_keyboard">"Skakel oor na teksinvoermodus vir die tydinvoer"</string>
-    <string msgid="8841786098195101324" name="m3c_time_picker_toggle_touch">"Skakel oor na horlosiemodus vir die tydinvoer"</string>
     <string msgid="1805687647081129904" name="m3c_tooltip_long_press_label">"Wys nutswenk"</string>
     <string msgid="5460405025248574620" name="m3c_tooltip_pane_description">"Nutswenk"</string>
-    <string msgid="6564222473543418073" name="m3c_wide_navigation_rail_close_rail">"Maak spoor toe"</string>
-    <string msgid="8350283435461615411" name="m3c_wide_navigation_rail_pane_title">"Navigasiespoor"</string>
-    <string msgid="8471891128988107974" name="mc2_snackbar_pane_title">"Opletberig"</string>
     <string msgid="542007171693138492" name="navigation_menu">"Navigasiekieslys"</string>
     <string msgid="6610465462668679431" name="not_selected">"Nie gekies nie"</string>
-    <string msgid="1303870564366209730" name="place_autocomplete_clear_button">"Maak soektog skoon"</string>
-    <string msgid="2809095107724486040" name="place_autocomplete_search_hint">"Soek"</string>
     <string msgid="5941395253238309765" name="range_end">"Eindgrens"</string>
     <string msgid="7097486360902471446" name="range_start">"Begingrens"</string>
     <string msgid="6264217191555673260" name="search_menu_title">"Soek"</string>

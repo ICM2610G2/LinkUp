@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">546132367133-pfmh3dl8f9j5t2p7at1j777vh4snlig2.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">546132367133</string>
+    <string name="google_api_key" translatable="false">AIzaSyBoyLa45sG_eMP8QFsxht4-qpDYcUS1gXU</string>
+    <string name="google_app_id" translatable="false">1:546132367133:android:1e043045f91d9a995533f4</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBoyLa45sG_eMP8QFsxht4-qpDYcUS1gXU</string>
+    <string name="google_storage_bucket" translatable="false">linkup-99296.firebasestorage.app</string>
+    <string name="project_id" translatable="false">linkup-99296</string>
+</resources>

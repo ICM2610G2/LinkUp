@@ -1,0 +1,20 @@
+# Build and Gen
+build/
+.gradle/
+*.apk
+*.aab
+*.class
+bin/
+gen/
+out/
+
+# IDE and Local Config
+.idea/
+*.iml
+local.properties
+captures/
+
+# Secrets
+*.jks
+*.keystore
+    

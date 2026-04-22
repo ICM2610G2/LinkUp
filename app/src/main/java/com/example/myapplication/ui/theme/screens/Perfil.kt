@@ -1,393 +1,506 @@
 package com.example.myapplication.ui.theme.screens
 
-import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.ui.theme.MyApplicationTheme
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.Photo
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Smartphone
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.ProgressIndicatorDefaults
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.example.myapplication.auth.BiometricAuthManager
+import com.example.myapplication.ui.theme.auth.FirebaseAuthManager
+import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.launch
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.myapplication.ui.theme.MyApplicationTheme
 
 @Composable
-fun Perfil() {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF0A0A0A)),
-        contentPadding = PaddingValues(
-            start = 16.dp,
-            end = 16.dp,
-            top = 16.dp,
-            bottom = 100.dp
-        )
-    ) {
-        item { PerfilHeader() }
-        item { Spacer(modifier = Modifier.height(20.dp)) }
-        item { StatsGridSection() }
-        item { Spacer(modifier = Modifier.height(16.dp)) }
-        item { NivelXpSection() }
-        item { Spacer(modifier = Modifier.height(20.dp)) }
-        item { InsigniasSection() }
-        item { Spacer(modifier = Modifier.height(20.dp)) }
-        item { MenuSection() }
-        item { Spacer(modifier = Modifier.height(16.dp)) }
-        item { CerrarSesionButton() }
-    }
-}
+fun Perfil(
+    user: FirebaseUser?,
+    onLogout: () -> Unit,
+    onAccountDeleted: () -> Unit
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val activity = context as androidx.appcompat.app.AppCompatActivity
+    val authManager = remember { FirebaseAuthManager(activity) }
+    val biometricManager = remember { BiometricAuthManager(activity) }
 
-@Composable
-fun PerfilHeader() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(64.dp)
-                .background(Color(0xFFFF9800), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                "JD",
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                "Juan David",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                "@juandavid · Bogotá, Colombia",
-                color = Color.White.copy(alpha = 0.6f),
-                fontSize = 12.sp
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .background(Color(0xFF1A1A1A), RoundedCornerShape(50))
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(Color(0xFFFF9800), CircleShape)
-                        )
-                        Text(
-                            "Nivel 12",
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showPasswordDialog by remember { mutableStateOf(false) }
+    var deletePassword by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var showBiometricConfirm by remember { mutableStateOf(false) }
+
+    val displayName = user?.displayName ?: "Usuario"
+    val email = user?.email ?: "correo@ejemplo.com"
+    val userId = user?.uid?.take(8) ?: ""
+
+    // Observar resultado de biometría para borrar cuenta
+    LaunchedEffect(Unit) {
+        biometricManager.authResult.collect { result ->
+            when (result) {
+                is com.example.myapplication.auth.BiometricAuthResult.Success -> {
+                    scope.launch {
+                        isLoading = true
+                        val deleteResult = authManager.deleteAccount()
+                        deleteResult.fold(
+                            onSuccess = {
+                                onAccountDeleted()
+                            },
+                            onFailure = { e ->
+                                errorMessage = "Error al borrar cuenta: ${e.message}"
+                                isLoading = false
+                                showBiometricConfirm = false
+                            }
                         )
                     }
                 }
-                Text(
-                    "Explorador",
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 12.sp
-                )
+                is com.example.myapplication.auth.BiometricAuthResult.Error -> {
+                    errorMessage = result.message
+                    showBiometricConfirm = false
+                }
+                else -> {}
             }
         }
     }
-}
 
-@Composable
-fun StatsGridSection() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        StatGridItem("24", "Carreras", Icons.Default.EmojiEvents, modifier = Modifier.weight(1f))
-        StatGridItem("87", "Fotos", Icons.Default.CameraAlt, modifier = Modifier.weight(1f))
-        StatGridItem("42", "Lugares", Icons.Default.Place, modifier = Modifier.weight(1f))
-        StatGridItem("7", "Racha", Icons.Default.Bolt, modifier = Modifier.weight(1f))
-    }
-}
-@Composable
-fun StatGridItem(valor: String, label: String, icon: ImageVector, modifier: Modifier = Modifier) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
-        shape = RoundedCornerShape(16.dp),
-        modifier = modifier,
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x0DFFFFFF))
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(12.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(icon, null, tint = Color(0xFFFF9800), modifier = Modifier.size(20.dp))
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(valor, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(label, color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp)
-        }
-    }
-}
-
-@Composable
-fun NivelXpSection() {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth(),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x0DFFFFFF))
-    ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    "Nivel 12",
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    "2,450 / 3,000 XP",
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 12.sp
-                )
+    PerfilContent(
+        displayName = displayName,
+        email = email,
+        userId = userId,
+        onLogoutClick = {
+            scope.launch {
+                authManager.logout()
+                onLogout()
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            LinearProgressIndicator(
-                progress = { 0.82f },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(50)),
-                color = Color(0xFFFF9800),
-                trackColor = Color(0xFF252525),
-                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-            )
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Text(
-                "550 XP para el siguiente nivel",
-                color = Color.White.copy(alpha = 0.6f),
-                fontSize = 10.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun InsigniasSection() {
-    val insignias = listOf(
-        Pair("🗺️", "Explorador") to true,
-        Pair("⚡", "Velocista") to true,
-        Pair("📷", "Fotógrafo") to true,
-        Pair("🌙", "Nocturno") to false,
-        Pair("👑", "Leyenda") to false
+        },
+        onDeleteClick = { showDeleteDialog = true }
     )
 
-    Column {
-        Text(
-            "Insignias",
-            color = Color.White,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
+    // Diálogo de confirmación para borrar cuenta
+    if (showDeleteDialog) {
+        Dialog(
+            onDismissRequest = { showDeleteDialog = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1C)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = Color(0xFFFF6B6B),
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "¿Borrar cuenta?",
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Esta acción es irreversible. Se eliminarán todos tus datos.",
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
 
-        Spacer(modifier = Modifier.height(12.dp))
+                    // Botón: Usar huella
+                    if (biometricManager.isBiometricAvailable() is com.example.myapplication.auth.BiometricAvailability.Available) {
+                        Button(
+                            onClick = {
+                                showDeleteDialog = false
+                                showBiometricConfirm = true
+                                biometricManager.setupBiometricPrompt()
+                                biometricManager.authenticate()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Confirmar con huella")
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
 
+                    // Botón: Usar contraseña
+                    Button(
+                        onClick = {
+                            showDeleteDialog = false
+                            showPasswordDialog = true
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Lock, null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Confirmar con contraseña")
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    TextButton(
+                        onClick = { showDeleteDialog = false }
+                    ) {
+                        Text("Cancelar", color = Color.Gray)
+                    }
+                }
+            }
+        }
+    }
+
+    // Diálogo para ingresar contraseña
+    if (showPasswordDialog) {
+        Dialog(
+            onDismissRequest = {
+                showPasswordDialog = false
+                deletePassword = ""
+                errorMessage = null
+            }
+        ) {
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1C)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp)
+                ) {
+                    Text(
+                        text = "Confirmar con contraseña",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    if (errorMessage != null) {
+                        Text(
+                            text = errorMessage!!,
+                            color = Color(0xFFFF6B6B),
+                            fontSize = 12.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    // CORREGIDO: TextField simplificado
+                    OutlinedTextField(
+                        value = deletePassword,
+                        onValueChange = { deletePassword = it },
+                        label = { Text("Contraseña") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                isLoading = true
+                                val result = authManager.deleteAccountWithPassword(deletePassword)
+                                result.fold(
+                                    onSuccess = {
+                                        onAccountDeleted()
+                                    },
+                                    onFailure = { e ->
+                                        errorMessage = e.message
+                                        isLoading = false
+                                    }
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B6B)),
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = !isLoading
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White)
+                        } else {
+                            Text("Confirmar y borrar cuenta")
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    TextButton(
+                        onClick = {
+                            showPasswordDialog = false
+                            deletePassword = ""
+                            errorMessage = null
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Cancelar", color = Color.Gray)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PerfilContent(
+    displayName: String,
+    email: String,
+    userId: String,
+    onLogoutClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    val accent = Color(0xFFFF9800)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0B0B0B))
+            .navigationBarsPadding()
+            .padding(16.dp)
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(horizontal = 8.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            insignias.forEach { (info, obtenida) ->
-                InsigniaItem(
-                    emoji = info.first,
-                    nombre = info.second,
-                    obtenida = obtenida
+            Box(
+                modifier = Modifier
+                    .size(90.dp)
+                    .background(accent, shape = CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Imagen de perfil",
+                    tint = Color.White,
+                    modifier = Modifier.size(44.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(14.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = displayName,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = email,
+                    fontSize = 14.sp,
+                    color = Color(0xFFBDBDBD)
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = "ID: $userId",
+                    fontSize = 14.sp,
+                    color = accent,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
-    }
-}
 
-@Composable
-fun InsigniaItem(emoji: String, nombre: String, obtenida: Boolean) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = if (obtenida) Color(0xFF1A1A1A) else Color(0x661A1A1A)
-        ),
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.width(64.dp),
-        border = androidx.compose.foundation.BorderStroke(
-            1.dp,
-            if (obtenida) Color(0x4DFF9800) else Color(0x0DFFFFFF)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        MenuItem(
+            icon = Icons.Default.Settings,
+            title = "Configuración",
+            accent = accent,
+            onClick = { /* Navegar a configuración */ }
         )
-    ) {
-        Column(
-            modifier = Modifier.padding(10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                emoji,
-                fontSize = 24.sp,
-                color = if (obtenida) Color.White else Color.White.copy(alpha = 0.4f)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                nombre,
-                color = if (obtenida) Color.White else Color.White.copy(alpha = 0.4f),
-                fontSize = 10.sp
-            )
-        }
-    }
-}
 
-@Composable
-fun MenuSection() {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        MenuItem(Icons.Default.EmojiEvents, "Historial de carreras", null)
-        MenuItem(Icons.Default.Photo, "Fotos guardadas", null)
-        MenuItem(Icons.Default.Smartphone, "Sensores del dispositivo", "Acelerómetro, GPS, Magnetómetro")
-        MenuItem(Icons.Default.Settings, "Configuración", null)
+        MenuItem(
+            icon = Icons.Default.Timeline,
+            title = "Historial de carreras",
+            subtitle = "Ver todas tus carreras",
+            accent = accent,
+            onClick = { /* Navegar a historial */ }
+        )
+
+        MenuItem(
+            icon = Icons.Default.CameraAlt,
+            title = "Fotos guardadas",
+            subtitle = "Revisa todos tus recuerdos",
+            accent = accent,
+            onClick = { /* Navegar a fotos */ }
+        )
+
+        MenuItem(
+            icon = Icons.Default.LocationOn,
+            title = "Sensores del dispositivo",
+            subtitle = "Acelerómetro, GPS, Magnetómetro",
+            accent = accent,
+            onClick = { /* Navegar a sensores */ }
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Botón de cerrar sesión
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 8.dp, top = 10.dp, bottom = 8.dp)
+                .clickable { onLogoutClick() },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.Logout,
+                    contentDescription = null,
+                    tint = Color(0xFFFF6B6B),
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Cerrar sesión",
+                    color = Color(0xFFFF6B6B),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        // Botón de borrar cuenta
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 8.dp, top = 0.dp, bottom = 90.dp)
+                .clickable { onDeleteClick() },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF2A0A0A))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = Color(0xFFFF6B6B),
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Borrar cuenta",
+                    color = Color(0xFFFF6B6B),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
     }
 }
 
 @Composable
 fun MenuItem(
     icon: ImageVector,
-    titulo: String,
-    subtitulo: String? = null
+    title: String,
+    subtitle: String? = null,
+    accent: Color,
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { Log.i("MyApp", "$titulo clicked") },
+            .padding(horizontal = 8.dp, vertical = 6.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
-        border = BorderStroke(1.dp, Color(0x0DFFFFFF))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF121212))
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(36.dp)
-                    .background(Color(0xFF252525), RoundedCornerShape(10.dp)),
+                    .size(40.dp)
+                    .background(accent.copy(alpha = 0.18f), CircleShape)
+                    .border(1.dp, accent.copy(alpha = 0.25f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
-                    null,
-                    tint = Color(0xFFFF9800),
-                    modifier = Modifier.size(18.dp)
+                    contentDescription = title,
+                    tint = accent,
+                    modifier = Modifier.size(20.dp)
                 )
             }
 
+            Spacer(modifier = Modifier.width(12.dp))
+
             Column(
-                modifier = Modifier.weight(1f) // ocupa el espacio del centro
+                modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = titulo,
+                    text = title,
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
 
-                if (subtitulo != null) {
+                if (subtitle != null) {
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = subtitulo,
-                        color = Color.White.copy(alpha = 0.6f),
-                        fontSize = 10.sp
+                        text = subtitle,
+                        color = Color(0xFF9E9E9E),
+                        fontSize = 12.sp
                     )
                 }
             }
-            Icon(
-                Icons.Default.ChevronRight,
-                null,
-                tint = Color.White.copy(alpha = 0.4f),
-                modifier = Modifier.size(16.dp)
-            )
-        }
-    }
-}
 
-@Composable
-fun CerrarSesionButton() {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0x1AFF3B30)),
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { Log.i("MyApp", "Cerrar sesión clicked") },
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x33FF3B30))
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            contentAlignment = Alignment.Center
-        ) {
             Text(
-                "Cerrar sesión",
-                color = Color(0xFFFF3B30),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+                text = "›",
+                color = Color(0xFF7A7A7A),
+                fontSize = 22.sp
             )
         }
     }
@@ -397,6 +510,26 @@ fun CerrarSesionButton() {
 @Composable
 fun PerfilPreview() {
     MyApplicationTheme {
-        Perfil()
+        PerfilContent(
+            displayName = "Juan Pérez",
+            email = "juan.perez@example.com",
+            userId = "ABC12345",
+            onLogoutClick = {},
+            onDeleteClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF0B0B0B)
+@Composable
+fun MenuItemPreview() {
+    MyApplicationTheme {
+        MenuItem(
+            icon = Icons.Default.Settings,
+            title = "Configuración",
+            subtitle = "Ajustes de la cuenta",
+            accent = Color(0xFFFF9800),
+            onClick = {}
+        )
     }
 }

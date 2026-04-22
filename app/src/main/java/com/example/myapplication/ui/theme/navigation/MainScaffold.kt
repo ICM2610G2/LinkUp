@@ -1,9 +1,6 @@
 package com.example.myapplication.ui.theme.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -14,63 +11,42 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseUser
 
-
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainScaffold() {
+fun MainScaffold(
+    user: FirebaseUser?,      // ← Recibir el usuario
+    onLogout: () -> Unit,
+    onAccountDeleted: () -> Unit, // ← Callback para cerrar sesión
+) {
     val navController = rememberNavController()
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = backStackEntry?.destination?.route
-    val mostrarBottomBar = currentRoute != "login"
 
     Scaffold(
         bottomBar = {
-            if (mostrarBottomBar) {
-                BottomBar(navController = navController)
-            }
+            BottomBar(navController = navController)
         }
     ) { innerPadding ->
         AppNavGraph(
             navController = navController,
-            innerPadding,
-            startDestination = "login"
+            user = user,
+            onLogout = onLogout,
+            onAccountDeleted = onAccountDeleted,
+
         )
     }
 }
 
-/**
- * BottomBar:
- * Dibuja la barra inferior con 5 botones.
- *
- * @param navController: se usa para navegar a la ruta del item tocado.
- */
 @Composable
-fun BottomBar(navController: NavHostController) {
-
-    /**
-     * currentBackStackEntryAsState():
-     * - Observa la navegación actual.
-     * - Cada vez que cambie la pantalla, esto se actualiza y recompone la UI.
-     */
+private fun BottomBar(navController: NavHostController) {
     val backStackEntry by navController.currentBackStackEntryAsState()
-
-    // route actual: "home", "mapa", etc.
     val currentRoute = backStackEntry?.destination?.route
 
-
     NavigationBar {
-
-        // Recorremos los 5 items definidos en BottomNavItem.items
         BottomNavItem.items.forEach { item ->
-
-            // selected = true si el item coincide con la pantalla actual
             val selected = currentRoute == item.route
-
 
             NavigationBarItem(
                 selected = selected,
-
                 onClick = {
                     navController.navigate(item.route) {
                         val startRoute = navController.graph.startDestinationRoute
@@ -81,21 +57,18 @@ fun BottomBar(navController: NavHostController) {
                         restoreState = true
                     }
                 },
-
                 icon = {
                     Icon(
                         imageVector = item.icon,
                         contentDescription = item.label
                     )
                 },
-
                 label = {
                     Text(text = item.label)
                 },
-
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFFFF9800),
-                    selectedTextColor = Color(0xFFFF9800),
+                    selectedIconColor = Color(0xFFF2823D),
+                    selectedTextColor = Color(0xFFF2823D),
                     unselectedIconColor = Color.Gray,
                     unselectedTextColor = Color.Gray,
                     indicatorColor = Color.Transparent

@@ -27,8 +27,9 @@
     <string msgid="8875138169939072951" name="abc_shareactionprovider_share_with">"اس کے ساتھ اشتراک کریں"</string>
     <string msgid="9055268688411532828" name="abc_shareactionprovider_share_with_application">"<ns1:g id="APPLICATION_NAME">%s</ns1:g> کے ساتھ اشتراک کریں"</string>
     <string msgid="1656852541809559762" name="abc_toolbar_collapse_description">"سکیڑیں"</string>
-    <string msgid="8719607706653693137" name="androidx_compose_foundation_autofill">"آٹو فل"</string>
-    <string msgid="1150566100598813236" name="androidx_compose_ui_autofill">"آٹو فل"</string>
+    <string msgid="8397015543330865059" name="android.credentials.TYPE_PASSWORD_CREDENTIAL">"پاس ورڈ"</string>
+    <string msgid="3929015085059320822" name="androidx.credentials.TYPE_PUBLIC_KEY_CREDENTIAL">"پاس کی"</string>
+    <string msgid="389117264260014992" name="autofill">"آٹو فل"</string>
     <string msgid="881409763997275156" name="call_notification_answer_action">"جواب دیں"</string>
     <string msgid="8793775615905189152" name="call_notification_answer_video_action">"ویڈیو"</string>
     <string msgid="3229508546291798546" name="call_notification_decline_action">"مسترد کریں"</string>
@@ -56,9 +57,25 @@
     <string name="common_open_on_phone">فون پر کھولیں</string>
     <string name="common_signin_button_text">سائن ان کریں</string>
     <string name="common_signin_button_text_long">‏Google کے ساتھ سائن ان کریں</string>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"پاس ورڈ استعمال کریں"</string>
+    <string msgid="3260749812566568062" name="copy_toast_msg">"لنک کلپ بورڈ پر کاپی ہو گیا"</string>
     <string msgid="8038256446254964252" name="default_error_message">"غلط ان پٹ"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"نامعلوم خرابی"</string>
     <string msgid="6312721426453364202" name="default_popup_window_title">"پاپ اپ ونڈو"</string>
     <string msgid="1890207353314751437" name="dropdown_menu">"ڈراپ ڈاؤن مینیو"</string>
+    <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"لنک کاپی کریں"</string>
+    <string msgid="3413186855122069269" name="fallback_menu_item_open_in_browser">"براؤزر میں کھولیں"</string>
+    <string msgid="7145444925855055364" name="fallback_menu_item_share_link">"لنک کا اشتراک کریں"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"فنگر پرنٹ سینسر کو ٹچ کریں"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"فنگر پرنٹ ہارڈ ویئر دستیاب نہیں ہے۔"</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"اس آلہ میں فنگر پرنٹ سینسر نہیں ہے"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"کافی زیادہ کوششیں۔ براہ کرم بعد میں دوبارہ کوشش کریں۔"</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"کوئی فنگر پرنٹ مندرج نہیں ہے۔"</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"صارف نے فنگر پرنٹ کی کارروائی منسوخ کر دی۔"</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"شناخت نہیں ہو سکی"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"کوئی پن، پیٹرن، یا پاس ورڈ سیٹ نہیں ہے۔"</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"‏یہ آلہ PIN، پیٹرن یا پاس ورڈ کو سپورٹ نہیں کرتا ہے۔"</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"صارف نے تصدیق کو منسوخ کر دیا۔"</string>
     <string msgid="6827826412747255547" name="in_progress">"پیشرفت میں"</string>
     <string msgid="7933458017204019916" name="indeterminate">"جزوی طور پر چیک کردہ"</string>
     <string msgid="2988463736136100848" name="m3c_bottom_sheet_collapse_description">"نیچے کی شیٹ کو سکیڑیں"</string>
@@ -101,15 +118,10 @@
     <string msgid="3177828188723359358" name="m3c_dropdown_menu_collapsed">"سکیڑا گیا"</string>
     <string msgid="2360841780724299882" name="m3c_dropdown_menu_expanded">"پھیلایا گیا"</string>
     <string msgid="8687821690726149911" name="m3c_dropdown_menu_toggle">"ڈراپ ڈاؤن مینیو کو ٹوگل کریں"</string>
-    <string msgid="6072492480528318635" name="m3c_floating_toolbar_collapse">"ٹول بار کو سکیڑیں"</string>
-    <string msgid="6880757017246780255" name="m3c_floating_toolbar_expand">"ٹول بار کو پھیلائیں"</string>
     <string msgid="6152806324422087846" name="m3c_search_bar_search">"تلاش کریں"</string>
     <string msgid="6152755701819882931" name="m3c_snackbar_dismiss">"برخاست کریں"</string>
-    <string msgid="3868801555855510515" name="m3c_snackbar_pane_title">"الرٹ"</string>
     <string msgid="7655536806087401899" name="m3c_suggestions_available">"تلاش کی تجاویز نیچے دستیاب ہیں"</string>
-    <string msgid="409352516511718051" name="m3c_time_input_dialog_title">"وقت درج کریں"</string>
     <string msgid="2786685010796619560" name="m3c_time_picker_am">"AM"</string>
-    <string msgid="7412665527536641863" name="m3c_time_picker_dialog_title">"وقت منتخب کریں"</string>
     <string msgid="2349193472625211372" name="m3c_time_picker_hour">"گھنٹہ"</string>
     <string msgid="9179527532316922345" name="m3c_time_picker_hour_24h_suffix">"‏‎%1$d گھنٹے"</string>
     <string msgid="8876759303332837035" name="m3c_time_picker_hour_selection">"گھنٹہ منتخب کریں"</string>
@@ -121,17 +133,10 @@
     <string msgid="7661234488295443182" name="m3c_time_picker_minute_text_field">"منٹ کے لیے"</string>
     <string msgid="5865171949528594571" name="m3c_time_picker_period_toggle_description">"‏AM یا PM منتخب کریں"</string>
     <string msgid="6616362054113087709" name="m3c_time_picker_pm">"PM"</string>
-    <string msgid="4145073906612931838" name="m3c_time_picker_toggle_keyboard">"وقت ان پٹ کے لیے ٹیکسٹ اِن پٹ موڈ پر سوئچ کریں"</string>
-    <string msgid="8841786098195101324" name="m3c_time_picker_toggle_touch">"وقت ان پٹ کے لیے گھڑی موڈ پر سوئچ کریں"</string>
     <string msgid="1805687647081129904" name="m3c_tooltip_long_press_label">"ٹول ٹپ دکھائیں"</string>
     <string msgid="5460405025248574620" name="m3c_tooltip_pane_description">"ٹول ٹپ"</string>
-    <string msgid="6564222473543418073" name="m3c_wide_navigation_rail_close_rail">"ریل بند کریں"</string>
-    <string msgid="8350283435461615411" name="m3c_wide_navigation_rail_pane_title">"نیوی گیشن ریل"</string>
-    <string msgid="8471891128988107974" name="mc2_snackbar_pane_title">"الرٹ"</string>
     <string msgid="542007171693138492" name="navigation_menu">"نیویگیشن مینیو"</string>
     <string msgid="6610465462668679431" name="not_selected">"غیر منتخب کردہ"</string>
-    <string msgid="1303870564366209730" name="place_autocomplete_clear_button">"تلاش صاف کریں"</string>
-    <string msgid="2809095107724486040" name="place_autocomplete_search_hint">"تلاش"</string>
     <string msgid="5941395253238309765" name="range_end">"رینج کا اختتام"</string>
     <string msgid="7097486360902471446" name="range_start">"رینج کی شروعات"</string>
     <string msgid="6264217191555673260" name="search_menu_title">"تلاش کریں"</string>
