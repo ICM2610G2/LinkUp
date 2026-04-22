@@ -2,6 +2,7 @@ package com.example.myapplication.ui.theme.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,39 +12,42 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.ui.theme.MyApplicationTheme
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.ui.theme.auth.FirebaseAuthManager
+import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.launch
 
 @Composable
-fun Perfil() {
-
+fun Perfil(
+    user: FirebaseUser?,  // ← Recibir el usuario logueado
+    onLogout: () -> Unit   // ← Callback cuando cierra sesión
+) {
     val accent = Color(0xFFFF9800)
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val authManager = remember { FirebaseAuthManager(context as androidx.appcompat.app.AppCompatActivity) }
+
+    // Obtener nombre y email del usuario
+    val displayName = user?.displayName ?: "Usuario"
+    val email = user?.email ?: "correo@ejemplo.com"
+    val userId = user?.uid?.take(8) ?: ""
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0B0B0B))
-            .navigationBarsPadding() // respeta la barra inferior
+            .navigationBarsPadding()
             .padding(16.dp)
-    )
-   {
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -70,7 +74,7 @@ fun Perfil() {
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "Nombre de Usuario",
+                    text = displayName,  // ← Nombre del usuario registrado
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -79,7 +83,7 @@ fun Perfil() {
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "Correo Electrónico",
+                    text = email,  // ← Email del usuario registrado
                     fontSize = 14.sp,
                     color = Color(0xFFBDBDBD)
                 )
@@ -87,7 +91,7 @@ fun Perfil() {
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "ID: 8414852",
+                    text = "ID: $userId",
                     fontSize = 14.sp,
                     color = accent,
                     fontWeight = FontWeight.SemiBold
@@ -97,73 +101,84 @@ fun Perfil() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-
         MenuItem(
             icon = Icons.Default.Settings,
             title = "Configuración",
-            accent = accent
+            accent = accent,
+            onClick = { /* Navegar a configuración */ }
         )
 
         MenuItem(
             icon = Icons.Default.Timeline,
             title = "Historial de carreras",
             subtitle = "Ver todas tus carreras",
-            accent = accent
+            accent = accent,
+            onClick = { /* Navegar a historial */ }
         )
 
         MenuItem(
             icon = Icons.Default.CameraAlt,
             title = "Fotos guardadas",
             subtitle = "Revisa todos tus recuerdos",
-            accent = accent
+            accent = accent,
+            onClick = { /* Navegar a fotos */ }
         )
 
         MenuItem(
             icon = Icons.Default.LocationOn,
             title = "Sensores del dispositivo",
             subtitle = "Acelerómetro, GPS, Magnetómetro",
-            accent = accent
+            accent = accent,
+            onClick = { /* Navegar a sensores */ }
         )
 
         Spacer(modifier = Modifier.weight(1f))
 
-       Card(
-           modifier = Modifier
-               .fillMaxWidth()
-               .padding(start = 8.dp, end = 8.dp, top = 10.dp, bottom = 90.dp),
-           shape = RoundedCornerShape(16.dp),
-           colors = CardDefaults.cardColors(containerColor = Color(0xFF2A0A0A))
-       ) {
-           Row(
-               modifier = Modifier
-                   .fillMaxWidth()
-                   .padding(16.dp),
-               horizontalArrangement = Arrangement.Center,
-               verticalAlignment = Alignment.CenterVertically
-           ) {
-               Text(
-                   text = "Cerrar sesión",
-                   color = Color(0xFFFF6B6B),
-                   fontSize = 16.sp,
-                   fontWeight = FontWeight.Bold
-               )
-           }
-       }
+        // Botón de cerrar sesión
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 8.dp, top = 10.dp, bottom = 90.dp)
+                .clickable {
+                    scope.launch {
+                        authManager.logout()
+                        onLogout()  // Notificar que se cerró sesión
+                    }
+                },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF2A0A0A))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Cerrar sesión",
+                    color = Color(0xFFFF6B6B),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
     }
 }
-
 
 @Composable
 fun MenuItem(
     icon: ImageVector,
     title: String,
     subtitle: String? = null,
-    accent: Color
+    accent: Color,
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 6.dp),
+            .padding(horizontal = 8.dp, vertical = 6.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF121212))
     ) {
@@ -173,8 +188,6 @@ fun MenuItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            // Círculo del ícono
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -192,9 +205,8 @@ fun MenuItem(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Textos
             Column(
-                modifier = Modifier.weight(1f) // ocupa el espacio del centro
+                modifier = Modifier.weight(1f)
             ) {
                 Text(
                     text = title,
@@ -219,13 +231,5 @@ fun MenuItem(
                 fontSize = 22.sp
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PerfilPreview() {
-    MyApplicationTheme {
-        Perfil()
     }
 }
