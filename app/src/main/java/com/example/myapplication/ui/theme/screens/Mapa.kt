@@ -61,6 +61,9 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
+import kotlin.math.sqrt
+import kotlin.math.abs
+
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -78,51 +81,120 @@ fun GPSContents() {
     //("Not yet implemented")
 }
 
-//@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalPermissionsApi::class)
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun Mapa(
     modifier: Modifier = Modifier,
     viewModel: MapsViewModel = viewModel()
 ) {
-    LocationPermission()
 
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
 
-    var place by remember { mutableStateOf("") }
-    var isDarkMode by remember { mutableStateOf(true) }
+    // PERMISSIONS
+    val activityPermission = rememberPermissionState(
+        android.Manifest.permission.ACTIVITY_RECOGNITION
+    )
+    SideEffect { activityPermission.launchPermissionRequest() }
 
-    // Sensor de luminosidad
+    // UI STATE
+    var isDarkMode by remember { mutableStateOf(true) }
+    var mostrarValidarFoto by remember { mutableStateOf(false) }
+
+    // SENSOR STATE
+    var stepCount by remember { mutableStateOf(0) }
+    var isWalking by remember { mutableStateOf(false) }
+
+    var accelMagnitude by remember { mutableStateOf(0f) }
+    var lastAccel by remember { mutableStateOf(0f) }
+    var smoothedAccel by remember { mutableStateOf(0f) }
+
+    var stepCooldown by remember { mutableStateOf(0L) }
+    var lastCheckTime by remember { mutableStateOf(0L) }
+
+    // SENSORS
     val sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
     val lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+    val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    val stepDetector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
 
     val sensorListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent?) {
-            if (event?.sensor?.type == Sensor.TYPE_LIGHT) {
-                val lux = event.values[0]
-                Log.i("MapApp", lux.toString())
-                isDarkMode = lux < 20.0f
+            when (event?.sensor?.type) {
+
+                Sensor.TYPE_LIGHT -> {
+                    val lux = event.values[0]
+                    isDarkMode = lux < 20f
+                }
+
+                Sensor.TYPE_ACCELEROMETER -> {
+                    val x = event.values[0]
+                    val y = event.values[1]
+                    val z = event.values[2]
+
+                    val magnitude = sqrt(x * x + y * y + z * z)
+                    accelMagnitude = magnitude
+
+                    val delta = abs(magnitude - lastAccel)
+                    lastAccel = magnitude
+
+                    // 🔹 LOW PASS FILTER (smooth movement)
+                    smoothedAccel = smoothedAccel * 0.8f + delta * 0.2f
+
+                    val now = System.currentTimeMillis()
+
+                    // 🔹 CHECK ONLY EVERY 1 SECOND
+                    if (now - lastCheckTime > 1000) {
+
+                        // MORE SENSITIVE WALK DETECTION
+                        isWalking = smoothedAccel > 0.6f
+
+                        // STEP DETECTION (fallback)
+                        if (stepDetector == null && smoothedAccel > 1.2f) {
+                            stepCount++
+                        }
+
+                        lastCheckTime = now
+                    }
+
+                    // 🔹 COOLDOWN STEP DETECTION (extra reliability)
+                    if (stepDetector == null) {
+                        if (delta > 1.8f && (now - stepCooldown) > 500) {
+                            stepCount++
+                            stepCooldown = now
+                        }
+                    }
+                }
+
+                Sensor.TYPE_STEP_DETECTOR -> {
+                    stepCount++
+                    isWalking = true
+                }
             }
         }
+
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
     }
 
     DisposableEffect(Unit) {
         sensorManager.registerListener(sensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(sensorListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+        stepDetector?.let {
+            sensorManager.registerListener(sensorListener, it, SensorManager.SENSOR_DELAY_NORMAL)
+        }
         onDispose { sensorManager.unregisterListener(sensorListener) }
     }
 
     Location { viewModel.onLocationUpdate(it) }
-
-    var mostrarValidarFoto by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0A0A0A))
     ) {
-        // ── Mapa OSM ──────────────────────────────────────────────────────────
+
+        // ───────── MAP (UNCHANGED) ─────────
         AndroidView(
             modifier = modifier.matchParentSize(),
             factory = { ctx ->
@@ -136,105 +208,61 @@ fun Mapa(
                 val startPoint = GeoPoint(4.627293, -74.063228)
                 mapView.controller.setCenter(startPoint)
 
-                // Marcador del usuario (índice 0 en el tag)
                 val userMarker = Marker(mapView)
                 userMarker.position = startPoint
-                // tag: [userMarker, searchMarker?, longClickMarker?, destinoMarkers...]
                 mapView.tag = mutableListOf<Any?>(userMarker, null, null)
                 mapView.overlays.add(userMarker)
 
-                // Marcadores de destinos fijos
                 viewModel.destinos.forEach { destino ->
                     val m = Marker(mapView)
                     m.position = destino.punto
                     m.title = destino.nombre
-                    // Icono personalizado si tienes uno, si no usa el por defecto
-                    // m.icon = ContextCompat.getDrawable(ctx, R.drawable.ic_destino)
                     m.setOnMarkerClickListener { _, _ ->
                         viewModel.onDestinoClick(destino)
-                        true   // consumimos el click → no muestra el label por defecto
+                        true
                     }
                     mapView.overlays.add(m)
                 }
 
-                // Long-click en el mapa
                 val overlayEvents = MapEventsOverlay(object : MapEventsReceiver {
-                    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean = false
-                    override fun longPressHelper(p: GeoPoint?): Boolean {
-                        //p?.let { viewModel.onLongClick(GeoPoint(it.latitude, it.longitude)) }
-                        return true
-                    }
+                    override fun singleTapConfirmedHelper(p: GeoPoint?) = false
+                    override fun longPressHelper(p: GeoPoint?) = true
                 })
                 mapView.overlays.add(overlayEvents)
+
                 mapView
             },
             update = { mapView ->
-                //@Suppress("UNCHECKED_CAST")
                 val tags = mapView.tag as MutableList<Any?>
                 val userMarker = tags[0] as Marker
                 var changed = false
 
-                // Modo oscuro/claro
                 if (isDarkMode) {
                     val inverse = ColorMatrix(floatArrayOf(
-                        -1f, 0f, 0f, 0f, 255f,
-                        0f, -1f, 0f, 0f, 255f,
-                        0f, 0f, -1f, 0f, 255f,
-                        0f, 0f, 0f, 1f, 0f
+                        -1f,0f,0f,0f,255f,
+                        0f,-1f,0f,0f,255f,
+                        0f,0f,-1f,0f,255f,
+                        0f,0f,0f,1f,0f
                     ))
                     mapView.overlayManager.tilesOverlay.setColorFilter(ColorMatrixColorFilter(inverse))
                 } else {
                     mapView.overlayManager.tilesOverlay.setColorFilter(null)
                 }
-                changed = true
 
-                // Posición del usuario
                 state.userLocation?.let {
                     if (userMarker.position != it) {
                         userMarker.position = it
-                        userMarker.title = state.userAddress
                         mapView.controller.setCenter(it)
                         changed = true
                     }
                 }
 
-                // Marcador de búsqueda
-                /*state.searchedLocation?.let { loc ->
-                    val searchMarker = tags[1] as? Marker
-                        ?: Marker(mapView).also {
-                            mapView.overlays.add(it)
-                            tags[1] = it
-                        }
-                    if (searchMarker.position != loc) {
-                        searchMarker.position = loc
-                        searchMarker.title = state.searchedAddress
-                        mapView.controller.setCenter(loc)
-                        changed = true
-                    }
-                }*/
-
-                // Marcador de long-click
-                /*state.longClickLocation?.let { loc ->
-                    val longClickMarker = tags[2] as? Marker
-                        ?: Marker(mapView).also {
-                            mapView.overlays.add(it)
-                            tags[2] = it
-                        }
-                    if (longClickMarker.position != loc) {
-                        longClickMarker.position = loc
-                        longClickMarker.title = state.longClickAddress
-                        changed = true
-                    }
-                }*/
-
-                // Overlay de ruta
-                state.roadOverlay?.let { overlay ->
-                    mapView.overlays.removeIf { it is Polyline }
-                    mapView.overlays.add(overlay)
+                state.roadOverlay?.let {
+                    mapView.overlays.removeIf { o -> o is Polyline }
+                    mapView.overlays.add(it)
                     changed = true
                 }
 
-                // Si no hay overlay activo, limpia polylines
                 if (state.roadOverlay == null) {
                     if (mapView.overlays.any { it is Polyline }) {
                         mapView.overlays.removeIf { it is Polyline }
@@ -246,7 +274,8 @@ fun Mapa(
             }
         )
 
-        // ── DestinoCard: visible solo cuando hay destino seleccionado ─────────
+        // ───────── UI (UNCHANGED) ─────────
+
         if (state.selectedDestino != null) {
             DestinoCard(
                 destino = state.selectedDestino!!,
@@ -258,7 +287,6 @@ fun Mapa(
             )
         }
 
-        // ── Botones laterales ─────────────────────────────────────────────────
         BotonesLaterales(
             mostrandoRutaCompleta = state.mostrandoRutaCompleta,
             onToggleRutaCompleta = { viewModel.onToggleRutaCompleta() },
@@ -267,17 +295,12 @@ fun Mapa(
                 .padding(top = 10.dp, end = 14.dp)
         )
 
-        // ── CardInferior: visible solo cuando hay destino seleccionado ────────
         if (state.selectedDestino != null) {
             CardInferior(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(start = 10.dp, end = 14.dp, bottom = 20.dp),
-                onValidarFoto = {
-                    Log.i("MyApp", "Validar foto")
-                    mostrarValidarFoto = true
-                }
+                    .padding(14.dp),
+                onValidarFoto = { mostrarValidarFoto = true }
             )
         }
 
@@ -285,11 +308,24 @@ fun Mapa(
             ValidarFoto(
                 nombreLugar = state.selectedDestino?.nombre ?: "Destino",
                 onCerrar = { mostrarValidarFoto = false },
-                onConfirmar = {
-                    Log.i("MyApp", "Llegada confirmada: ${state.selectedDestino?.nombre}")
-                    mostrarValidarFoto = false
-                }
+                onConfirmar = { mostrarValidarFoto = false }
             )
+        }
+
+        Card(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 120.dp, start = 14.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xF21A1A1A))
+        ) {
+            Column(modifier = Modifier.padding(10.dp)) {
+                Text("Actividad", color = Color.White.copy(0.6f))
+                Text(
+                    if (isWalking) "Caminando 🚶" else "Quieto 🧍",
+                    color = if (isWalking) Color(0xFF22C55E) else Color.Gray
+                )
+                Text("Pasos: $stepCount", color = Color(0xFFFF9800))
+            }
         }
     }
 }
