@@ -51,15 +51,32 @@ fun Login(
 
     // Verificar credenciales guardadas para huella
     LaunchedEffect(Unit) {
+        Log.d("HUELLA", "=== INICIANDO VERIFICACIÓN DE HUELLA ===")
         val isBiometricEnabled = encryptedPrefs.isBiometricEnabled()
+        Log.d("HUELLA", "isBiometricEnabled: $isBiometricEnabled")
+
         if (isBiometricEnabled) {
             val (savedEmail, savedPassword) = encryptedPrefs.getUserCredentials()
+            Log.d("HUELLA", "savedEmail: $savedEmail")
+            Log.d("HUELLA", "savedPassword existe: ${savedPassword != null}")
+
             if (savedEmail != null && savedPassword != null) {
                 email = savedEmail
                 password = savedPassword
+                Log.d("HUELLA", "Credenciales cargadas, preparando biometría...")
+
+                val available = biometricManager.isBiometricAvailable()
+                Log.d("HUELLA", "Biometría disponible: $available")
+
                 biometricManager.setupBiometricPrompt()
+                Log.d("HUELLA", "BiometricPrompt configurado")
                 biometricManager.authenticate()
+                Log.d("HUELLA", "authenticate() llamado")
+            } else {
+                Log.d("HUELLA", "No hay credenciales guardadas (email o password null)")
             }
+        } else {
+            Log.d("HUELLA", "Biometría NO habilitada en preferencias")
         }
     }
 
@@ -72,6 +89,7 @@ fun Login(
             val authResult = authManager.handleGoogleSignInResult(result.data)
             authResult.fold(
                 onSuccess = {
+                    Log.d("HUELLA", "Google login exitoso")
                     onLoginSuccess()
                 },
                 onFailure = {
@@ -85,15 +103,20 @@ fun Login(
     // Observar resultado de biometría
     LaunchedEffect(Unit) {
         biometricManager.authResult.collect { result ->
+            Log.d("HUELLA", "Resultado de biometría recibido: $result")
             when (result) {
                 is BiometricAuthResult.Success -> {
+                    Log.d("HUELLA", "Biometría exitosa, iniciando sesión...")
                     scope.launch {
                         isLoading = true
                         val (savedEmail, savedPassword) = encryptedPrefs.getUserCredentials()
                         if (savedEmail != null && savedPassword != null) {
                             val loginResult = authManager.loginWithEmail(savedEmail, savedPassword)
                             loginResult.fold(
-                                onSuccess = { onLoginSuccess() },
+                                onSuccess = {
+                                    Log.d("HUELLA", "Login con huella exitoso")
+                                    onLoginSuccess()
+                                },
                                 onFailure = {
                                     errorMessage = "Error al iniciar con huella: ${it.message}"
                                     isLoading = false
@@ -103,9 +126,12 @@ fun Login(
                     }
                 }
                 is BiometricAuthResult.Error -> {
+                    Log.d("HUELLA", "Error de biometría: ${result.message}")
                     errorMessage = result.message
                 }
-                else -> {}
+                is BiometricAuthResult.Failed -> {
+                    Log.d("HUELLA", "Biometría fallida")
+                }
             }
         }
     }
@@ -187,9 +213,11 @@ fun Login(
 
                         result.fold(
                             onSuccess = { user ->
-                                if (esRegistro) {
-                                    encryptedPrefs.saveUserCredentials(email, password)
-                                }
+                                Log.d("HUELLA", "${if (esRegistro) "Registro" else "Login"} exitoso para: ${user.email}")
+                                // Guardar credenciales SIEMPRE (tanto en registro como en login)
+                                Log.d("HUELLA", "Guardando credenciales para: $email")
+                                encryptedPrefs.saveUserCredentials(email, password)
+                                Log.d("HUELLA", "Credenciales guardadas")
                                 onLoginSuccess()
                             },
                             onFailure = { exception ->
@@ -219,6 +247,7 @@ fun Login(
                     }
                 },
                 onBiometric = {
+                    Log.d("HUELLA", "Botón de huella presionado manualmente")
                     biometricManager.setupBiometricPrompt()
                     biometricManager.authenticate()
                 },
@@ -387,22 +416,6 @@ fun FormularioLogin(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (isBiometricAvailable && !esRegistro) {
-                Button(
-                    onClick = onBiometric,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0x1AFFFFFF)),
-                    shape = RoundedCornerShape(12.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x33FFFFFF))
-                ) {
-                    Icon(Icons.Default.Fingerprint, null, tint = Color.White, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Iniciar con huella", color = Color.White, fontWeight = FontWeight.Medium)
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-            }
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 TextButton(onClick = onToggleRegistro) {
@@ -426,19 +439,7 @@ fun FormularioLogin(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = onGoogle,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0x0DFFFFFF)),
-                shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x33FFFFFF))
-            ) {
-                Icon(Icons.Default.Language, null, tint = Color.White, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Continuar con Google", color = Color.White, fontWeight = FontWeight.Medium)
-            }
+
         }
     }
 }

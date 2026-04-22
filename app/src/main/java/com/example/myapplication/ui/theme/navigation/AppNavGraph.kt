@@ -16,7 +16,8 @@ fun AppNavGraph(
     navController: NavHostController,
     startDestination: String = BottomNavItem.Home.route,
     user: FirebaseUser?,  // ← Recibir el usuario
-    onLogout: () -> Unit  // ← Callback para cerrar sesión
+    onLogout: () -> Unit,  // ← Callback para cerrar sesion
+    onAccountDeleted: () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -41,7 +42,8 @@ fun AppNavGraph(
         composable(BottomNavItem.Perfil.route) {
             Perfil(
                 user = user,
-                onLogout = onLogout
+                onLogout = onLogout,
+                onAccountDeleted = onAccountDeleted
             )
         }
     }

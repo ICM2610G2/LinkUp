@@ -16,7 +16,8 @@ import com.google.firebase.auth.FirebaseUser
 @Composable
 fun MainScaffold(
     user: FirebaseUser?,      // ← Recibir el usuario
-    onLogout: () -> Unit      // ← Callback para cerrar sesión
+    onLogout: () -> Unit,
+    onAccountDeleted: () -> Unit, // ← Callback para cerrar sesión
 ) {
     val navController = rememberNavController()
 
@@ -28,7 +29,9 @@ fun MainScaffold(
         AppNavGraph(
             navController = navController,
             user = user,
-            onLogout = onLogout
+            onLogout = onLogout,
+            onAccountDeleted = onAccountDeleted,
+
         )
     }
 }

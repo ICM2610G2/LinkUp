@@ -14,6 +14,8 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import com.google.firebase.auth.EmailAuthProvider
+
 
 class FirebaseAuthManager(private val activity: Activity) {
 
@@ -98,6 +100,37 @@ class FirebaseAuthManager(private val activity: Activity) {
     }
 
     fun getCurrentUser(): FirebaseUser? = auth.currentUser
+
+    suspend fun deleteAccountWithPassword(password: String): Result<Unit> {
+        return try {
+            val user = auth.currentUser ?: throw Exception("No hay usuario logueado")
+            val email = user.email ?: throw Exception("No hay email asociado")
+
+            // Re-autenticar antes de borrar
+            val credential = EmailAuthProvider.getCredential(email, password)
+            user.reauthenticate(credential).await()
+
+            // Borrar la cuenta
+            user.delete().await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteAccount(): Result<Unit> {
+        return try {
+            val user = auth.currentUser ?: throw Exception("No hay usuario logueado")
+            user.delete().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+
 }
 
 sealed class AuthState {
