@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.theme.screens
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context.SENSOR_SERVICE
 import android.content.pm.PackageManager
@@ -9,9 +10,12 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.net.Uri
 import android.os.Build
 import android.os.Looper
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import com.example.myapplication.R
 import androidx.compose.foundation.Image
@@ -25,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.ui.theme.model.Destino
 import com.example.myapplication.ui.theme.model.MapsViewModel
@@ -61,10 +67,11 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
+import java.io.File
 import kotlin.math.sqrt
 import kotlin.math.abs
 
-
+val cameraPerm = Manifest.permission.CAMERA
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LocationPermission() {
@@ -78,7 +85,7 @@ fun LocationPermission() {
 
 @Composable
 fun GPSContents() {
-    //("Not yet implemented")
+    /*...*/
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -139,12 +146,12 @@ fun Mapa(
                     val delta = abs(magnitude - lastAccel)
                     lastAccel = magnitude
 
-                    // 🔹 LOW PASS FILTER (smooth movement)
+                    // LOW PASS FILTER
                     smoothedAccel = smoothedAccel * 0.8f + delta * 0.2f
 
                     val now = System.currentTimeMillis()
 
-                    // 🔹 CHECK ONLY EVERY 1 SECOND
+                    // CHECK ONLY EVERY 1 SECOND
                     if (now - lastCheckTime > 1000) {
 
                         // MORE SENSITIVE WALK DETECTION
@@ -158,7 +165,7 @@ fun Mapa(
                         lastCheckTime = now
                     }
 
-                    // 🔹 COOLDOWN STEP DETECTION (extra reliability)
+                    // COOLDOWN STEP DETECTION
                     if (stepDetector == null) {
                         if (delta > 1.8f && (now - stepCooldown) > 500) {
                             stepCount++
@@ -194,7 +201,6 @@ fun Mapa(
             .background(Color(0xFF0A0A0A))
     ) {
 
-        // ───────── MAP (UNCHANGED) ─────────
         AndroidView(
             modifier = modifier.matchParentSize(),
             factory = { ctx ->
@@ -274,8 +280,6 @@ fun Mapa(
             }
         )
 
-        // ───────── UI (UNCHANGED) ─────────
-
         if (state.selectedDestino != null) {
             DestinoCard(
                 destino = state.selectedDestino!!,
@@ -283,7 +287,7 @@ fun Mapa(
                 onCerrar = { viewModel.onCerrarDestino() },
                 modifier = Modifier
                     .align(Alignment.TopStart)
-                    .padding(start = 14.dp, end = 92.dp, top = 14.dp)
+                    .padding(start = 14.dp, end = 112.dp, top = 10.dp)
             )
         }
 
@@ -314,8 +318,8 @@ fun Mapa(
 
         Card(
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 120.dp, start = 14.dp),
+                .align(Alignment.TopEnd)
+                .padding(top = 10.dp, end = 14.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xF21A1A1A))
         ) {
             Column(modifier = Modifier.padding(10.dp)) {
@@ -330,9 +334,6 @@ fun Mapa(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DestinoCard — ahora recibe datos dinámicos del destino seleccionado
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun DestinoCard(
     destino: Destino,
@@ -434,9 +435,6 @@ fun DestinoCard(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BotonesLaterales — último botón activa/desactiva ruta completa
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun BotonesLaterales(
     mostrandoRutaCompleta: Boolean,
@@ -448,7 +446,7 @@ fun BotonesLaterales(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Botón estado del usuario (caminando / validado)
-        Card(
+        /*Card(
             colors = CardDefaults.cardColors(containerColor = Color(0xF21A1A1A)),
             shape = RoundedCornerShape(16.dp),
             border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF)),
@@ -474,13 +472,13 @@ fun BotonesLaterales(
                 Text("Caminando", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
                 Text("Validado ✓", color = Color(0xFF22C55E), fontSize = 8.sp)
             }
-        }
+        }*/
 
         // Brújula
         Card(
             colors = CardDefaults.cardColors(containerColor = Color(0xF21A1A1A)),
             shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.align(Alignment.End).clickable { Log.i("MyApp", "Brújula clicked") },
+            modifier = Modifier.align(Alignment.End).padding(top = 100.dp).clickable { Log.i("MyApp", "Brújula clicked") },
             border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF)),
         ) {
             Box(modifier = Modifier.padding(10.dp)) {
@@ -500,7 +498,7 @@ fun BotonesLaterales(
             }
         }
 
-        // ── Botón ruta completa (ÚLTIMO botón) ────────────────────────────────
+        // Boton ruta
         Card(
             colors = CardDefaults.cardColors(
                 containerColor = if (mostrandoRutaCompleta) Color(0xFFFF9800) else Color(0xF21A1A1A)
@@ -524,11 +522,24 @@ fun BotonesLaterales(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CardInferior — sin cambios en su estructura interna
-// ─────────────────────────────────────────────────────────────────────────────
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CardInferior(modifier: Modifier = Modifier, onValidarFoto: () -> Unit) {
+    val context = LocalContext.current
+    val permissionStatus = rememberPermissionState(cameraPerm)
+    var imageUri by remember{ mutableStateOf<Uri?>(null) }
+    val cameraUri = FileProvider.getUriForFile(context,
+        "${context.packageName}.fileprovider",
+        File(context.filesDir, "cameraPic.jpg")
+    )
+
+    val camera = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()){ it ->
+        if(it){
+            imageUri = cameraUri
+        }
+    }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xF21A1A1A)),
         shape = RoundedCornerShape(16.dp),
@@ -558,7 +569,7 @@ fun CardInferior(modifier: Modifier = Modifier, onValidarFoto: () -> Unit) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
+            /*Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -587,10 +598,20 @@ fun CardInferior(modifier: Modifier = Modifier, onValidarFoto: () -> Unit) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp))*/
 
             Button(
-                onClick = onValidarFoto,
+                onClick = {
+                    onValidarFoto
+                    if(!permissionStatus.status.isGranted){
+                        permissionStatus.launchPermissionRequest()
+                    }
+                    if(permissionStatus.status.isGranted ){
+                        camera.launch(cameraUri)
+                    }else{
+                        imageUri = null
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
                 modifier = Modifier
                     .fillMaxWidth()
