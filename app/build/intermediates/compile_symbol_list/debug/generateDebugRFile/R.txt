@@ -8,7 +8,9 @@ int color white 0x0
 int drawable bogota_bg 0x0
 int drawable ic_launcher_background 0x0
 int drawable ic_launcher_foreground 0x0
+int drawable la_candelaria 0x0
 int drawable map_background 0x0
+int drawable monserrate 0x0
 int drawable museum_sample 0x0
 int mipmap ic_launcher 0x0
 int mipmap ic_launcher_round 0x0

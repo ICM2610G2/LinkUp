@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 package com.example.myapplication
 
 import android.os.Bundle
@@ -15,15 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import com.example.myapplication.auth.BiometricAuthManager
+import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.ui.theme.auth.EncryptedPreferences
 import com.example.myapplication.ui.theme.auth.FirebaseAuthManager
 import com.example.myapplication.ui.theme.auth.AuthState
-import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.ui.theme.navigation.MainScaffold
 import com.example.myapplication.ui.theme.screens.Login
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {  // <--- CAMBIA a AppCompatActivity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,7 +44,7 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun LinkUpApp() {
     val context = LocalContext.current
-    val activity = context as AppCompatActivity
+    val activity = context as AppCompatActivity  // <--- CAMBIA a AppCompatActivity
     val scope = rememberCoroutineScope()
 
     val authManager = remember { FirebaseAuthManager(activity) }
@@ -58,11 +57,8 @@ fun LinkUpApp() {
         is AuthState.Authenticated -> {
             MainScaffold(
                 user = state.user,
-                onLogout = {
-                    // El logout ya maneja el cambio de estado
-                },
+                onLogout = {},
                 onAccountDeleted = {
-                    // Limpiar credenciales guardadas cuando se borra la cuenta
                     scope.launch {
                         encryptedPrefs.clearUserCredentials()
                     }
@@ -86,33 +82,4 @@ fun LinkUpApp() {
             )
         }
     }
-=======
-package com.example.myapplication
-
-import android.location.Geocoder
-import android.os.Bundle
-import android.os.StrictMode
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import com.example.myapplication.ui.theme.MyApplicationTheme
-import com.example.myapplication.ui.theme.navigation.MainScaffold
-import org.osmdroid.config.Configuration
-
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val policy =
-            StrictMode.ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
-        Configuration.getInstance().userAgentValue = "AndroidApp"
-        setContent {
-            // Si ya tienes tema, lo dejas y metes el MainScaffold dentro
-            MyApplicationTheme {
-                MainScaffold()
-            }
-        }
-        lateinit var geocoder: Geocoder
-        geocoder = Geocoder(this)
-    }
->>>>>>> 0d3ecbd77c6ec322bdd7dfd15199c6371177efbe
 }
