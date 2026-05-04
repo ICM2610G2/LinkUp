@@ -40,10 +40,14 @@ MERGED from [androidx.credentials:credentials:1.2.0-rc01] C:\Users\Nicolas\.grad
 MERGED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:17:1-44:12
 MERGED from [com.google.android.gms:play-services-auth:21.2.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:17:1-40:12
 MERGED from [com.google.android.gms:play-services-places:17.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\e77814761824f542832feb7271d7edfe\workspace\transformed\play-services-places-17.1.0\AndroidManifest.xml:2:1-8:12
+MERGED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:2:1-26:12
+MERGED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:15:1-39:12
 MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\14cfc3bc5ac7699a116023807effa4a6\workspace\transformed\play-services-auth-api-phone-18.0.2\AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.gms:play-services-auth-base:18.0.10] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\ee94a4bb7d1bd336ae631317c91a8d3f\workspace\transformed\play-services-auth-base-18.0.10\AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\54a3fa2d8869df767d5396d7313d25b5\workspace\transformed\play-services-maps-17.0.0\AndroidManifest.xml:17:1-38:12
-MERGED from [com.google.firebase:firebase-appcheck-interop:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\fe26430f32004ae854bb2527bff34817\workspace\transformed\firebase-appcheck-interop-17.0.0\AndroidManifest.xml:15:1-25:12
+MERGED from [com.google.firebase:firebase-database-collection:18.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\db33e0c28b51aa669aed7435b7174671\workspace\transformed\firebase-database-collection-18.0.1\AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:15:1-34:12
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\4f1949a971a2fa33e15edb31c70dfccc\workspace\transformed\firebase-appcheck-interop-17.1.0\AndroidManifest.xml:15:1-23:12
 MERGED from [com.google.firebase:firebase-analytics:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\021403648adeb38aa0a532974b343dfe\workspace\transformed\firebase-analytics-22.1.2\AndroidManifest.xml:2:1-9:12
 MERGED from [com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:17:1-46:12
 MERGED from [com.google.android.gms:play-services-measurement-sdk:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\da918bc7207335ed132f969ff3563040\workspace\transformed\play-services-measurement-sdk-22.1.2\AndroidManifest.xml:17:1-25:12
@@ -149,6 +153,8 @@ MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Nicolas\.gradle\cac
 MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\e4cb885430f487bebb6da169d681f953\workspace\transformed\documentfile-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.print:print:1.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\13885de3d04a4170f320bdc3ce670427\workspace\transformed\print-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [org.osmdroid:osmdroid-android:6.1.20] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:2:1-27:12
+MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\0673843bf75873dcb5e1bcc9fd303981\workspace\transformed\grpc-android-1.62.2\AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.firebase:protolite-well-known-types:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9b7de4f7c5989aea84a9f425fd8506bd\workspace\transformed\protolite-well-known-types-18.0.0\AndroidManifest.xml:2:1-11:12
 MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:2:1-21:12
 	package
 		INJECTED from C:\Users\Nicolas\LinkUp\app\src\main\AndroidManifest.xml
@@ -164,6 +170,10 @@ uses-permission#android.permission.INTERNET
 ADDED from C:\Users\Nicolas\LinkUp\app\src\main\AndroidManifest.xml:6:5-67
 MERGED from [com.google.firebase:firebase-auth:23.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:25:5-67
 MERGED from [com.google.firebase:firebase-auth:23.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:25:5-67
+MERGED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:11:5-67
+MERGED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:11:5-67
+MERGED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:24:5-67
+MERGED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:24:5-67
 MERGED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\54a3fa2d8869df767d5396d7313d25b5\workspace\transformed\play-services-maps-17.0.0\AndroidManifest.xml:24:5-67
 MERGED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\54a3fa2d8869df767d5396d7313d25b5\workspace\transformed\play-services-maps-17.0.0\AndroidManifest.xml:24:5-67
 MERGED from [com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:23:5-67
@@ -268,14 +278,22 @@ MERGED from [com.google.android.gms:play-services-auth:21.2.0] C:\Users\Nicolas\
 MERGED from [com.google.android.gms:play-services-auth:21.2.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:20:5-44
 MERGED from [com.google.android.gms:play-services-places:17.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\e77814761824f542832feb7271d7edfe\workspace\transformed\play-services-places-17.1.0\AndroidManifest.xml:4:5-44
 MERGED from [com.google.android.gms:play-services-places:17.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\e77814761824f542832feb7271d7edfe\workspace\transformed\play-services-places-17.1.0\AndroidManifest.xml:4:5-44
+MERGED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:6:5-44
+MERGED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:6:5-44
+MERGED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:19:5-44
+MERGED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:19:5-44
 MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\14cfc3bc5ac7699a116023807effa4a6\workspace\transformed\play-services-auth-api-phone-18.0.2\AndroidManifest.xml:5:5-44
 MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\14cfc3bc5ac7699a116023807effa4a6\workspace\transformed\play-services-auth-api-phone-18.0.2\AndroidManifest.xml:5:5-44
 MERGED from [com.google.android.gms:play-services-auth-base:18.0.10] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\ee94a4bb7d1bd336ae631317c91a8d3f\workspace\transformed\play-services-auth-base-18.0.10\AndroidManifest.xml:5:5-44
 MERGED from [com.google.android.gms:play-services-auth-base:18.0.10] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\ee94a4bb7d1bd336ae631317c91a8d3f\workspace\transformed\play-services-auth-base-18.0.10\AndroidManifest.xml:5:5-44
 MERGED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\54a3fa2d8869df767d5396d7313d25b5\workspace\transformed\play-services-maps-17.0.0\AndroidManifest.xml:20:5-44
 MERGED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\54a3fa2d8869df767d5396d7313d25b5\workspace\transformed\play-services-maps-17.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.google.firebase:firebase-appcheck-interop:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\fe26430f32004ae854bb2527bff34817\workspace\transformed\firebase-appcheck-interop-17.0.0\AndroidManifest.xml:18:5-20:41
-MERGED from [com.google.firebase:firebase-appcheck-interop:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\fe26430f32004ae854bb2527bff34817\workspace\transformed\firebase-appcheck-interop-17.0.0\AndroidManifest.xml:18:5-20:41
+MERGED from [com.google.firebase:firebase-database-collection:18.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\db33e0c28b51aa669aed7435b7174671\workspace\transformed\firebase-database-collection-18.0.1\AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.firebase:firebase-database-collection:18.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\db33e0c28b51aa669aed7435b7174671\workspace\transformed\firebase-database-collection-18.0.1\AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\4f1949a971a2fa33e15edb31c70dfccc\workspace\transformed\firebase-appcheck-interop-17.1.0\AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\4f1949a971a2fa33e15edb31c70dfccc\workspace\transformed\firebase-appcheck-interop-17.1.0\AndroidManifest.xml:18:5-44
 MERGED from [com.google.firebase:firebase-analytics:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\021403648adeb38aa0a532974b343dfe\workspace\transformed\firebase-analytics-22.1.2\AndroidManifest.xml:5:5-44
 MERGED from [com.google.firebase:firebase-analytics:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\021403648adeb38aa0a532974b343dfe\workspace\transformed\firebase-analytics-22.1.2\AndroidManifest.xml:5:5-44
 MERGED from [com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:20:5-44
@@ -486,6 +504,10 @@ MERGED from [androidx.print:print:1.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\t
 MERGED from [androidx.print:print:1.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\13885de3d04a4170f320bdc3ce670427\workspace\transformed\print-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [org.osmdroid:osmdroid-android:6.1.20] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:5:5-7:41
 MERGED from [org.osmdroid:osmdroid-android:6.1.20] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:5:5-7:41
+MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\0673843bf75873dcb5e1bcc9fd303981\workspace\transformed\grpc-android-1.62.2\AndroidManifest.xml:5:5-44
+MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\0673843bf75873dcb5e1bcc9fd303981\workspace\transformed\grpc-android-1.62.2\AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:protolite-well-known-types:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9b7de4f7c5989aea84a9f425fd8506bd\workspace\transformed\protolite-well-known-types-18.0.0\AndroidManifest.xml:7:5-9:41
+MERGED from [com.google.firebase:protolite-well-known-types:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9b7de4f7c5989aea84a9f425fd8506bd\workspace\transformed\protolite-well-known-types-18.0.0\AndroidManifest.xml:7:5-9:41
 MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:7:5-9:41
 MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:7:5-9:41
 	tools:overrideLibrary
@@ -511,10 +533,16 @@ MERGED from [com.google.android.gms:play-services-auth:21.2.0] C:\Users\Nicolas\
 MERGED from [com.google.android.gms:play-services-auth:21.2.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:22:5-38:19
 MERGED from [com.google.android.gms:play-services-places:17.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\e77814761824f542832feb7271d7edfe\workspace\transformed\play-services-places-17.1.0\AndroidManifest.xml:6:5-20
 MERGED from [com.google.android.gms:play-services-places:17.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\e77814761824f542832feb7271d7edfe\workspace\transformed\play-services-places-17.1.0\AndroidManifest.xml:6:5-20
+MERGED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:13:5-24:19
+MERGED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:13:5-24:19
+MERGED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:26:5-37:19
+MERGED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:26:5-37:19
 MERGED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\54a3fa2d8869df767d5396d7313d25b5\workspace\transformed\play-services-maps-17.0.0\AndroidManifest.xml:30:5-36:19
 MERGED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\54a3fa2d8869df767d5396d7313d25b5\workspace\transformed\play-services-maps-17.0.0\AndroidManifest.xml:30:5-36:19
-MERGED from [com.google.firebase:firebase-appcheck-interop:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\fe26430f32004ae854bb2527bff34817\workspace\transformed\firebase-appcheck-interop-17.0.0\AndroidManifest.xml:23:5-20
-MERGED from [com.google.firebase:firebase-appcheck-interop:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\fe26430f32004ae854bb2527bff34817\workspace\transformed\firebase-appcheck-interop-17.0.0\AndroidManifest.xml:23:5-20
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:21:5-32:19
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:21:5-32:19
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\4f1949a971a2fa33e15edb31c70dfccc\workspace\transformed\firebase-appcheck-interop-17.1.0\AndroidManifest.xml:21:5-20
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\4f1949a971a2fa33e15edb31c70dfccc\workspace\transformed\firebase-appcheck-interop-17.1.0\AndroidManifest.xml:21:5-20
 MERGED from [com.google.firebase:firebase-analytics:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\021403648adeb38aa0a532974b343dfe\workspace\transformed\firebase-analytics-22.1.2\AndroidManifest.xml:7:5-20
 MERGED from [com.google.firebase:firebase-analytics:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\021403648adeb38aa0a532974b343dfe\workspace\transformed\firebase-analytics-22.1.2\AndroidManifest.xml:7:5-20
 MERGED from [com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:28:5-44:19
@@ -657,6 +685,10 @@ ADDED from [androidx.camera:camera-camera2:1.3.0] C:\Users\Nicolas\.gradle\cache
 		ADDED from [androidx.camera:camera-camera2:1.3.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:31:17-103
 uses-permission#android.permission.ACCESS_NETWORK_STATE
 ADDED from [com.google.firebase:firebase-auth:23.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:26:5-79
+MERGED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:10:5-79
+MERGED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:10:5-79
+MERGED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:23:5-79
+MERGED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:23:5-79
 MERGED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\54a3fa2d8869df767d5396d7313d25b5\workspace\transformed\play-services-maps-17.0.0\AndroidManifest.xml:23:5-79
 MERGED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\54a3fa2d8869df767d5396d7313d25b5\workspace\transformed\play-services-maps-17.0.0\AndroidManifest.xml:23:5-79
 MERGED from [com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:24:5-79
@@ -671,6 +703,8 @@ MERGED from [com.google.firebase:firebase-installations:18.0.0] C:\Users\Nicolas
 MERGED from [com.google.firebase:firebase-installations:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:7:5-79
 MERGED from [com.google.android.gms:play-services-measurement-sdk-api:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\dc2f76409f512abf77f3591cdb91437c\workspace\transformed\play-services-measurement-sdk-api-22.1.2\AndroidManifest.xml:24:5-79
 MERGED from [com.google.android.gms:play-services-measurement-sdk-api:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\dc2f76409f512abf77f3591cdb91437c\workspace\transformed\play-services-measurement-sdk-api-22.1.2\AndroidManifest.xml:24:5-79
+MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\0673843bf75873dcb5e1bcc9fd303981\workspace\transformed\grpc-android-1.62.2\AndroidManifest.xml:7:5-79
+MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\0673843bf75873dcb5e1bcc9fd303981\workspace\transformed\grpc-android-1.62.2\AndroidManifest.xml:7:5-79
 	android:name
 		ADDED from [com.google.firebase:firebase-auth:23.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:26:22-76
 activity#com.google.firebase.auth.internal.GenericIdpActivity
@@ -723,6 +757,12 @@ intent-filter#action:name:android.intent.action.VIEW+category:name:android.inten
 ADDED from [com.google.firebase:firebase-auth:23.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:53:13-63:29
 service#com.google.firebase.components.ComponentDiscoveryService
 ADDED from [com.google.firebase:firebase-auth:23.1.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:66:9-72:19
+MERGED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:14:9-23:19
+MERGED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:14:9-23:19
+MERGED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:27:9-36:19
+MERGED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:27:9-36:19
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:22:9-31:19
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:22:9-31:19
 MERGED from [com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:34:9-40:19
 MERGED from [com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:34:9-40:19
 MERGED from [com.google.firebase:firebase-installations:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:12:9-21:19
@@ -795,6 +835,30 @@ ADDED from [com.google.android.gms:play-services-auth:21.2.0] C:\Users\Nicolas\.
 		ADDED from [com.google.android.gms:play-services-auth:21.2.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:36:13-107
 	android:name
 		ADDED from [com.google.android.gms:play-services-auth:21.2.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:34:13-89
+meta-data#com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar
+ADDED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:17:13-19:85
+	android:value
+		ADDED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:19:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:18:17-122
+meta-data#com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar
+ADDED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:20:13-22:85
+	android:value
+		ADDED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:22:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-firestore:25.1.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:21:17-111
+meta-data#com.google.firebase.components:com.google.firebase.storage.FirebaseStorageKtxRegistrar
+ADDED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:30:13-32:85
+	android:value
+		ADDED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:32:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:31:17-118
+meta-data#com.google.firebase.components:com.google.firebase.storage.StorageRegistrar
+ADDED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:33:13-35:85
+	android:value
+		ADDED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:35:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-storage:21.0.1] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:34:17-107
 uses-feature#0x00020000
 ADDED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\54a3fa2d8869df767d5396d7313d25b5\workspace\transformed\play-services-maps-17.0.0\AndroidManifest.xml:26:5-28:35
 	android:glEsVersion
@@ -807,6 +871,18 @@ ADDED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.
 		ADDED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\54a3fa2d8869df767d5396d7313d25b5\workspace\transformed\play-services-maps-17.0.0\AndroidManifest.xml:35:13-37
 	android:name
 		ADDED from [com.google.android.gms:play-services-maps:17.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\54a3fa2d8869df767d5396d7313d25b5\workspace\transformed\play-services-maps-17.0.0\AndroidManifest.xml:34:13-50
+meta-data#com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckKtxRegistrar
+ADDED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:25:13-27:85
+	android:value
+		ADDED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:27:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:26:17-120
+meta-data#com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckRegistrar
+ADDED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:28:13-30:85
+	android:value
+		ADDED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:30:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:29:17-117
 uses-permission#android.permission.WAKE_LOCK
 ADDED from [com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:25:5-68
 MERGED from [com.google.android.gms:play-services-measurement-impl:22.1.2] C:\Users\Nicolas\.gradle\caches\9.2.1\transforms\8e70b55ac0da888e5067793558692d1d\workspace\transformed\play-services-measurement-impl-22.1.2\AndroidManifest.xml:25:5-68

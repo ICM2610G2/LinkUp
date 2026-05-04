@@ -1,50 +1,151 @@
 package com.example.myapplication.ui.theme.navigation
 
-import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.myapplication.data.models.User
+import com.example.myapplication.repository.UserRepository
+import com.example.myapplication.ui.theme.screens.*
 import com.google.firebase.auth.FirebaseUser
-import com.example.myapplication.ui.theme.screens.Home
-import com.example.myapplication.ui.theme.screens.Mapa
-import com.example.myapplication.ui.theme.screens.Carreras
-import com.example.myapplication.ui.theme.screens.Chat
-import com.example.myapplication.ui.theme.screens.Perfil
+import kotlinx.coroutines.launch
+
+sealed class Screen(val route: String) {
+    object Home : Screen("home")
+    object Mapa : Screen("mapa")
+    object Carreras : Screen("carreras")
+    object Chat : Screen("chat")
+    object Perfil : Screen("perfil")
+    object Login : Screen("login")
+    object EditProfile : Screen("edit_profile")
+}
 
 @Composable
 fun AppNavGraph(
-    navController: NavHostController,
-    startDestination: String = BottomNavItem.Home.route,
-    user: FirebaseUser?,  // ← Recibir el usuario
-    onLogout: () -> Unit,  // ← Callback para cerrar sesion
+    modifier: Modifier = Modifier,
+    isLoggedIn: Boolean,
+    user: FirebaseUser? = null,
+    onLogout: () -> Unit,
     onAccountDeleted: () -> Unit
 ) {
+    val navController = rememberNavController()
+    val scope = rememberCoroutineScope()
+    val userRepository = remember { UserRepository() }
+
+    // Estado para userData desde Firestore
+    var userData by remember { mutableStateOf<User?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    // Cargar userData cuando cambia el usuario
+    LaunchedEffect(user) {
+        isLoading = true
+        userData = if (user != null) {
+            userRepository.getUser(user.uid)
+        } else {
+            null
+        }
+        isLoading = false
+    }
+
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = if (isLoggedIn) Screen.Home.route else Screen.Login.route,
+        modifier = modifier
     ) {
-        composable(BottomNavItem.Home.route) {
+        composable(Screen.Login.route) {
+            val dummyAuthManager = com.example.myapplication.ui.theme.auth.FirebaseAuthManager(
+                androidx.compose.ui.platform.LocalContext.current as androidx.appcompat.app.AppCompatActivity
+            )
+            val dummyBiometricManager = com.example.myapplication.auth.BiometricAuthManager(
+                androidx.compose.ui.platform.LocalContext.current as androidx.appcompat.app.AppCompatActivity
+            )
+            val dummyEncryptedPrefs = com.example.myapplication.ui.theme.auth.EncryptedPreferences(
+                androidx.compose.ui.platform.LocalContext.current
+            )
+            Login(
+                onLoginSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                authManager = dummyAuthManager,
+                biometricManager = dummyBiometricManager,
+                encryptedPrefs = dummyEncryptedPrefs
+            )
+        }
+
+        composable(Screen.Home.route) {
             Home()
         }
 
-        composable(BottomNavItem.Mapa.route) {
+        composable(Screen.Mapa.route) {
             Mapa()
         }
 
-        composable(BottomNavItem.Carreras.route) {
+        composable(Screen.Carreras.route) {
             Carreras()
         }
 
-        composable(BottomNavItem.Chat.route) {
+        composable(Screen.Chat.route) {
             Chat()
         }
 
-        composable(BottomNavItem.Perfil.route) {
-            Perfil(
-                user = user,
-                onLogout = onLogout,
-                onAccountDeleted = onAccountDeleted
-            )
+        composable(Screen.Perfil.route) {
+            if (isLoading) {
+                // Mostrar loading mientras carga
+                androidx.compose.material3.CircularProgressIndicator(
+                    modifier = Modifier,
+                    color = androidx.compose.ui.graphics.Color(0xFFFF9800)
+                )
+            } else {
+                Perfil(
+                    user = user,
+                    userData = userData,
+                    onLogout = {
+                        scope.launch {
+                            onLogout()
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    },
+                    onAccountDeleted = {
+                        scope.launch {
+                            onAccountDeleted()
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    },
+                    onEditProfile = {
+                        navController.navigate(Screen.EditProfile.route)
+                    },
+                    onRefresh = {
+                        scope.launch {
+                            userData = user?.let { userRepository.getUser(it.uid) }
+                        }
+                    }
+                )
+            }
+        }
+
+        composable(Screen.EditProfile.route) {
+            if (userData != null) {
+                EditProfileScreen(
+                    userData = userData!!,
+                    onSave = { updatedUser ->
+                        userData = updatedUser
+                        navController.popBackStack()
+                    },
+                    onCancel = {
+                        navController.popBackStack()
+                    }
+                )
+            }
         }
     }
 }

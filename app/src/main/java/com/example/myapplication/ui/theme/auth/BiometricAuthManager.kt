@@ -69,9 +69,9 @@ class BiometricAuthManager(private val activity: FragmentActivity) {
             })
 
         promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Confirmar eliminación de cuenta")
-            .setSubtitle("Esta acción es irreversible")
-            .setDescription("Coloca tu dedo en el sensor para confirmar que quieres eliminar tu cuenta")
+            .setTitle("Iniciar sesión con huella")
+            .setSubtitle("Confirma tu identidad")
+            .setDescription("Usa tu huella para entrar a LinkUp")
             .setNegativeButtonText("Cancelar")
             .build()
     }

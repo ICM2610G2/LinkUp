@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.myapplication.auth.BiometricAuthManager
+import com.example.myapplication.data.models.User
 import com.example.myapplication.ui.theme.auth.FirebaseAuthManager
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
@@ -28,12 +29,18 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun Perfil(
     user: FirebaseUser?,
+    userData: User?,
     onLogout: () -> Unit,
-    onAccountDeleted: () -> Unit
+    onAccountDeleted: () -> Unit,
+    onEditProfile: () -> Unit,
+    onRefresh: () -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -41,6 +48,7 @@ fun Perfil(
     val authManager = remember { FirebaseAuthManager(activity) }
     val biometricManager = remember { BiometricAuthManager(activity) }
 
+    var showEditProfile by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showPasswordDialog by remember { mutableStateOf(false) }
     var deletePassword by remember { mutableStateOf("") }
@@ -48,9 +56,16 @@ fun Perfil(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showBiometricConfirm by remember { mutableStateOf(false) }
 
-    val displayName = user?.displayName ?: "Usuario"
+    val displayName = user?.displayName ?: userData?.displayName ?: "Usuario"
     val email = user?.email ?: "correo@ejemplo.com"
-    val userId = user?.uid?.take(8) ?: ""
+    val userId = user?.uid ?: userData?.uid?.take(8) ?: ""
+
+    // Datos reales de Firestore
+    val totalPlaces = userData?.totalPlacesVisited ?: 0
+    val currentStreak = userData?.currentStreak ?: 0
+    val bestStreak = userData?.bestStreak ?: 0
+    val totalPoints = userData?.totalPoints ?: 0
+    val gameId = userData?.gameId ?: "linkup#0000"
 
     // Observar resultado de biometría para borrar cuenta
     LaunchedEffect(Unit) {
@@ -81,18 +96,36 @@ fun Perfil(
         }
     }
 
-    PerfilContent(
-        displayName = displayName,
-        email = email,
-        userId = userId,
-        onLogoutClick = {
-            scope.launch {
-                authManager.logout()
-                onLogout()
-            }
-        },
-        onDeleteClick = { showDeleteDialog = true }
-    )
+    // Pantalla de edición de perfil
+    if (showEditProfile && userData != null) {
+        EditProfileScreen(
+            userData = userData,
+            onSave = {
+                showEditProfile = false
+                // Recargar datos - esto se manejará con un ViewModel en la siguiente iteración
+            },
+            onCancel = { showEditProfile = false }
+        )
+    } else {
+        PerfilContent(
+            displayName = displayName,
+            email = email,
+            userId = userId,
+            gameId = gameId,
+            totalPlaces = totalPlaces,
+            currentStreak = currentStreak,
+            bestStreak = bestStreak,
+            totalPoints = totalPoints,
+            onEditClick = onEditProfile,
+            onLogoutClick = {
+                scope.launch {
+                    authManager.logout()
+                    onLogout()
+                }
+            },
+            onDeleteClick = { showDeleteDialog = true }
+        )
+    }
 
     // Diálogo de confirmación para borrar cuenta
     if (showDeleteDialog) {
@@ -215,7 +248,6 @@ fun Perfil(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
 
-                    // CORREGIDO: TextField simplificado
                     OutlinedTextField(
                         value = deletePassword,
                         onValueChange = { deletePassword = it },
@@ -275,17 +307,26 @@ fun PerfilContent(
     displayName: String,
     email: String,
     userId: String,
+    gameId: String,
+    totalPlaces: Int,
+    currentStreak: Int,
+    bestStreak: Int,
+    totalPoints: Int,
+    onEditClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
     val accent = Color(0xFFFF9800)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0B0B0B))
             .navigationBarsPadding()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
+        // Header con foto y nombre
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -311,12 +352,30 @@ fun PerfilContent(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(
-                    text = displayName,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = displayName,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(
+                        onClick = onEditClick,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = "Editar perfil",
+                            tint = accent,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(4.dp))
 
@@ -328,20 +387,70 @@ fun PerfilContent(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                Text(
-                    text = "ID: $userId",
-                    fontSize = 14.sp,
-                    color = accent,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "ID: $userId",
+                        fontSize = 12.sp,
+                        color = accent,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Box(
+                        modifier = Modifier
+                            .size(4.dp)
+                            .background(Color.Gray, CircleShape)
+                    )
+                    Text(
+                        text = gameId,
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
+        // Tarjetas de estadísticas
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            StatCard(
+                value = totalPlaces.toString(),
+                label = "Lugares",
+                icon = Icons.Default.Place,
+                modifier = Modifier.weight(1f)
+            )
+            StatCard(
+                value = currentStreak.toString(),
+                label = "Racha actual",
+                icon = Icons.Default.LocalFireDepartment,
+                modifier = Modifier.weight(1f)
+            )
+            StatCard(
+                value = bestStreak.toString(),
+                label = "Mejor racha",
+                icon = Icons.Default.Star,
+                modifier = Modifier.weight(1f)
+            )
+            StatCard(
+                value = totalPoints.toString(),
+                label = "XP",
+                icon = Icons.Default.Star,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Menú de opciones
         MenuItem(
             icon = Icons.Default.Settings,
             title = "Configuración",
+            subtitle = "Ajustes de la cuenta",
             accent = accent,
             onClick = { /* Navegar a configuración */ }
         )
@@ -368,6 +477,14 @@ fun PerfilContent(
             subtitle = "Acelerómetro, GPS, Magnetómetro",
             accent = accent,
             onClick = { /* Navegar a sensores */ }
+        )
+
+        MenuItem(
+            icon = Icons.Default.PrivacyTip,
+            title = "Privacidad de ubicación",
+            subtitle = "¿Quién puede ver tu ubicación?",
+            accent = accent,
+            onClick = { /* Navegar a privacidad */ }
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -408,7 +525,7 @@ fun PerfilContent(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 8.dp, end = 8.dp, top = 0.dp, bottom = 90.dp)
+                .padding(start = 8.dp, end = 8.dp, top = 0.dp, bottom = 24.dp)
                 .clickable { onDeleteClick() },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF2A0A0A))
@@ -434,6 +551,36 @@ fun PerfilContent(
                     fontWeight = FontWeight.Bold
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun StatCard(
+    value: String,
+    label: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    Card(
+        modifier = modifier
+            .height(90.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1C))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(icon, contentDescription = label, tint = Color(0xFFFF9800), modifier = Modifier.size(24.dp))
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(value, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(label, color = Color.Gray, fontSize = 10.sp)
         }
     }
 }
@@ -514,6 +661,12 @@ fun PerfilPreview() {
             displayName = "Juan Pérez",
             email = "juan.perez@example.com",
             userId = "ABC12345",
+            gameId = "linkup#4821",
+            totalPlaces = 12,
+            currentStreak = 3,
+            bestStreak = 7,
+            totalPoints = 1250,
+            onEditClick = {},
             onLogoutClick = {},
             onDeleteClick = {}
         )
@@ -522,14 +675,15 @@ fun PerfilPreview() {
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B0B0B)
 @Composable
-fun MenuItemPreview() {
+fun StatCardPreview() {
     MyApplicationTheme {
-        MenuItem(
-            icon = Icons.Default.Settings,
-            title = "Configuración",
-            subtitle = "Ajustes de la cuenta",
-            accent = Color(0xFFFF9800),
-            onClick = {}
-        )
+        Row(modifier = Modifier.padding(16.dp)) {
+            StatCard(
+                value = "12",
+                label = "Lugares",
+                icon = Icons.Default.Place,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }

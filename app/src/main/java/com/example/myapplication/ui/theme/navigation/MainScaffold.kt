@@ -1,79 +1,164 @@
 package com.example.myapplication.ui.theme.navigation
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.google.firebase.auth.FirebaseUser
+import androidx.navigation.compose.*
+import com.example.myapplication.data.models.User
+import com.example.myapplication.repository.UserRepository
+import com.example.myapplication.ui.theme.screens.*
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Box
+
 
 @Composable
 fun MainScaffold(
-    user: FirebaseUser?,      // ← Recibir el usuario
-    onLogout: () -> Unit,
-    onAccountDeleted: () -> Unit, // ← Callback para cerrar sesión
+    user: User?,
+    onLogout: () -> Unit = {},
+    onAccountDeleted: () -> Unit = {}
 ) {
     val navController = rememberNavController()
+    val scope = rememberCoroutineScope()
+    val userRepository = remember { UserRepository() }
+    val firebaseUser = FirebaseAuth.getInstance().currentUser
+
+    var userData by remember { mutableStateOf(user) }
+
+    LaunchedEffect(user) {
+        userData = user
+    }
 
     Scaffold(
         bottomBar = {
-            BottomBar(navController = navController)
+            NavigationBar(
+                containerColor = Color(0xFF1A1A1A),
+                contentColor = Color.White
+            ) {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                val items = listOf(
+                    NavItem("home", "Home", Icons.Default.Home),
+                    NavItem("mapa", "Mapa", Icons.Default.Map),
+                    NavItem("carreras", "Carreras", Icons.Default.EmojiEvents),
+                    NavItem("chat", "Chat", Icons.Default.Chat),
+                    NavItem("perfil", "Perfil", Icons.Default.Person)
+                )
+
+                items.forEach { item ->
+                    NavigationBarItem(
+                        selected = currentRoute == item.route,
+                        onClick = {
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                item.icon,
+                                contentDescription = item.title,
+                                tint = if (currentRoute == item.route) Color(0xFFFF9800) else Color.Gray
+                            )
+                        },
+                        label = {
+                            Text(
+                                item.title,
+                                color = if (currentRoute == item.route) Color(0xFFFF9800) else Color.Gray
+                            )
+                        }
+                    )
+                }
+            }
         }
     ) { innerPadding ->
-        AppNavGraph(
+
+        NavHost(
             navController = navController,
-            user = user,
-            onLogout = onLogout,
-            onAccountDeleted = onAccountDeleted,
+            startDestination = "home",
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable("home") {
+                Home()
+            }
 
-        )
-    }
-}
+            composable("mapa") {
+                Mapa()
+            }
 
-@Composable
-private fun BottomBar(navController: NavHostController) {
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = backStackEntry?.destination?.route
+            composable("carreras") {
+                Carreras()
+            }
 
-    NavigationBar {
-        BottomNavItem.items.forEach { item ->
-            val selected = currentRoute == item.route
+            composable("chat") {
+                Chat()
+            }
 
-            NavigationBarItem(
-                selected = selected,
-                onClick = {
-                    navController.navigate(item.route) {
-                        val startRoute = navController.graph.startDestinationRoute
-                        if (startRoute != null) {
-                            popUpTo(startRoute) { saveState = true }
+            composable("perfil") {
+                Perfil(
+                    user = firebaseUser,
+                    userData = userData,
+                    onLogout = onLogout,
+                    onAccountDeleted = onAccountDeleted,
+                    onEditProfile = {
+                        navController.navigate("edit_profile")
+                    },
+                    onRefresh = {
+                        scope.launch {
+                            firebaseUser?.uid?.let { uid ->
+                                userData = userRepository.getUser(uid)
+                            }
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
-                },
-                icon = {
-                    Icon(
-                        imageVector = item.icon,
-                        contentDescription = item.label
-                    )
-                },
-                label = {
-                    Text(text = item.label)
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFFF2823D),
-                    selectedTextColor = Color(0xFFF2823D),
-                    unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray,
-                    indicatorColor = Color.Transparent
                 )
-            )
+            }
+
+            composable("edit_profile") {
+                val currentUserData = userData
+
+                if (currentUserData != null) {
+                    EditProfileScreen(
+                        userData = currentUserData,
+                        onSave = { updatedUser ->
+                            userData = updatedUser
+                            navController.popBackStack()
+                        },
+                        onCancel = {
+                            navController.popBackStack()
+                        }
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No se encontraron datos del perfil en Firestore",
+                            color = Color.White
+                        )
+                    }
+                }
+            }
         }
     }
 }
+
+data class NavItem(
+    val route: String,
+    val title: String,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector
+)

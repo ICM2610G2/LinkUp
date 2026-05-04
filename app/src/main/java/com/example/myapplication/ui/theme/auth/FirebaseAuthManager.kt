@@ -15,6 +15,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.Timestamp
+import android.util.Log
+
 
 
 class FirebaseAuthManager(private val activity: Activity) {
@@ -129,7 +133,61 @@ class FirebaseAuthManager(private val activity: Activity) {
         }
     }
 
+    suspend fun saveUserToFirestore(user: FirebaseUser, gameId: String): Result<Unit> {
+        return try {
+            Log.d("FIRESTORE", "=== GUARDANDO USUARIO EN FIRESTORE ===")
+            Log.d("FIRESTORE", "UID: ${user.uid}")
+            Log.d("FIRESTORE", "Email: ${user.email}")
+            Log.d("FIRESTORE", "DisplayName: ${user.displayName}")
+            Log.d("FIRESTORE", "GameId: $gameId")
 
+            val db = FirebaseFirestore.getInstance()
+
+            val userMap = hashMapOf(
+                "uid" to user.uid,
+                "displayName" to (user.displayName ?: ""),
+                "email" to (user.email ?: ""),
+                "photoURL" to (user.photoUrl?.toString() ?: ""),
+                "gameId" to gameId,
+                "totalPlacesVisited" to 0,
+                "currentStreak" to 0,
+                "bestStreak" to 0,
+                "totalPoints" to 0,
+                "shareLocationMode" to "in_race",
+                "createdAt" to Timestamp.now()
+            )
+
+            db.collection("users").document(user.uid).set(userMap).await()
+
+            Log.d("FIRESTORE", "Usuario guardado exitosamente")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("FIRESTORE", "Error guardando usuario: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
+
+    suspend fun generateUniqueGameId(): String {
+        val db = FirebaseFirestore.getInstance()
+        var isUnique = false
+        var gameId = ""
+
+        while (!isUnique) {
+            val randomNum = (1000..9999).random()
+            gameId = "linkup#$randomNum"
+
+            val query = db.collection("users")
+                .whereEqualTo("gameId", gameId)
+                .get()
+                .await()
+
+            if (query.isEmpty) {
+                isUnique = true
+            }
+        }
+        return gameId
+    }
 
 }
 

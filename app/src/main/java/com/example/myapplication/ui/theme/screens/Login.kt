@@ -26,10 +26,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.example.myapplication.R
 import com.example.myapplication.ui.theme.auth.*
 import kotlinx.coroutines.launch
+import com.example.myapplication.ui.theme.auth.FirebaseAuthManager
+import com.example.myapplication.ui.theme.auth.AuthState
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import com.example.myapplication.auth.BiometricAuthManager
 import com.example.myapplication.auth.BiometricAuthResult
 import com.example.myapplication.auth.BiometricAvailability
-
 
 @Composable
 fun Login(
@@ -88,12 +91,22 @@ fun Login(
             isLoading = true
             val authResult = authManager.handleGoogleSignInResult(result.data)
             authResult.fold(
-                onSuccess = {
-                    Log.d("HUELLA", "Google login exitoso")
+                onSuccess = { user ->
+                    Log.d("AUTH", "Google login exitoso: ${user.email}")
+
+                    // Verificar si el usuario ya existe en Firestore
+                    val db = FirebaseFirestore.getInstance()
+                    val userDoc = db.collection("users").document(user.uid).get().await()
+
+                    if (!userDoc.exists()) {
+                        val gameId = authManager.generateUniqueGameId()
+                        authManager.saveUserToFirestore(user, gameId)
+                    }
+
                     onLoginSuccess()
                 },
-                onFailure = {
-                    errorMessage = "Error con Google: ${it.message}"
+                onFailure = { exception ->
+                    errorMessage = "Error con Google: ${exception.message}"
                     isLoading = false
                 }
             )
@@ -117,8 +130,8 @@ fun Login(
                                     Log.d("HUELLA", "Login con huella exitoso")
                                     onLoginSuccess()
                                 },
-                                onFailure = {
-                                    errorMessage = "Error al iniciar con huella: ${it.message}"
+                                onFailure = { exception ->
+                                    errorMessage = "Error al iniciar con huella: ${exception.message}"
                                     isLoading = false
                                 }
                             )
@@ -213,20 +226,50 @@ fun Login(
 
                         result.fold(
                             onSuccess = { user ->
-                                Log.d("HUELLA", "${if (esRegistro) "Registro" else "Login"} exitoso para: ${user.email}")
-                                // Guardar credenciales SIEMPRE (tanto en registro como en login)
-                                Log.d("HUELLA", "Guardando credenciales para: $email")
-                                encryptedPrefs.saveUserCredentials(email, password)
-                                Log.d("HUELLA", "Credenciales guardadas")
-                                onLoginSuccess()
+                                Log.d("AUTH", "${if (esRegistro) "Registro" else "Login"} exitoso para: ${user.email}")
+
+                                if (esRegistro) {
+                                    val gameId = authManager.generateUniqueGameId()
+                                    val saveResult = authManager.saveUserToFirestore(user, gameId)
+                                    saveResult.fold(
+                                        onSuccess = {
+                                            Log.d("AUTH", "Usuario guardado en Firestore con gameId: $gameId")
+
+                                            authManager.logout()
+
+                                            esRegistro = false
+                                            name = ""
+                                            password = ""
+                                            errorMessage = "Cuenta creada correctamente. Ahora inicia sesión."
+                                            isLoading = false
+                                        },
+                                        onFailure = { exception ->
+                                            errorMessage = "Error al guardar perfil: ${exception.message}"
+                                            isLoading = false
+                                        }
+                                    )
+                                } else {
+                                    // Verificar si ya existe en Firestore (por si se registró con Google)
+                                    val db = FirebaseFirestore.getInstance()
+                                    val userDoc = db.collection("users").document(user.uid).get().await()
+
+                                    if (!userDoc.exists()) {
+                                        val gameId = authManager.generateUniqueGameId()
+                                        authManager.saveUserToFirestore(user, gameId)
+                                    }
+
+                                    encryptedPrefs.saveUserCredentials(email, password)
+                                    onLoginSuccess()
+                                }
                             },
                             onFailure = { exception ->
                                 errorMessage = when {
-                                    exception.message?.contains("email") == true -> "Email inválido"
-                                    exception.message?.contains("password") == true -> "Contraseña débil (mínimo 6 caracteres)"
-                                    exception.message?.contains("already in use") == true -> "Email ya registrado"
-                                    exception.message?.contains("wrong password") == true -> "Contraseña incorrecta"
-                                    exception.message?.contains("user-not-found") == true -> "Usuario no encontrado"
+                                    exception.message?.contains("email", ignoreCase = true) == true -> "Email inválido"
+                                    exception.message?.contains("password", ignoreCase = true) == true -> "Contraseña débil (mínimo 6 caracteres)"
+                                    exception.message?.contains("already in use", ignoreCase = true) == true -> "Email ya registrado"
+                                    exception.message?.contains("wrong password", ignoreCase = true) == true -> "Contraseña incorrecta"
+                                    exception.message?.contains("user-not-found", ignoreCase = true) == true -> "Usuario no encontrado"
+                                    exception.message?.contains("network", ignoreCase = true) == true -> "Error de red. Verifica tu conexión"
                                     else -> "Error: ${exception.message}"
                                 }
                                 isLoading = false
@@ -414,8 +457,58 @@ fun FormularioLogin(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
+            // Botón de Google
+            Button(
+                onClick = onGoogle,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(
+                    Icons.Default.Person,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "Continuar con Google",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp
+                )
+            }
+
+            // Botón de huella (solo si está disponible)
+            if (isBiometricAvailable) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = onBiometric,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF252525)
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Fingerprint,
+                        contentDescription = null,
+                        tint = Color(0xFFFF9800)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "Iniciar con huella digital",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 TextButton(onClick = onToggleRegistro) {
@@ -427,19 +520,6 @@ fun FormularioLogin(
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(Color(0x1AFFFFFF))
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-
         }
     }
 }
