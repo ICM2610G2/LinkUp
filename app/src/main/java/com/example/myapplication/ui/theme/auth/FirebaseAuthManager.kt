@@ -133,6 +133,7 @@ class FirebaseAuthManager(private val activity: Activity) {
         }
     }
 
+
     suspend fun saveUserToFirestore(user: FirebaseUser, gameId: String): Result<Unit> {
         return try {
             Log.d("FIRESTORE", "=== GUARDANDO USUARIO EN FIRESTORE ===")
@@ -143,26 +144,34 @@ class FirebaseAuthManager(private val activity: Activity) {
 
             val db = FirebaseFirestore.getInstance()
 
-            val userMap = hashMapOf(
-                "uid" to user.uid,
-                "displayName" to (user.displayName ?: ""),
-                "email" to (user.email ?: ""),
-                "photoURL" to (user.photoUrl?.toString() ?: ""),
-                "gameId" to gameId,
-                "totalPlacesVisited" to 0,
-                "currentStreak" to 0,
-                "bestStreak" to 0,
-                "totalPoints" to 0,
-                "shareLocationMode" to "in_race",
-                "createdAt" to Timestamp.now()
+
+            val userModel = com.example.myapplication.data.models.User(
+                uid = user.uid,
+                displayName = user.displayName ?: "",
+                email = user.email ?: "",
+                photoURL = user.photoUrl?.toString() ?: "",
+                gameId = gameId.lowercase(),
+                totalPlacesVisited = 0,
+                currentStreak = 0,
+                bestStreak = 0,
+                totalPoints = 0,
+                shareLocationMode = "in_race",
+                fcmToken = null,
+                createdAt = Timestamp.now()
             )
 
-            db.collection("users").document(user.uid).set(userMap).await()
+            db.collection("users").document(user.uid).set(userModel).await()
 
-            Log.d("FIRESTORE", "Usuario guardado exitosamente")
+            Log.d("FIRESTORE", " Usuario guardado exitosamente")
+            Log.d("FIRESTORE", "GameID guardado: ${userModel.gameId}")
+
+            val savedDoc = db.collection("users").document(user.uid).get().await()
+            val savedGameId = savedDoc.getString("gameId")
+            Log.d("FIRESTORE", "Verificación - GameID en Firestore: $savedGameId")
+
             Result.success(Unit)
         } catch (e: Exception) {
-            Log.e("FIRESTORE", "Error guardando usuario: ${e.message}", e)
+            Log.e("FIRESTORE", " Error guardando usuario: ${e.message}", e)
             Result.failure(e)
         }
     }

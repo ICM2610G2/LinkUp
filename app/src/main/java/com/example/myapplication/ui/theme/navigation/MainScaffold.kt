@@ -117,6 +117,11 @@ fun MainScaffold(
                     onEditProfile = {
                         navController.navigate("edit_profile")
                     },
+                    onVerAmigos = {
+                        navController.navigate("lista_amigos")
+                    },
+
+
                     onRefresh = {
                         scope.launch {
                             firebaseUser?.uid?.let { uid ->
@@ -124,6 +129,13 @@ fun MainScaffold(
                             }
                         }
                     }
+                )
+            }
+            composable("lista_amigos") {
+                ListaAmigos(
+                    onCerrar = { navController.popBackStack() },
+                    onBuscarAmigos = { navController.navigate("buscar_amigos") },
+                    onVerSolicitudes = { navController.navigate("solicitudes") }
                 )
             }
 
@@ -153,6 +165,17 @@ fun MainScaffold(
                     }
                 }
             }
+
+
+            composable("buscar_amigos") {
+                BuscarAmigosScreen(onBack = { navController.popBackStack() })
+            }
+
+            composable("solicitudes") {
+                SolicitudesScreen(onBack = { navController.popBackStack() })
+            }
+
+
         }
     }
 }

@@ -27,7 +27,7 @@ import com.example.myapplication.ui.theme.navigation.MainScaffold
 import com.example.myapplication.ui.theme.screens.Login
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {  // ← CAMBIADO: AppCompatActivity en lugar de ComponentActivity
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "onCreate llamado")
@@ -49,49 +49,77 @@ class MainActivity : AppCompatActivity() {  // ← CAMBIADO: AppCompatActivity e
 
 @Composable
 fun LinkUpApp() {
-    Log.d("LinkUpApp", "LinkUpApp composable iniciado")
-
     val context = LocalContext.current
-    val activity = context as AppCompatActivity  // ← CAMBIADO: AppCompatActivity
+    val activity = context as AppCompatActivity
     val scope = rememberCoroutineScope()
     val userRepository = remember { UserRepository() }
-
     val authManager = remember { FirebaseAuthManager(activity) }
     val biometricManager = remember { BiometricAuthManager(activity) }
     val encryptedPrefs = remember { EncryptedPreferences(context) }
 
     val authState by authManager.authState.collectAsState()
 
-    Log.d("LinkUpApp", "authState: $authState")
-
-    // Estado para userData desde Firestore
     var userData by remember { mutableStateOf<User?>(null) }
     var isLoadingUserData by remember { mutableStateOf(false) }
 
-    // Cargar userData cuando haya un usuario autenticado
     LaunchedEffect(authState) {
-        Log.d("LinkUpApp", "LaunchedEffect ejecutado con authState: $authState")
+        Log.d("LinkUpApp", "authState cambió: $authState")
+
         if (authState is AuthState.Authenticated) {
-            Log.d("LinkUpApp", "Usuario autenticado, cargando userData...")
             isLoadingUserData = true
             val firebaseUser = (authState as AuthState.Authenticated).user
-            Log.d("LinkUpApp", "FirebaseUser UID: ${firebaseUser.uid}")
+            Log.d("LinkUpApp", "Usuario autenticado: ${firebaseUser.uid}")
+
             try {
-                userData = userRepository.getUser(firebaseUser.uid)
-                Log.d("LinkUpApp", "userData cargado: $userData")
+                // Intentar cargar desde Firestore
+                var user = userRepository.getUser(firebaseUser.uid)
+                Log.d("LinkUpApp", "Usuario encontrado en Firestore: ${user != null}")
+
+
+                if (user == null) {
+                    Log.d("LinkUpApp", " Usuario no existe en Firestore, creando...")
+                    val gameId = authManager.generateUniqueGameId()
+                    Log.d("LinkUpApp", "GameID generado: $gameId")
+
+                    val saveResult = authManager.saveUserToFirestore(firebaseUser, gameId)
+
+                    saveResult.fold(
+                        onSuccess = {
+                            Log.d("LinkUpApp", " Usuario creado en Firestore")
+                            kotlinx.coroutines.delay(500)
+                            user = userRepository.getUser(firebaseUser.uid)
+                            Log.d("LinkUpApp", "Usuario recargado: ${user?.gameId}")
+                        },
+                        onFailure = { e ->
+                            Log.e("LinkUpApp", " Error creando usuario: ${e.message}", e)
+                        }
+                    )
+                }
+
+                // ✅ Asegurar que el user tiene gameId incluso si existe pero está vacío
+                if (user != null && user.gameId.isEmpty()) {
+                    Log.d("LinkUpApp", "⚠ Usuario sin Game ID, actualizando...")
+                    val newGameId = authManager.generateUniqueGameId()
+                    val updatedUser = user.copy(gameId = newGameId)
+                    userRepository.updateUser(updatedUser)
+                    user = updatedUser
+                }
+
+                userData = user
+                Log.d("LinkUpApp", " userData final: ${userData?.gameId}")
+
             } catch (e: Exception) {
-                Log.e("LinkUpApp", "Error cargando userData: ${e.message}", e)
+                Log.e("LinkUpApp", "Error en LaunchedEffect: ${e.message}", e)
             }
+
             isLoadingUserData = false
         } else {
-            Log.d("LinkUpApp", "Usuario no autenticado, userData = null")
             userData = null
         }
     }
 
-    when (val state = authState) {
+    when (authState) {
         is AuthState.Authenticated -> {
-            Log.d("LinkUpApp", "Estado: Authenticated, isLoadingUserData=$isLoadingUserData")
             if (isLoadingUserData) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -100,26 +128,19 @@ fun LinkUpApp() {
                     CircularProgressIndicator(color = Color(0xFFFF9800))
                 }
             } else {
-                Log.d("LinkUpApp", "Mostrando MainScaffold con userData=$userData")
                 MainScaffold(
                     user = userData,
                     onLogout = {
-                        Log.d("LinkUpApp", "onLogout llamado")
-                        scope.launch {
-                            authManager.logout()
-                        }
+                        scope.launch { authManager.logout() }
                     },
                     onAccountDeleted = {
-                        Log.d("LinkUpApp", "onAccountDeleted llamado")
-                        scope.launch {
-                            encryptedPrefs.clearUserCredentials()
-                        }
+                        scope.launch { encryptedPrefs.clearUserCredentials() }
                     }
                 )
             }
         }
+
         AuthState.Loading -> {
-            Log.d("LinkUpApp", "Estado: Loading")
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -127,12 +148,11 @@ fun LinkUpApp() {
                 Text("Verificando sesión...")
             }
         }
+
         else -> {
-            Log.d("LinkUpApp", "Estado: No autenticado (Login)")
+
             Login(
-                onLoginSuccess = {
-                    Log.d("LinkUpApp", "Login exitoso")
-                },
+                onLoginSuccess = { /* authState cambia solo, LaunchedEffect se encarga */ },
                 authManager = authManager,
                 biometricManager = biometricManager,
                 encryptedPrefs = encryptedPrefs

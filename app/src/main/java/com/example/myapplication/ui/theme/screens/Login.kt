@@ -21,18 +21,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import com.example.myapplication.R
 import com.example.myapplication.ui.theme.auth.*
-import kotlinx.coroutines.launch
-import com.example.myapplication.ui.theme.auth.FirebaseAuthManager
-import com.example.myapplication.ui.theme.auth.AuthState
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 import com.example.myapplication.auth.BiometricAuthManager
 import com.example.myapplication.auth.BiometricAuthResult
 import com.example.myapplication.auth.BiometricAvailability
+import kotlinx.coroutines.launch
 
 @Composable
 fun Login(
@@ -41,7 +35,6 @@ fun Login(
     biometricManager: BiometricAuthManager,
     encryptedPrefs: EncryptedPreferences
 ) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     var email by remember { mutableStateOf("") }
@@ -54,97 +47,38 @@ fun Login(
 
     // Verificar credenciales guardadas para huella
     LaunchedEffect(Unit) {
-        Log.d("HUELLA", "=== INICIANDO VERIFICACIÓN DE HUELLA ===")
         val isBiometricEnabled = encryptedPrefs.isBiometricEnabled()
-        Log.d("HUELLA", "isBiometricEnabled: $isBiometricEnabled")
-
         if (isBiometricEnabled) {
             val (savedEmail, savedPassword) = encryptedPrefs.getUserCredentials()
-            Log.d("HUELLA", "savedEmail: $savedEmail")
-            Log.d("HUELLA", "savedPassword existe: ${savedPassword != null}")
-
             if (savedEmail != null && savedPassword != null) {
                 email = savedEmail
                 password = savedPassword
-                Log.d("HUELLA", "Credenciales cargadas, preparando biometría...")
-
-                val available = biometricManager.isBiometricAvailable()
-                Log.d("HUELLA", "Biometría disponible: $available")
-
                 biometricManager.setupBiometricPrompt()
-                Log.d("HUELLA", "BiometricPrompt configurado")
                 biometricManager.authenticate()
-                Log.d("HUELLA", "authenticate() llamado")
-            } else {
-                Log.d("HUELLA", "No hay credenciales guardadas (email o password null)")
             }
-        } else {
-            Log.d("HUELLA", "Biometría NO habilitada en preferencias")
-        }
-    }
-
-    // Launcher para Google Sign-In
-    val googleLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        scope.launch {
-            isLoading = true
-            val authResult = authManager.handleGoogleSignInResult(result.data)
-            authResult.fold(
-                onSuccess = { user ->
-                    Log.d("AUTH", "Google login exitoso: ${user.email}")
-
-                    // Verificar si el usuario ya existe en Firestore
-                    val db = FirebaseFirestore.getInstance()
-                    val userDoc = db.collection("users").document(user.uid).get().await()
-
-                    if (!userDoc.exists()) {
-                        val gameId = authManager.generateUniqueGameId()
-                        authManager.saveUserToFirestore(user, gameId)
-                    }
-
-                    onLoginSuccess()
-                },
-                onFailure = { exception ->
-                    errorMessage = "Error con Google: ${exception.message}"
-                    isLoading = false
-                }
-            )
         }
     }
 
     // Observar resultado de biometría
     LaunchedEffect(Unit) {
         biometricManager.authResult.collect { result ->
-            Log.d("HUELLA", "Resultado de biometría recibido: $result")
             when (result) {
                 is BiometricAuthResult.Success -> {
-                    Log.d("HUELLA", "Biometría exitosa, iniciando sesión...")
-                    scope.launch {
-                        isLoading = true
-                        val (savedEmail, savedPassword) = encryptedPrefs.getUserCredentials()
-                        if (savedEmail != null && savedPassword != null) {
-                            val loginResult = authManager.loginWithEmail(savedEmail, savedPassword)
-                            loginResult.fold(
-                                onSuccess = {
-                                    Log.d("HUELLA", "Login con huella exitoso")
-                                    onLoginSuccess()
-                                },
-                                onFailure = { exception ->
-                                    errorMessage = "Error al iniciar con huella: ${exception.message}"
-                                    isLoading = false
-                                }
-                            )
-                        }
+                    isLoading = true
+                    val (savedEmail, savedPassword) = encryptedPrefs.getUserCredentials()
+                    if (savedEmail != null && savedPassword != null) {
+                        // Login con email/password — Firestore lo maneja MainActivity
+                        authManager.loginWithEmail(savedEmail, savedPassword).fold(
+                            onSuccess = { isLoading = false },  // authState cambia solo
+                            onFailure = { e ->
+                                errorMessage = "Error al iniciar con huella: ${e.message}"
+                                isLoading = false
+                            }
+                        )
                     }
                 }
-                is BiometricAuthResult.Error -> {
-                    Log.d("HUELLA", "Error de biometría: ${result.message}")
-                    errorMessage = result.message
-                }
-                is BiometricAuthResult.Failed -> {
-                    Log.d("HUELLA", "Biometría fallida")
-                }
+                is BiometricAuthResult.Error -> errorMessage = result.message
+                is BiometricAuthResult.Failed -> { /* no-op */ }
             }
         }
     }
@@ -162,11 +96,7 @@ fun Login(
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        listOf(
-                            Color(0xB3000000),
-                            Color(0x80000000),
-                            Color(0xB3000000)
-                        )
+                        listOf(Color(0xB3000000), Color(0x80000000), Color(0xB3000000))
                     )
                 )
         )
@@ -179,7 +109,6 @@ fun Login(
             verticalArrangement = Arrangement.Center
         ) {
             LogoSection()
-
             Spacer(modifier = Modifier.height(32.dp))
 
             if (errorMessage != null) {
@@ -213,64 +142,48 @@ fun Login(
                         isLoading = true
                         errorMessage = null
 
+                        if (email.isBlank() || password.isBlank()) {
+                            errorMessage = "Ingresa email y contraseña"
+                            isLoading = false
+                            return@launch
+                        }
+                        if (esRegistro && name.isBlank()) {
+                            errorMessage = "Ingresa tu nombre"
+                            isLoading = false
+                            return@launch
+                        }
+
                         val result = if (esRegistro) {
-                            if (name.isBlank()) {
-                                errorMessage = "Ingresa tu nombre"
-                                isLoading = false
-                                return@launch
-                            }
                             authManager.registerWithEmail(email, password, name)
                         } else {
                             authManager.loginWithEmail(email, password)
                         }
 
                         result.fold(
-                            onSuccess = { user ->
-                                Log.d("AUTH", "${if (esRegistro) "Registro" else "Login"} exitoso para: ${user.email}")
-
-                                if (esRegistro) {
-                                    val gameId = authManager.generateUniqueGameId()
-                                    val saveResult = authManager.saveUserToFirestore(user, gameId)
-                                    saveResult.fold(
-                                        onSuccess = {
-                                            Log.d("AUTH", "Usuario guardado en Firestore con gameId: $gameId")
-
-                                            authManager.logout()
-
-                                            esRegistro = false
-                                            name = ""
-                                            password = ""
-                                            errorMessage = "Cuenta creada correctamente. Ahora inicia sesión."
-                                            isLoading = false
-                                        },
-                                        onFailure = { exception ->
-                                            errorMessage = "Error al guardar perfil: ${exception.message}"
-                                            isLoading = false
-                                        }
-                                    )
-                                } else {
-                                    // Verificar si ya existe en Firestore (por si se registró con Google)
-                                    val db = FirebaseFirestore.getInstance()
-                                    val userDoc = db.collection("users").document(user.uid).get().await()
-
-                                    if (!userDoc.exists()) {
-                                        val gameId = authManager.generateUniqueGameId()
-                                        authManager.saveUserToFirestore(user, gameId)
-                                    }
-
-                                    encryptedPrefs.saveUserCredentials(email, password)
-                                    onLoginSuccess()
-                                }
+                            onSuccess = {
+                                // ✅ NO tocar Firestore aquí
+                                // MainActivity.LaunchedEffect detecta el cambio de authState
+                                // y se encarga de crear/cargar el usuario en Firestore
+                                encryptedPrefs.saveUserCredentials(email, password)
+                                // isLoading no hace falta en false: este composable
+                                // se destruye cuando authState cambia a Authenticated
                             },
-                            onFailure = { exception ->
+                            onFailure = { e ->
+                                Log.e("AUTH", "Error: ${e.message}", e)
                                 errorMessage = when {
-                                    exception.message?.contains("email", ignoreCase = true) == true -> "Email inválido"
-                                    exception.message?.contains("password", ignoreCase = true) == true -> "Contraseña débil (mínimo 6 caracteres)"
-                                    exception.message?.contains("already in use", ignoreCase = true) == true -> "Email ya registrado"
-                                    exception.message?.contains("wrong password", ignoreCase = true) == true -> "Contraseña incorrecta"
-                                    exception.message?.contains("user-not-found", ignoreCase = true) == true -> "Usuario no encontrado"
-                                    exception.message?.contains("network", ignoreCase = true) == true -> "Error de red. Verifica tu conexión"
-                                    else -> "Error: ${exception.message}"
+                                    e.message?.contains("already in use", ignoreCase = true) == true ->
+                                        "Email ya registrado"
+                                    e.message?.contains("invalid-credential", ignoreCase = true) == true ->
+                                        "Email o contraseña incorrectos"
+                                    e.message?.contains("wrong-password", ignoreCase = true) == true ->
+                                        "Contraseña incorrecta"
+                                    e.message?.contains("user-not-found", ignoreCase = true) == true ->
+                                        "Usuario no encontrado"
+                                    e.message?.contains("password", ignoreCase = true) == true ->
+                                        "La contraseña debe tener al menos 6 caracteres"
+                                    e.message?.contains("network", ignoreCase = true) == true ->
+                                        "Error de red. Verifica tu conexión"
+                                    else -> "Error: ${e.message}"
                                 }
                                 isLoading = false
                             }
@@ -282,15 +195,7 @@ fun Login(
                     errorMessage = null
                     name = ""
                 },
-                onGoogle = {
-                    scope.launch {
-                        isLoading = true
-                        val signInIntent = authManager.getGoogleSignInIntent()
-                        googleLauncher.launch(signInIntent)
-                    }
-                },
                 onBiometric = {
-                    Log.d("HUELLA", "Botón de huella presionado manualmente")
                     biometricManager.setupBiometricPrompt()
                     biometricManager.authenticate()
                 },
@@ -304,18 +209,8 @@ fun Login(
 fun LogoSection() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row {
-            Text(
-                "Link",
-                color = Color.White,
-                fontSize = 48.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                "Up",
-                color = Color(0xFFFF9800),
-                fontSize = 48.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text("Link", color = Color.White, fontSize = 48.sp, fontWeight = FontWeight.Bold)
+            Text("Up", color = Color(0xFFFF9800), fontSize = 48.sp, fontWeight = FontWeight.Bold)
         }
         Text(
             "Explora tu ciudad con amigos",
@@ -339,7 +234,6 @@ fun FormularioLogin(
     isLoading: Boolean,
     onLogin: () -> Unit,
     onToggleRegistro: () -> Unit,
-    onGoogle: () -> Unit,
     onBiometric: () -> Unit,
     isBiometricAvailable: Boolean
 ) {
@@ -357,9 +251,7 @@ fun FormularioLogin(
                 TextField(
                     value = name,
                     onValueChange = onNameChange,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(54.dp),
+                    modifier = Modifier.fillMaxWidth().height(54.dp),
                     placeholder = { Text("Tu nombre", color = Color.White.copy(alpha = 0.4f)) },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color(0x1AFFFFFF),
@@ -381,9 +273,7 @@ fun FormularioLogin(
             TextField(
                 value = email,
                 onValueChange = onEmailChange,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(54.dp),
+                modifier = Modifier.fillMaxWidth().height(54.dp),
                 placeholder = { Text("tu@email.com", color = Color.White.copy(alpha = 0.4f)) },
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color(0x1AFFFFFF),
@@ -405,9 +295,7 @@ fun FormularioLogin(
             TextField(
                 value = password,
                 onValueChange = onPasswordChange,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(54.dp),
+                modifier = Modifier.fillMaxWidth().height(54.dp),
                 placeholder = { Text("••••••••", color = Color.White.copy(alpha = 0.4f)) },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
@@ -436,18 +324,13 @@ fun FormularioLogin(
 
             Button(
                 onClick = onLogin,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
                 shape = RoundedCornerShape(12.dp),
                 enabled = !isLoading
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Color.White
-                    )
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
                 } else {
                     Text(
                         if (esRegistro) "Crear cuenta" else "Iniciar sesión",
@@ -457,54 +340,17 @@ fun FormularioLogin(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Botón de Google
-            Button(
-                onClick = onGoogle,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(
-                    Icons.Default.Person,
-                    contentDescription = null,
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    "Continuar con Google",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp
-                )
-            }
-
-            // Botón de huella (solo si está disponible)
             if (isBiometricAvailable) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(
                     onClick = onBiometric,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF252525)
-                    ),
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF252525)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(
-                        Icons.Default.Fingerprint,
-                        contentDescription = null,
-                        tint = Color(0xFFFF9800)
-                    )
+                    Icon(Icons.Default.Fingerprint, null, tint = Color(0xFFFF9800))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "Iniciar con huella digital",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp
-                    )
+                    Text("Iniciar con huella digital", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 }
             }
 

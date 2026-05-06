@@ -124,6 +124,9 @@ fun AppNavGraph(
                     onEditProfile = {
                         navController.navigate(Screen.EditProfile.route)
                     },
+                    onVerAmigos = {
+                        navController.navigate("lista_amigos")
+                    },
                     onRefresh = {
                         scope.launch {
                             userData = user?.let { userRepository.getUser(it.uid) }
