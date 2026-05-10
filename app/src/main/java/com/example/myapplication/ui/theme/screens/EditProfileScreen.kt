@@ -92,11 +92,23 @@ fun EditProfileScreen(
                 }
 
                 // Actualizar en Firestore
-                val result = userRepository.updateDisplayName(userData.uid, displayName)
+                val updatedUser = userData.copy(
+                    displayName = displayName.trim(),
+                    photoURL = selectedImageUri?.toString() ?: newPhotoURL
+                )
+
+                onSave(updatedUser)
+
+                val saveResult = userRepository.updateUser(updatedUser)
+
+                if (saveResult.isSuccess) {
+                    onSave(updatedUser)
+                } else {
+                    errorMessage = "No se pudo guardar el perfil"
+                }
+                val result = userRepository.updateUser(updatedUser)
+
                 if (result.isSuccess) {
-                    if (newPhotoURL != photoURL) {
-                        userRepository.updatePhotoURL(userData.uid, newPhotoURL)
-                    }
                     // Actualizar displayName en Firebase Auth
                     auth.currentUser?.updateProfile(
                         com.google.firebase.auth.UserProfileChangeRequest.Builder()
@@ -105,10 +117,7 @@ fun EditProfileScreen(
                             .build()
                     )?.await()
 
-                    val updatedUser = userData.copy(
-                        displayName = displayName,
-                        photoURL = newPhotoURL
-                    )
+
                     onSave(updatedUser)
                 } else {
                     errorMessage = "Error al guardar"

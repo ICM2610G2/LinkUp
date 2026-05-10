@@ -101,7 +101,54 @@ fun MainScaffold(
             }
 
             composable("carreras") {
-                Carreras()
+                Carreras(
+                    onCrearCarrera = {
+                        navController.navigate("crear_carrera")
+                    },
+                    onAbrirLobby = { sessionId ->
+                        navController.navigate("lobby_carrera/$sessionId")
+                    }
+                )
+            }
+
+            composable("lobby_carrera/{sessionId}") { backStackEntry ->
+                val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
+
+                LobbyCarreraScreen(
+                    sessionId = sessionId,
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                    onRaceStarted = { id ->
+                        navController.navigate("carrera_activa/$id") {
+                            popUpTo("lobby_carrera/$id") {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
+
+            composable("carrera_activa/{sessionId}") { backStackEntry ->
+                val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
+
+                CarreraActivaScreen(
+                    sessionId = sessionId,
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable("crear_carrera") {
+                CrearCarrera(
+                    onCerrar = {
+                        navController.popBackStack()
+                    },
+                    onCarreraCreada = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable("chat") {

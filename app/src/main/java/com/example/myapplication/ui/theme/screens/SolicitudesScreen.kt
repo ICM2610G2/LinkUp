@@ -21,6 +21,9 @@ import com.example.myapplication.data.models.User
 import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.repository.UserRepository
 import kotlinx.coroutines.launch
+import coil.compose.AsyncImage
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 
 // Par de solicitud + datos del solicitante ya cargados
 data class SolicitudConUsuario(
@@ -145,7 +148,7 @@ fun SolicitudesScreen(
                                 scope.launch {
                                     friendsRepository.acceptRequest(item.friendship.id).fold(
                                         onSuccess = { loadRequests() },
-                                        onFailure = { /* podrías mostrar snackbar */ }
+                                        onFailure = {  }
                                     )
                                 }
                             },
@@ -187,15 +190,25 @@ fun SolicitudCard(
                 Box(
                     modifier = Modifier
                         .size(52.dp)
-                        .background(Color(0xFFE9C46A), CircleShape),
+                        .clip(CircleShape)
+                        .background(Color(0xFFE9C46A)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        user.displayName.take(2).uppercase(),
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
+                    if (user.photoURL.isNotBlank()) {
+                        AsyncImage(
+                            model = user.photoURL,
+                            contentDescription = "Foto de ${user.displayName}",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Text(
+                            user.displayName.take(2).uppercase(),
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    }
                 }
 
                 Column(modifier = Modifier.weight(1f)) {

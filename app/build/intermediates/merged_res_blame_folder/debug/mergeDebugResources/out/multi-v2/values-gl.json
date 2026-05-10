@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.myapplication.app-mergeDebugResources-72:/values-gl/values-gl.xml",
+            "outputFile": "com.example.myapplication.app-mergeDebugResources-73:/values-gl/values-gl.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Nicolas\\.gradle\\caches\\9.2.1\\transforms\\2df2b3fc2609d4a20c7f7b46fe012fd9\\workspace\\transformed\\biometric-1.1.0\\res\\values-gl\\values-gl.xml",

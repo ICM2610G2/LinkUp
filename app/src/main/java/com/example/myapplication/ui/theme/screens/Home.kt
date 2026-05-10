@@ -113,8 +113,8 @@ fun Home () {
         if (mostrarCrearCarrera) {
             CrearCarrera(
                 onCerrar = { mostrarCrearCarrera = false },
-                onIniciar = {
-                    Log.i("MyApp", "Carrera iniciada desde Home")
+                onCarreraCreada = {
+                    Log.i("MyApp", "Carrera creada desde Home")
                     mostrarCrearCarrera = false
                 }
             )
