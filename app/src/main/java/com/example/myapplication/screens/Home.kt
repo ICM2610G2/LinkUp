@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.theme.screens
+package com.example.myapplication.screens
 
 
 import android.util.Log

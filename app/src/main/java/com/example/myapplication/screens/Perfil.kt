@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.theme.screens
+package com.example.myapplication.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,7 +27,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.myapplication.auth.BiometricAuthManager
 import com.example.myapplication.data.models.User
 import com.example.myapplication.ui.theme.MyApplicationTheme
-import com.example.myapplication.ui.theme.auth.FirebaseAuthManager
+import com.example.myapplication.auth.FirebaseAuthManager
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.automirrored.filled.Logout

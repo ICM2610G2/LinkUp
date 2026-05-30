@@ -49,8 +49,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.ui.theme.model.Destino
-import com.example.myapplication.ui.theme.model.MapsViewModel
+import com.example.myapplication.model.Destino
+import com.example.myapplication.model.MapsViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState

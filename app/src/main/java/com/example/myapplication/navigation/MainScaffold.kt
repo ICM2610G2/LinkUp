@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.theme.navigation
+package com.example.myapplication.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.*
 import com.example.myapplication.data.models.User
 import com.example.myapplication.repository.UserRepository
-import com.example.myapplication.ui.theme.screens.*
+import com.example.myapplication.screens.*
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.fillMaxSize

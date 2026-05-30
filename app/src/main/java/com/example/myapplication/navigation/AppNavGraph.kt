@@ -1,16 +1,24 @@
-package com.example.myapplication.ui.theme.navigation
+package com.example.myapplication.navigation
 
+import android.content.ContextWrapper
+import androidx.activity.compose.LocalActivity
+import android.app.Activity
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.myapplication.auth.BiometricAuthManager
+import com.example.myapplication.auth.EncryptedPreferences
+import com.example.myapplication.auth.FirebaseAuthManager
 import com.example.myapplication.data.models.User
 import com.example.myapplication.repository.UserRepository
-import com.example.myapplication.ui.theme.screens.*
+import com.example.myapplication.screens.*
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
@@ -57,15 +65,26 @@ fun AppNavGraph(
         modifier = modifier
     ) {
         composable(Screen.Login.route) {
-            val dummyAuthManager = com.example.myapplication.ui.theme.auth.FirebaseAuthManager(
-                androidx.compose.ui.platform.LocalContext.current as androidx.appcompat.app.AppCompatActivity
-            )
-            val dummyBiometricManager = com.example.myapplication.auth.BiometricAuthManager(
-                androidx.compose.ui.platform.LocalContext.current as androidx.appcompat.app.AppCompatActivity
-            )
-            val dummyEncryptedPrefs = com.example.myapplication.ui.theme.auth.EncryptedPreferences(
-                androidx.compose.ui.platform.LocalContext.current
-            )
+            val context = LocalContext.current
+            val fragmentActivity = remember(context) {
+                var currentContext = context
+                while (currentContext is ContextWrapper) {
+                    if (currentContext is FragmentActivity) break
+                    currentContext = currentContext.baseContext
+                }
+                currentContext as FragmentActivity
+            }
+
+            val dummyAuthManager = remember(fragmentActivity) {
+                FirebaseAuthManager(fragmentActivity)
+            }
+            val dummyBiometricManager = remember(fragmentActivity) {
+                BiometricAuthManager(fragmentActivity)
+            }
+            val dummyEncryptedPrefs = remember(context) {
+                EncryptedPreferences(context)
+            }
+
             Login(
                 onLoginSuccess = {
                     navController.navigate(Screen.Home.route) {
