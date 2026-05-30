@@ -20,11 +20,11 @@ import com.example.myapplication.auth.BiometricAuthManager
 import com.example.myapplication.data.models.User
 import com.example.myapplication.repository.UserRepository
 import com.example.myapplication.ui.theme.MyApplicationTheme
-import com.example.myapplication.ui.theme.auth.EncryptedPreferences
-import com.example.myapplication.ui.theme.auth.FirebaseAuthManager
-import com.example.myapplication.ui.theme.auth.AuthState
-import com.example.myapplication.ui.theme.navigation.MainScaffold
-import com.example.myapplication.ui.theme.screens.Login
+import com.example.myapplication.auth.EncryptedPreferences
+import com.example.myapplication.auth.FirebaseAuthManager
+import com.example.myapplication.auth.AuthState
+import com.example.myapplication.navigation.MainScaffold
+import com.example.myapplication.screens.Login
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -53,9 +53,21 @@ fun LinkUpApp() {
     val activity = context as AppCompatActivity
     val scope = rememberCoroutineScope()
     val userRepository = remember { UserRepository() }
-    val authManager = remember { FirebaseAuthManager(activity) }
-    val biometricManager = remember { BiometricAuthManager(activity) }
-    val encryptedPrefs = remember { EncryptedPreferences(context) }
+    val authManager = remember {
+        _root_ide_package_.com.example.myapplication.auth.FirebaseAuthManager(
+            activity
+        )
+    }
+    val biometricManager = remember {
+        _root_ide_package_.com.example.myapplication.auth.BiometricAuthManager(
+            activity
+        )
+    }
+    val encryptedPrefs = remember {
+        _root_ide_package_.com.example.myapplication.auth.EncryptedPreferences(
+            context
+        )
+    }
 
     val authState by authManager.authState.collectAsState()
 
