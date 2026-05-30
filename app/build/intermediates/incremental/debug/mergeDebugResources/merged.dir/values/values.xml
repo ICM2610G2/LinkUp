@@ -405,7 +405,6 @@
     <item name="is_pooling_container_tag" type="id"/>
     <item name="line1" type="id"/>
     <item name="line3" type="id"/>
-    <item name="maps_compose_nodraw_container_view" type="id"/>
     <item name="nav_controller_view_tag" type="id"/>
     <item name="parent_matrix" type="id"/>
     <item name="pooling_container_listener_holder_tag" type="id"/>
@@ -3249,10 +3248,6 @@
 <attr format="float" name="latLngBoundsNorthEastLatitude"/>
 
 <attr format="float" name="latLngBoundsNorthEastLongitude"/>
-
-<attr format="color" name="backgroundColor"/>
-
-<attr format="string" name="mapId"/>
 </declare-styleable>
     <declare-styleable name="MenuGroup">
 

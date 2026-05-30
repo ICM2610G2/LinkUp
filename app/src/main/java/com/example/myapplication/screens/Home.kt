@@ -1,4 +1,4 @@
-package com.example.myapplication.screens
+package com.example.myapplication.ui.theme.screens
 
 
 import android.util.Log
@@ -113,8 +113,8 @@ fun Home () {
         if (mostrarCrearCarrera) {
             CrearCarrera(
                 onCerrar = { mostrarCrearCarrera = false },
-                onCarreraCreada = {
-                    Log.i("MyApp", "Carrera creada desde Home")
+                onIniciar = {
+                    Log.i("MyApp", "Carrera iniciada desde Home")
                     mostrarCrearCarrera = false
                 }
             )

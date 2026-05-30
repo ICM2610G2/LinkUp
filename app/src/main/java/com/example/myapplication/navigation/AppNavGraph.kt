@@ -1,10 +1,13 @@
-package com.example.myapplication.navigation
+package com.example.myapplication.ui.theme.navigation
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.myapplication.data.models.User
 import com.example.myapplication.repository.UserRepository
 import com.example.myapplication.ui.theme.screens.*
@@ -33,9 +36,11 @@ fun AppNavGraph(
     val scope = rememberCoroutineScope()
     val userRepository = remember { UserRepository() }
 
+    // Estado para userData desde Firestore
     var userData by remember { mutableStateOf<User?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
+    // Cargar userData cuando cambia el usuario
     LaunchedEffect(user) {
         isLoading = true
         userData = if (user != null) {
@@ -55,15 +60,12 @@ fun AppNavGraph(
             val dummyAuthManager = com.example.myapplication.ui.theme.auth.FirebaseAuthManager(
                 androidx.compose.ui.platform.LocalContext.current as androidx.appcompat.app.AppCompatActivity
             )
-
             val dummyBiometricManager = com.example.myapplication.auth.BiometricAuthManager(
                 androidx.compose.ui.platform.LocalContext.current as androidx.appcompat.app.AppCompatActivity
             )
-
             val dummyEncryptedPrefs = com.example.myapplication.ui.theme.auth.EncryptedPreferences(
                 androidx.compose.ui.platform.LocalContext.current
             )
-
             Login(
                 onLoginSuccess = {
                     navController.navigate(Screen.Home.route) {
@@ -85,54 +87,7 @@ fun AppNavGraph(
         }
 
         composable(Screen.Carreras.route) {
-            Carreras(
-                onCrearCarrera = {
-                    navController.navigate("crear_carrera")
-                },
-                onAbrirLobby = { sessionId ->
-                    navController.navigate("lobby_carrera/$sessionId")
-                }
-            )
-        }
-
-        composable("crear_carrera") {
-            CrearCarrera(
-                onCerrar = {
-                    navController.popBackStack()
-                },
-                onCarreraCreada = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        composable("lobby_carrera/{sessionId}") { backStackEntry ->
-            val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
-
-            composable("lobby_carrera/{sessionId}") { backStackEntry ->
-                val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
-
-                LobbyCarreraScreen(
-                    sessionId = sessionId,
-                    onBack = {
-                        navController.popBackStack()
-                    },
-                    onRaceStarted = { id ->
-                        navController.navigate("carrera_activa/$id")
-                    }
-                )
-            }
-
-            composable("carrera_activa/{sessionId}") { backStackEntry ->
-                val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
-
-                CarreraActivaScreen(
-                    sessionId = sessionId,
-                    onBack = {
-                        navController.popBackStack()
-                    }
-                )
-            }
+            Carreras()
         }
 
         composable(Screen.Chat.route) {
@@ -141,6 +96,7 @@ fun AppNavGraph(
 
         composable(Screen.Perfil.route) {
             if (isLoading) {
+                // Mostrar loading mientras carga
                 androidx.compose.material3.CircularProgressIndicator(
                     modifier = Modifier,
                     color = androidx.compose.ui.graphics.Color(0xFFFF9800)

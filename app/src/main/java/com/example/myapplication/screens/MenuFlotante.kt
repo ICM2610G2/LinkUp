@@ -100,7 +100,17 @@ fun MenuFlotante(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-
+                OpcionMenu(
+                    titulo = "Amigos",
+                    descripcion = "Administra tu lista de amigos",
+                    iconoColor = Color.White,
+                    fondoBoton = Color(0xFF252525),
+                    onClick = {
+                        Log.i("MyApp", "Ver amigos clicked desde menu flotante")
+                        onCerrar()
+                        onVerAmigos()
+                    }
+                )
             }
         }
     }

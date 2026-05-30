@@ -1,4 +1,4 @@
-package com.example.myapplication.screens
+package com.example.myapplication.ui.theme.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,10 +31,6 @@ import com.example.myapplication.ui.theme.auth.FirebaseAuthManager
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.automirrored.filled.Logout
-import coil.compose.AsyncImage
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
 fun Perfil(
@@ -59,9 +55,8 @@ fun Perfil(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showBiometricConfirm by remember { mutableStateOf(false) }
 
-    val displayName = userData?.displayName ?: user?.displayName ?: "Usuario"
-    val email = userData?.email ?: user?.email ?: "correo@ejemplo.com"
-    val photoURL = userData?.photoURL ?: ""
+    val displayName = user?.displayName ?: userData?.displayName ?: "Usuario"
+    val email = user?.email ?: "correo@ejemplo.com"
     val userId = user?.uid ?: userData?.uid?.take(8) ?: ""
 
     // Datos reales de Firestore
@@ -105,7 +100,6 @@ fun Perfil(
         email = email,
         userId = userId,
         gameId = gameId,
-        photoURL = photoURL,
         totalPlaces = totalPlaces,
         currentStreak = currentStreak,
         bestStreak = bestStreak,
@@ -302,7 +296,6 @@ fun PerfilContent(
     email: String,
     userId: String,
     gameId: String,
-    photoURL: String,
     totalPlaces: Int,
     currentStreak: Int,
     bestStreak: Int,
@@ -331,27 +324,18 @@ fun PerfilContent(
         ) {
             Box(
                 modifier = Modifier
-                    .size(82.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF1A1A1A)),
+                    .size(90.dp)
+                    .background(accent, shape = CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                if (photoURL.isNotBlank()) {
-                    AsyncImage(
-                        model = photoURL,
-                        contentDescription = "Foto de perfil",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Imagen de perfil",
-                        tint = Color.White,
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Imagen de perfil",
+                    tint = Color.White,
+                    modifier = Modifier.size(44.dp)
+                )
             }
+
             Spacer(modifier = Modifier.width(14.dp))
 
             Column(
@@ -392,26 +376,25 @@ fun PerfilContent(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                Column(
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
                         text = "ID: $userId",
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         color = accent,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        fontWeight = FontWeight.SemiBold
                     )
-
-                    Spacer(modifier = Modifier.height(2.dp))
-
+                    Box(
+                        modifier = Modifier
+                            .size(4.dp)
+                            .background(Color.Gray, CircleShape)
+                    )
                     Text(
                         text = gameId,
-                        fontSize = 11.sp,
-                        color = Color.Gray,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        fontSize = 12.sp,
+                        color = Color.Gray
                     )
                 }
             }
@@ -662,6 +645,42 @@ fun MenuItem(
                 text = "›",
                 color = Color(0xFF7A7A7A),
                 fontSize = 22.sp
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PerfilPreview() {
+    MyApplicationTheme {
+        PerfilContent(
+            displayName = "Juan Pérez",
+            email = "juan.perez@example.com",
+            userId = "ABC12345",
+            gameId = "linkup#4821",
+            totalPlaces = 12,
+            currentStreak = 3,
+            bestStreak = 7,
+            totalPoints = 1250,
+            onEditClick = {},
+            onVerAmigosClick = {},
+            onLogoutClick = {},
+            onDeleteClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF0B0B0B)
+@Composable
+fun StatCardPreview() {
+    MyApplicationTheme {
+        Row(modifier = Modifier.padding(16.dp)) {
+            StatCard(
+                value = "12",
+                label = "Lugares",
+                icon = Icons.Default.Place,
+                modifier = Modifier.weight(1f)
             )
         }
     }

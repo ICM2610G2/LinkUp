@@ -21,10 +21,6 @@ import com.example.myapplication.data.models.User
 import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.repository.UserRepository
 import kotlinx.coroutines.launch
-import androidx.compose.ui.draw.clip
-import coil.compose.AsyncImage
-import androidx.compose.ui.layout.ContentScale
-
 
 @Composable
 fun ListaAmigos(
@@ -288,25 +284,15 @@ fun AmigoItem(
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFFF9800)),
+                    .background(Color(0xFFFF9800), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                if (amigo.photoURL.isNotBlank()) {
-                    AsyncImage(
-                        model = amigo.photoURL,
-                        contentDescription = "Foto de ${amigo.displayName}",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Text(
-                        amigo.displayName.take(2).uppercase(),
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                }
+                Text(
+                    amigo.displayName.take(2).uppercase(),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
             }
 
             Column(modifier = Modifier.weight(1f)) {
