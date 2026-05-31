@@ -1,6 +1,9 @@
-package com.example.myapplication.ui.theme.screens
+package com.example.myapplication.screens
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -43,7 +46,7 @@ fun CrearPunto(
                 .fillMaxHeight(0.9f)
                 .align(Alignment.BottomCenter)
                 .padding(horizontal = 0.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
+            border = BorderStroke(1.dp, Color(0x1AFFFFFF))
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
 
@@ -100,7 +103,7 @@ fun CrearPunto(
                             onObtenerUbicacion = {
                                 obteniendo = true
                                 Log.i("MyApp", "Obtener ubicación clicked")
-                                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                                Handler(Looper.getMainLooper()).postDelayed({
                                     ubicacion = Pair(4.5981, -74.0758)
                                     obteniendo = false
                                     Log.i("MyApp", "Ubicación obtenida")
@@ -261,7 +264,7 @@ fun SeccionCategoria(categoria: String, onCategoriaChange: (String) -> Unit) {
                     modifier = Modifier
                         .weight(1f)
                         .clickable { onCategoriaChange(id) },
-                    border = androidx.compose.foundation.BorderStroke(
+                    border = BorderStroke(
                         1.dp,
                         if (seleccionada) Color(0xFFFF9800) else Color(0x1AFFFFFF)
                     )
@@ -315,7 +318,7 @@ fun SeccionDificultad(dificultad: String, onDificultadChange: (String) -> Unit) 
                     modifier = Modifier
                         .weight(1f)
                         .clickable { onDificultadChange(id) },
-                    border = androidx.compose.foundation.BorderStroke(
+                    border = BorderStroke(
                         1.dp,
                         if (seleccionada) color else Color(0x1AFFFFFF)
                     )
@@ -361,7 +364,7 @@ fun SeccionUbicacion(
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF252525)),
                 shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
+                border = BorderStroke(1.dp, Color(0x1AFFFFFF))
             ) {
                 if (obteniendo) {
                     CircularProgressIndicator(
@@ -382,7 +385,7 @@ fun SeccionUbicacion(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF252525)),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth(),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x4D22C55E))
+                border = BorderStroke(1.dp, Color(0x4D22C55E))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(
@@ -415,7 +418,7 @@ fun ConsejoPunto() {
         colors = CardDefaults.cardColors(containerColor = Color(0xFF252525)),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth(),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
+        border = BorderStroke(1.dp, Color(0x1AFFFFFF))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(

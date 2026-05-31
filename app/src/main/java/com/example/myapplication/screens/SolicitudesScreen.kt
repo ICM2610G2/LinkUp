@@ -1,5 +1,6 @@
-package com.example.myapplication.ui.theme.screens
+package com.example.myapplication.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -180,7 +181,7 @@ fun SolicitudCard(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth(),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x4DE9C46A))
+        border = BorderStroke(1.dp, Color(0x4DE9C46A))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -250,7 +251,7 @@ fun SolicitudCard(
                         .height(44.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(12.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x33FFFFFF))
+                    border = BorderStroke(1.dp, Color(0x33FFFFFF))
                 ) {
                     Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))

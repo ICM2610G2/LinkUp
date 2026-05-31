@@ -1,6 +1,7 @@
-package com.example.myapplication.ui.theme.screens
+package com.example.myapplication.screens
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -22,10 +22,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
-import com.example.myapplication.ui.theme.auth.*
 import com.example.myapplication.auth.BiometricAuthManager
 import com.example.myapplication.auth.BiometricAuthResult
 import com.example.myapplication.auth.BiometricAvailability
+import com.example.myapplication.auth.EncryptedPreferences
+import com.example.myapplication.auth.FirebaseAuthManager
 import kotlinx.coroutines.launch
 
 @Composable
@@ -241,7 +242,7 @@ fun FormularioLogin(
         colors = CardDefaults.cardColors(containerColor = Color(0x66000000)),
         shape = RoundedCornerShape(24.dp),
         modifier = Modifier.fillMaxWidth(),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
+        border = BorderStroke(1.dp, Color(0x1AFFFFFF))
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
 

@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.theme.screens
+package com.example.myapplication.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

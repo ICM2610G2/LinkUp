@@ -1,6 +1,7 @@
-package com.example.myapplication.ui.theme.model
+package com.example.myapplication.model
 
 import android.app.Application
+import android.graphics.Color
 import android.location.Geocoder
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -175,7 +176,7 @@ class MapsViewModel(app: Application) : AndroidViewModel(app) {
                 val road = roadManager.getRoad(points)
                 val overlay = RoadManager.buildRoadOverlay(road)
                 overlay?.outlinePaint?.strokeWidth = 10f
-                overlay?.outlinePaint?.color = android.graphics.Color.parseColor("#FF9800")
+                overlay?.outlinePaint?.color = Color.parseColor("#FF9800")
                 _state.update { it.copy(roadOverlay = overlay) }
             }
         }

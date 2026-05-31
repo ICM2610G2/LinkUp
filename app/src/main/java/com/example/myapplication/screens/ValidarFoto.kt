@@ -1,6 +1,8 @@
-package com.example.myapplication.ui.theme.screens
+package com.example.myapplication.screens
 
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.draw.drawBehind
@@ -20,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
@@ -28,12 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import java.io.File
 
 import androidx.camera.core.Preview as CameraPreview
 import androidx.camera.core.ImageCapture
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.geometry.Offset
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -105,7 +107,7 @@ fun ValidarFoto(
                 fotoTomada = true
                 validando = true
                 resultadoValidacion = null
-                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                Handler(Looper.getMainLooper()).postDelayed({
                     validando = false
                     resultadoValidacion = ResultadoValidacion(
                         ubicacion = true,
@@ -191,8 +193,12 @@ fun MarcoEncuadre() {
                     .align(Alignment.TopStart)
                     .background(Color.Transparent)
                     .drawBehind {
-                        drawLine(Color(0xFFFF9800), androidx.compose.ui.geometry.Offset(0f, 0f), androidx.compose.ui.geometry.Offset(size.width, 0f), strokeWidth = 4f)
-                        drawLine(Color(0xFFFF9800), androidx.compose.ui.geometry.Offset(0f, 0f), androidx.compose.ui.geometry.Offset(0f, size.height), strokeWidth = 4f)
+                        drawLine(Color(0xFFFF9800),
+                            Offset(0f, 0f),
+                            Offset(size.width, 0f), strokeWidth = 4f)
+                        drawLine(Color(0xFFFF9800),
+                            Offset(0f, 0f),
+                            Offset(0f, size.height), strokeWidth = 4f)
                     }
             )
 
@@ -201,8 +207,12 @@ fun MarcoEncuadre() {
                     .size(28.dp)
                     .align(Alignment.TopEnd)
                     .drawBehind {
-                        drawLine(Color(0xFFFF9800), androidx.compose.ui.geometry.Offset(0f, 0f), androidx.compose.ui.geometry.Offset(size.width, 0f), strokeWidth = 4f)
-                        drawLine(Color(0xFFFF9800), androidx.compose.ui.geometry.Offset(size.width, 0f), androidx.compose.ui.geometry.Offset(size.width, size.height), strokeWidth = 4f)
+                        drawLine(Color(0xFFFF9800),
+                            Offset(0f, 0f),
+                            Offset(size.width, 0f), strokeWidth = 4f)
+                        drawLine(Color(0xFFFF9800),
+                            Offset(size.width, 0f),
+                            Offset(size.width, size.height), strokeWidth = 4f)
                     }
             )
 
@@ -211,8 +221,12 @@ fun MarcoEncuadre() {
                     .size(28.dp)
                     .align(Alignment.BottomStart)
                     .drawBehind {
-                        drawLine(Color(0xFFFF9800), androidx.compose.ui.geometry.Offset(0f, size.height), androidx.compose.ui.geometry.Offset(size.width, size.height), strokeWidth = 4f)
-                        drawLine(Color(0xFFFF9800), androidx.compose.ui.geometry.Offset(0f, 0f), androidx.compose.ui.geometry.Offset(0f, size.height), strokeWidth = 4f)
+                        drawLine(Color(0xFFFF9800),
+                            Offset(0f, size.height),
+                            Offset(size.width, size.height), strokeWidth = 4f)
+                        drawLine(Color(0xFFFF9800),
+                            Offset(0f, 0f),
+                            Offset(0f, size.height), strokeWidth = 4f)
                     }
             )
 
@@ -221,8 +235,12 @@ fun MarcoEncuadre() {
                     .size(28.dp)
                     .align(Alignment.BottomEnd)
                     .drawBehind {
-                        drawLine(Color(0xFFFF9800), androidx.compose.ui.geometry.Offset(0f, size.height), androidx.compose.ui.geometry.Offset(size.width, size.height), strokeWidth = 4f)
-                        drawLine(Color(0xFFFF9800), androidx.compose.ui.geometry.Offset(size.width, 0f), androidx.compose.ui.geometry.Offset(size.width, size.height), strokeWidth = 4f)
+                        drawLine(Color(0xFFFF9800),
+                            Offset(0f, size.height),
+                            Offset(size.width, size.height), strokeWidth = 4f)
+                        drawLine(Color(0xFFFF9800),
+                            Offset(size.width, 0f),
+                            Offset(size.width, size.height), strokeWidth = 4f)
                     }
             )
         }
@@ -273,7 +291,7 @@ fun IndicadoresValidacion(resultado: ResultadoValidacion, modifier: Modifier = M
         colors = CardDefaults.cardColors(containerColor = Color(0xF21A1A1A)),
         shape = RoundedCornerShape(16.dp),
         modifier = modifier.fillMaxWidth(),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
+        border = BorderStroke(1.dp, Color(0x1AFFFFFF))
     ) {
         Column(
             modifier = Modifier.padding(12.dp),

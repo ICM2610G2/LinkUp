@@ -1,9 +1,11 @@
-package com.example.myapplication.ui.theme.screens
+package com.example.myapplication.screens
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -32,6 +34,7 @@ import java.util.UUID
 import kotlinx.coroutines.tasks.await
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.google.firebase.auth.UserProfileChangeRequest
 
 @Composable
 fun EditProfileScreen(
@@ -111,7 +114,7 @@ fun EditProfileScreen(
                 if (result.isSuccess) {
                     // Actualizar displayName en Firebase Auth
                     auth.currentUser?.updateProfile(
-                        com.google.firebase.auth.UserProfileChangeRequest.Builder()
+                        UserProfileChangeRequest.Builder()
                             .setDisplayName(displayName)
                             .setPhotoUri(if (newPhotoURL.isNotEmpty()) Uri.parse(newPhotoURL) else null)
                             .build()
@@ -128,8 +131,8 @@ fun EditProfileScreen(
         onCancelClick = onCancel,
         onImageClick = { galleryLauncher.launch("image/*") },
         onCopyGameId = {
-            val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-            val clip = android.content.ClipData.newPlainText("Game ID", userData.gameId)
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Game ID", userData.gameId)
             clipboard.setPrimaryClip(clip)
         }
     )

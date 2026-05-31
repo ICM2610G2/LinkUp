@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.theme.model
+package com.example.myapplication.model
 
 data class GpsPoint(
     val xPercent: Float,

@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.theme.auth
+package com.example.myapplication.auth
 
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
