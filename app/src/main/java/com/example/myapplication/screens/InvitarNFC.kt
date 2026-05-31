@@ -20,14 +20,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.InvitarNFCViewModel
 import kotlin.random.Random
 
 @Composable
-fun InvitarNFC(onCerrar: () -> Unit) {
-
-    var mostrarQR by remember { mutableStateOf(false) }
-    var escaneando by remember { mutableStateOf(false) }
-
+fun InvitarNFC(
+    onCerrar: () -> Unit,
+    viewModel: InvitarNFCViewModel = viewModel()
+    ) {
+    val state by viewModel.state.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -51,12 +53,12 @@ fun InvitarNFC(onCerrar: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     BotonNFC(
-                        escaneando = escaneando,
+                        escaneando = state.escaneando,
                         onClick = {
-                            escaneando = true
+                            viewModel.updateEscaneando(true)
                             Log.i("MyApp", "NFC scan iniciado")
                             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                                escaneando = false
+                                viewModel.updateEscaneando(false)
                                 Log.i("MyApp", "NFC scan completado")
                             }, 2000)
                         }
@@ -72,12 +74,12 @@ fun InvitarNFC(onCerrar: () -> Unit) {
                         descripcion = "Escanea para unirte",
                         icono = Icons.Default.QrCode,
                         onClick = {
-                            mostrarQR = !mostrarQR
-                            Log.i("MyApp", "QR toggled: $mostrarQR")
+                            viewModel.updateMostrarQR(!state.mostrarQR)
+                            Log.i("MyApp", "QR toggled: ${state.mostrarQR}")
                         }
                     )
 
-                    if (mostrarQR) {
+                    if (state.mostrarQR) {
                         CodigoQR()
                     }
 
