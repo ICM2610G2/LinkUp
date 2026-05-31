@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.update
 
 data class CrearCarreraState(
     val nombre: String = "",
-    val tipoOrden: String = "libre",
-    val tiempoLimite: String = "sin-limite",
-    val tipoCarrera: String = "rapida",
-    val lugaresSeleccionados: Int = 0
+    val descripcion: String = "",
+    val isPublic: Boolean = true,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
 )
 
 class CrearCarreraViewModel : ViewModel() {
@@ -20,16 +20,16 @@ class CrearCarreraViewModel : ViewModel() {
     fun updateNombre(newValue: String) {
         _crearCarreraState.update { it.copy(nombre = newValue) }
     }
-    fun updateTipoOrden(newValue: String) {
-        _crearCarreraState.update { it.copy(tipoOrden = newValue) }
+    fun updateDescripcion(newValue: String) {
+        _crearCarreraState.update { it.copy(descripcion = newValue) }
     }
-    fun updateTiempoLimite(newValue: String) {
-        _crearCarreraState.update { it.copy(tiempoLimite = newValue) }
+    fun updateIsPublic(newValue: Boolean) {
+        _crearCarreraState.update { it.copy(isPublic = newValue) }
     }
-    fun updateTipoCarrera(newValue: String) {
-        _crearCarreraState.update { it.copy(tipoCarrera = newValue) }
+    fun updateIsLoading(newValue: Boolean) {
+        _crearCarreraState.update { it.copy(isLoading = newValue) }
     }
-    fun agregarLugar() {
-        _crearCarreraState.update { it.copy(lugaresSeleccionados = minOf(it.lugaresSeleccionados + 1, 10)) }
+    fun updateErrorMessage(newValue: String?) {
+        _crearCarreraState.update { it.copy(errorMessage = newValue) }
     }
 }

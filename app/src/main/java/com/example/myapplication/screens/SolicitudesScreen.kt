@@ -1,6 +1,5 @@
 package com.example.myapplication.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,57 +16,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.models.Friendship
 import com.example.myapplication.data.models.User
+import com.example.myapplication.model.SolicitudConUsuario
+import com.example.myapplication.model.SolicitudesViewModel
 import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.repository.UserRepository
 import kotlinx.coroutines.launch
-import coil.compose.AsyncImage
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-
-// Par de solicitud + datos del solicitante ya cargados
-data class SolicitudConUsuario(
-    val friendship: Friendship,
-    val solicitante: User
-)
+import kotlin.collections.isNotEmpty
 
 @Composable
-fun SolicitudesScreen(
-    onBack: () -> Unit
+fun Solicitudes(
+    onBack: () -> Unit,
+    viewModel: SolicitudesViewModel = viewModel()
 ) {
-    val scope = rememberCoroutineScope()
-    val friendsRepository = remember { FriendsRepository() }
-    val userRepository = remember { UserRepository() }
-
-    // Lista ya enriquecida con los datos del solicitante
-    var solicitudes by remember { mutableStateOf<List<SolicitudConUsuario>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-
-    suspend fun loadRequests() {
-        isLoading = true
-        val pending = friendsRepository.getPendingRequests()
-
-        // Cargamos los usuarios de todos los solicitantes de una vez,
-        // fuera del LazyColumn — sin parpadeos
-        val enriched = pending.mapNotNull { friendship ->
-            val user = userRepository.getUser(friendship.userA)
-            if (user != null) SolicitudConUsuario(friendship, user) else null
-        }
-        solicitudes = enriched
-        isLoading = false
-    }
-
-    LaunchedEffect(Unit) {
-        loadRequests()
-    }
+    val state by viewModel.state.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0A0A0A))
     ) {
-        // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -86,7 +56,7 @@ fun SolicitudesScreen(
                 modifier = Modifier.weight(1f)
             )
             // Badge con cantidad
-            if (solicitudes.isNotEmpty()) {
+            if (state.solicitudes.isNotEmpty()) {
                 Box(
                     modifier = Modifier
                         .size(28.dp)
@@ -94,7 +64,7 @@ fun SolicitudesScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        solicitudes.size.toString(),
+                        state.solicitudes.size.toString(),
                         color = Color.White,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
@@ -104,13 +74,13 @@ fun SolicitudesScreen(
         }
 
         when {
-            isLoading -> {
+            state.isLoading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Color(0xFFFF9800))
                 }
             }
 
-            solicitudes.isEmpty() -> {
+            state.solicitudes.isEmpty() -> {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -140,27 +110,13 @@ fun SolicitudesScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(
-                        items = solicitudes,
+                        items = state.solicitudes,
                         key = { it.friendship.id }
                     ) { item ->
                         SolicitudCard(
                             item = item,
-                            onAccept = {
-                                scope.launch {
-                                    friendsRepository.acceptRequest(item.friendship.id).fold(
-                                        onSuccess = { loadRequests() },
-                                        onFailure = {  }
-                                    )
-                                }
-                            },
-                            onReject = {
-                                scope.launch {
-                                    friendsRepository.rejectRequest(item.friendship.id).fold(
-                                        onSuccess = { loadRequests() },
-                                        onFailure = { }
-                                    )
-                                }
-                            }
+                            onAccept = { viewModel.acceptRequest(item.friendship.id) },
+                            onReject = { viewModel.rejectRequest(item.friendship.id) }
                         )
                     }
                 }
@@ -181,7 +137,7 @@ fun SolicitudCard(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth(),
-        border = BorderStroke(1.dp, Color(0x4DE9C46A))
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x4DE9C46A))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -191,25 +147,15 @@ fun SolicitudCard(
                 Box(
                     modifier = Modifier
                         .size(52.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFE9C46A)),
+                        .background(Color(0xFFE9C46A), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (user.photoURL.isNotBlank()) {
-                        AsyncImage(
-                            model = user.photoURL,
-                            contentDescription = "Foto de ${user.displayName}",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Text(
-                            user.displayName.take(2).uppercase(),
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        )
-                    }
+                    Text(
+                        user.displayName.take(2).uppercase(),
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
@@ -251,7 +197,7 @@ fun SolicitudCard(
                         .height(44.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Color(0x33FFFFFF))
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x33FFFFFF))
                 ) {
                     Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))

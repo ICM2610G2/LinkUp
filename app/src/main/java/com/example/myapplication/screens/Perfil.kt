@@ -19,23 +19,20 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.myapplication.auth.BiometricAuthManager
 import com.example.myapplication.data.models.User
+import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.auth.FirebaseAuthManager
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.automirrored.filled.Logout
-import coil.compose.AsyncImage
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import com.example.myapplication.auth.BiometricAuthResult
-import com.example.myapplication.auth.BiometricAvailability
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.PerfilViewModel
 
 @Composable
 fun Perfil(
@@ -45,7 +42,8 @@ fun Perfil(
     onAccountDeleted: () -> Unit,
     onEditProfile: () -> Unit,
     onVerAmigos: () -> Unit,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    viewModel: PerfilViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -53,48 +51,40 @@ fun Perfil(
     val authManager = remember { FirebaseAuthManager(activity) }
     val biometricManager = remember { BiometricAuthManager(activity) }
 
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var showPasswordDialog by remember { mutableStateOf(false) }
-    var deletePassword by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var showBiometricConfirm by remember { mutableStateOf(false) }
+    val state by viewModel.perfilState.collectAsState()
 
-    val displayName = userData?.displayName ?: user?.displayName ?: "Usuario"
-    val email = userData?.email ?: user?.email ?: "correo@ejemplo.com"
-    val photoURL = userData?.photoURL ?: ""
+    val displayName = user?.displayName ?: userData?.displayName ?: "Usuario"
+    val email = user?.email ?: "correo@ejemplo.com"
     val userId = user?.uid ?: userData?.uid?.take(8) ?: ""
 
-    // Datos reales de Firestore
     val totalPlaces = userData?.totalPlacesVisited ?: 0
     val currentStreak = userData?.currentStreak ?: 0
     val bestStreak = userData?.bestStreak ?: 0
     val totalPoints = userData?.totalPoints ?: 0
     val gameId = userData?.gameId ?: "linkup#0000"
 
-    // Observar resultado de biometría para borrar cuenta
     LaunchedEffect(Unit) {
         biometricManager.authResult.collect { result ->
             when (result) {
-                is BiometricAuthResult.Success -> {
+                is com.example.myapplication.auth.BiometricAuthResult.Success -> {
                     scope.launch {
-                        isLoading = true
+                        viewModel.updateIsLoading(true)
                         val deleteResult = authManager.deleteAccount()
                         deleteResult.fold(
                             onSuccess = {
                                 onAccountDeleted()
                             },
                             onFailure = { e ->
-                                errorMessage = "Error al borrar cuenta: ${e.message}"
-                                isLoading = false
-                                showBiometricConfirm = false
+                                viewModel.updateErrorMessage("Error al borrar cuenta: ${e.message}")
+                                viewModel.updateIsLoading(false)
+                                viewModel.updateShowBiometricConfirm(false)
                             }
                         )
                     }
                 }
-                is BiometricAuthResult.Error -> {
-                    errorMessage = result.message
-                    showBiometricConfirm = false
+                is com.example.myapplication.auth.BiometricAuthResult.Error -> {
+                    viewModel.updateErrorMessage(result.message)
+                    viewModel.updateShowBiometricConfirm(false)
                 }
                 else -> {}
             }
@@ -106,7 +96,6 @@ fun Perfil(
         email = email,
         userId = userId,
         gameId = gameId,
-        photoURL = photoURL,
         totalPlaces = totalPlaces,
         currentStreak = currentStreak,
         bestStreak = bestStreak,
@@ -119,13 +108,12 @@ fun Perfil(
                 onLogout()
             }
         },
-        onDeleteClick = { showDeleteDialog = true }
+        onDeleteClick = { viewModel.updateShowDeleteDialog(true) }
     )
 
-    // Diálogo de confirmación para borrar cuenta
-    if (showDeleteDialog) {
+    if (state.showDeleteDialog) {
         Dialog(
-            onDismissRequest = { showDeleteDialog = false },
+            onDismissRequest = { viewModel.updateShowDeleteDialog(false) },
             properties = DialogProperties(usePlatformDefaultWidth = false)
         ) {
             Card(
@@ -157,16 +145,16 @@ fun Perfil(
                         text = "Esta acción es irreversible. Se eliminarán todos tus datos.",
                         color = Color.Gray,
                         fontSize = 14.sp,
-                        textAlign = TextAlign.Center
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // Botón: Usar huella
-                    if (biometricManager.isBiometricAvailable() is BiometricAvailability.Available) {
+                    if (biometricManager.isBiometricAvailable() is com.example.myapplication.auth.BiometricAvailability.Available) {
                         Button(
                             onClick = {
-                                showDeleteDialog = false
-                                showBiometricConfirm = true
+                                viewModel.updateShowDeleteDialog(false)
+                                viewModel.updateShowBiometricConfirm(true)
                                 biometricManager.setupBiometricPrompt()
                                 biometricManager.authenticate()
                             },
@@ -181,11 +169,10 @@ fun Perfil(
                         Spacer(modifier = Modifier.height(12.dp))
                     }
 
-                    // Botón: Usar contraseña
                     Button(
                         onClick = {
-                            showDeleteDialog = false
-                            showPasswordDialog = true
+                            viewModel.updateShowDeleteDialog(false)
+                            viewModel.updateShowPasswordDialog(true)
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
@@ -198,7 +185,7 @@ fun Perfil(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     TextButton(
-                        onClick = { showDeleteDialog = false }
+                        onClick = { viewModel.updateShowDeleteDialog(false) }
                     ) {
                         Text("Cancelar", color = Color.Gray)
                     }
@@ -207,13 +194,12 @@ fun Perfil(
         }
     }
 
-    // Diálogo para ingresar contraseña
-    if (showPasswordDialog) {
+    if (state.showPasswordDialog) {
         Dialog(
             onDismissRequest = {
-                showPasswordDialog = false
-                deletePassword = ""
-                errorMessage = null
+                viewModel.updateShowPasswordDialog(false)
+                viewModel.updateDeletePassword("")
+                viewModel.updateErrorMessage(null)
             }
         ) {
             Card(
@@ -234,9 +220,9 @@ fun Perfil(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    if (errorMessage != null) {
+                    if (state.errorMessage != null) {
                         Text(
-                            text = errorMessage!!,
+                            text = state.errorMessage!!,
                             color = Color(0xFFFF6B6B),
                             fontSize = 12.sp
                         )
@@ -244,8 +230,8 @@ fun Perfil(
                     }
 
                     OutlinedTextField(
-                        value = deletePassword,
-                        onValueChange = { deletePassword = it },
+                        value = state.deletePassword,
+                        onValueChange = {viewModel.updateDeletePassword(it)},
                         label = { Text("Contraseña") },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth()
@@ -255,15 +241,15 @@ fun Perfil(
                     Button(
                         onClick = {
                             scope.launch {
-                                isLoading = true
-                                val result = authManager.deleteAccountWithPassword(deletePassword)
+                                viewModel.updateIsLoading(true)
+                                val result = authManager.deleteAccountWithPassword(state.deletePassword)
                                 result.fold(
                                     onSuccess = {
                                         onAccountDeleted()
                                     },
                                     onFailure = { e ->
-                                        errorMessage = e.message
-                                        isLoading = false
+                                        viewModel.updateErrorMessage(e.message)
+                                        viewModel.updateIsLoading(false)
                                     }
                                 )
                             }
@@ -271,9 +257,9 @@ fun Perfil(
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B6B)),
                         shape = RoundedCornerShape(12.dp),
-                        enabled = !isLoading
+                        enabled = !state.isLoading
                     ) {
-                        if (isLoading) {
+                        if (state.isLoading) {
                             CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White)
                         } else {
                             Text("Confirmar y borrar cuenta")
@@ -283,9 +269,9 @@ fun Perfil(
 
                     TextButton(
                         onClick = {
-                            showPasswordDialog = false
-                            deletePassword = ""
-                            errorMessage = null
+                            viewModel.updateShowPasswordDialog(false)
+                            viewModel.updateDeletePassword("")
+                            viewModel.updateErrorMessage(null)
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -303,7 +289,6 @@ fun PerfilContent(
     email: String,
     userId: String,
     gameId: String,
-    photoURL: String,
     totalPlaces: Int,
     currentStreak: Int,
     bestStreak: Int,
@@ -323,7 +308,6 @@ fun PerfilContent(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        // Header con foto y nombre
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -332,27 +316,18 @@ fun PerfilContent(
         ) {
             Box(
                 modifier = Modifier
-                    .size(82.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF1A1A1A)),
+                    .size(90.dp)
+                    .background(accent, shape = CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                if (photoURL.isNotBlank()) {
-                    AsyncImage(
-                        model = photoURL,
-                        contentDescription = "Foto de perfil",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Imagen de perfil",
-                        tint = Color.White,
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Imagen de perfil",
+                    tint = Color.White,
+                    modifier = Modifier.size(44.dp)
+                )
             }
+
             Spacer(modifier = Modifier.width(14.dp))
 
             Column(
@@ -384,7 +359,6 @@ fun PerfilContent(
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
-
                 Text(
                     text = email,
                     fontSize = 14.sp,
@@ -392,35 +366,31 @@ fun PerfilContent(
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
-
-                Column(
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
                         text = "ID: $userId",
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         color = accent,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        fontWeight = FontWeight.SemiBold
                     )
-
-                    Spacer(modifier = Modifier.height(2.dp))
-
+                    Box(
+                        modifier = Modifier
+                            .size(4.dp)
+                            .background(Color.Gray, CircleShape)
+                    )
                     Text(
                         text = gameId,
-                        fontSize = 11.sp,
-                        color = Color.Gray,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        fontSize = 12.sp,
+                        color = Color.Gray
                     )
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Tarjetas de estadísticas
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -453,7 +423,6 @@ fun PerfilContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Menú de opciones
         MenuItem(
             icon = Icons.Default.Settings,
             title = "Configuración",
@@ -504,7 +473,6 @@ fun PerfilContent(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Botón de cerrar sesión
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -536,7 +504,6 @@ fun PerfilContent(
             }
         }
 
-        // Botón de borrar cuenta
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -663,6 +630,42 @@ fun MenuItem(
                 text = "›",
                 color = Color(0xFF7A7A7A),
                 fontSize = 22.sp
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PerfilPreview() {
+    MyApplicationTheme {
+        PerfilContent(
+            displayName = "Juan Pérez",
+            email = "juan.perez@example.com",
+            userId = "ABC12345",
+            gameId = "linkup#4821",
+            totalPlaces = 12,
+            currentStreak = 3,
+            bestStreak = 7,
+            totalPoints = 1250,
+            onEditClick = {},
+            onVerAmigosClick = {},
+            onLogoutClick = {},
+            onDeleteClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF0B0B0B)
+@Composable
+fun StatCardPreview() {
+    MyApplicationTheme {
+        Row(modifier = Modifier.padding(16.dp)) {
+            StatCard(
+                value = "12",
+                label = "Lugares",
+                icon = Icons.Default.Place,
+                modifier = Modifier.weight(1f)
             )
         }
     }

@@ -1,9 +1,7 @@
 package com.example.myapplication.screens
 
-
 import android.util.Log
 import com.example.myapplication.R
-
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -14,10 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
@@ -27,17 +23,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.HomeViewModel
 
 @Composable
-fun Home () {
-    var mostrarCrearPunto by remember { mutableStateOf(false) }
-    var mostrarMenuFlotante by remember { mutableStateOf(false) }
-    var mostrarCrearCarrera by remember { mutableStateOf(false) }
-    var mostrarNFC by remember { mutableStateOf(false) }
-    var mostrarAmigos by remember { mutableStateOf(false) }
-    var lugarSeleccionado by remember { mutableStateOf<String?>(null) }
+fun Home(
+    viewModel: HomeViewModel = viewModel()
+) {
+    val state by viewModel.homeState.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize()){
+    Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -50,7 +45,8 @@ fun Home () {
             item {
                 RutasHeader({
                     Log.i("MyApp", "Crear ruta")
-                    mostrarCrearCarrera = true})
+                    viewModel.updateMostrarCrearCarrera(true)
+                })
             }
             item {
                 RutaItem(
@@ -60,8 +56,10 @@ fun Home () {
                     dificultad = "Media",
                     dificultadColor = Color(0xFFFFB300),
                     imageRes = R.drawable.la_candelaria,
-                    onClick = {Log.i("MyApp", "La Candelaria")
-                    lugarSeleccionado = "La Candelaria"}
+                    onClick = {
+                        Log.i("MyApp", "La Candelaria")
+                        viewModel.updateLugarSeleccionado("La Candelaria")
+                    }
                 )
             }
             item {
@@ -72,19 +70,22 @@ fun Home () {
                     dificultad = "Difícil",
                     dificultadColor = Color(0xFFE53935),
                     imageRes = R.drawable.monserrate,
-                    onClick = {Log.i("MyApp", "Monserrate")
-                    lugarSeleccionado = "Monserrate"}
+                    onClick = {
+                        Log.i("MyApp", "Monserrate")
+                        viewModel.updateLugarSeleccionado("Monserrate")
+                    }
                 )
             }
             item {
                 Spacer(modifier = Modifier.height(24.dp))
                 InvitarCard(onNFC = {
                     Log.i("MyApp", "Compartir NFC")
-                    mostrarNFC = true
+                    viewModel.updateMostrarNFC(true)
                 })
             }
-            item{Spacer(modifier = Modifier.height(24.dp))}
+            item { Spacer(modifier = Modifier.height(24.dp)) }
         }
+
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -93,55 +94,54 @@ fun Home () {
                 .background(Color(0xFF2A9D8F), CircleShape)
                 .clickable {
                     Log.i("MyApp", "Menu flotante clicked")
-                    mostrarMenuFlotante = true
+                    viewModel.updateMostrarMenuFlotante(true)
                 },
             contentAlignment = Alignment.Center
         ) {
             Icon(Icons.Default.Add, null, tint = Color.White, modifier = Modifier.size(28.dp))
         }
 
-        // Modales
-        if (mostrarMenuFlotante) {
+        if (state.mostrarMenuFlotante) {
             MenuFlotante(
-                onCerrar = { mostrarMenuFlotante = false },
-                onCrearCarrera = { mostrarCrearCarrera = true },
-                onInvitarNFC = { mostrarNFC = true },
-                onVerAmigos = { mostrarAmigos = true }
+                onCerrar = { viewModel.updateMostrarMenuFlotante(false) },
+                onCrearCarrera = { viewModel.updateMostrarCrearCarrera(true) },
+                onInvitarNFC = { viewModel.updateMostrarNFC(true) },
+                onVerAmigos = { viewModel.updateMostrarAmigos(true) }
             )
         }
 
-        if (mostrarCrearCarrera) {
+        if (state.mostrarCrearCarrera) {
             CrearCarrera(
-                onCerrar = { mostrarCrearCarrera = false },
+                onCerrar = { viewModel.updateMostrarCrearCarrera(false) },
                 onCarreraCreada = {
                     Log.i("MyApp", "Carrera creada desde Home")
-                    mostrarCrearCarrera = false
+                    viewModel.updateMostrarCrearCarrera(false)
                 }
             )
         }
 
-        if (mostrarCrearPunto) {
+        if (state.mostrarCrearPunto) {
             CrearPunto(
-                onCerrar = { mostrarCrearPunto = false },
+                onCerrar = { viewModel.updateMostrarCrearPunto(false) },
                 onPublicar = {
                     Log.i("MyApp", "Punto publicado desde Home")
-                    mostrarCrearPunto = false
+                    viewModel.updateMostrarCrearPunto(false)
                 }
             )
         }
 
-        if (mostrarNFC) {
-            InvitarNFC(onCerrar = { mostrarNFC = false })
+        if (state.mostrarNFC) {
+            InvitarNFC(onCerrar = { viewModel.updateMostrarNFC(false) })
         }
 
-        if (mostrarAmigos) {
-            ListaAmigos(onCerrar = { mostrarAmigos = false })
+        if (state.mostrarAmigos) {
+            ListaAmigos(onCerrar = { viewModel.updateMostrarAmigos(false) })
         }
 
-        if (lugarSeleccionado != null) {
+        if (state.lugarSeleccionado != null) {
             GaleriaLugar(
-                nombreLugar = lugarSeleccionado!!,
-                onCerrar = { lugarSeleccionado = null }
+                nombreLugar = state.lugarSeleccionado!!,
+                onCerrar = { viewModel.updateLugarSeleccionado(null) }
             )
         }
     }
@@ -230,26 +230,6 @@ fun StatBadge(valor: String, label: String, icon: ImageVector, modifier: Modifie
     }
 }
 
-//@Composable
-//fun StatCard(valor: String, label: String, icon: ImageVector) {
-//    Card(
-//        colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1C)),
-//        shape = RoundedCornerShape(16.dp),
-//        modifier = Modifier
-//            .width(110.dp)
-//            .height(90.dp)
-//    ) {
-//        Column(
-//            modifier = Modifier.padding(12.dp),
-//            verticalArrangement = Arrangement.SpaceBetween
-//        ) {
-//            Icon(icon, contentDescription = null, tint = Color(0xFFFF9800))
-//            Text(valor, color = Color.White, fontWeight = FontWeight.Bold)
-//            Text(label, color = Color.Gray, fontSize = 12.sp)
-//        }
-//    }
-//}
-
 @Composable
 fun CarreraEnCursoCard() {
     Card(
@@ -258,11 +238,10 @@ fun CarreraEnCursoCard() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .clickable { Log.i("MyApp", "Carrera en curso clicked")}
+            .clickable { Log.i("MyApp", "Carrera en curso clicked") }
     ) {
         Row(
-            modifier = Modifier
-                .padding(20.dp),
+            modifier = Modifier.padding(20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -278,20 +257,20 @@ fun CarreraEnCursoCard() {
                 ) {
                     Icon(Icons.Default.AccessTime, null, tint = Color.White)
                 }
-            Column {
-                Text(
-                    "Carrera en curso",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-                Text(
-                    "La Candelaria · 3 de 5 puntos",
-                    color = Color.White.copy(alpha = 0.9f),
-                    fontSize = 12.sp
-                )
-            }
+                Column {
+                    Text(
+                        "Carrera en curso",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        "La Candelaria · 3 de 5 puntos",
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontSize = 12.sp
+                    )
                 }
+            }
             Icon(Icons.Default.ChevronRight, null, tint = Color.White)
         }
     }
@@ -359,7 +338,6 @@ fun RutaItem(
             Column(modifier = Modifier.weight(1f)) {
                 Text(titulo, color = Color.White, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
-
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
@@ -386,9 +364,7 @@ fun RutaItem(
                         )
                     }
                 }
-
                 Spacer(modifier = Modifier.height(6.dp))
-
                 Box(
                     modifier = Modifier
                         .background(dificultadColor, RoundedCornerShape(50))
@@ -433,9 +409,7 @@ fun InvitarCard(onNFC: () -> Unit) {
             Button(
                 onClick = onNFC,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFF9800)
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Icon(Icons.Default.Nfc, null, tint = Color.White)
