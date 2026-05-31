@@ -20,53 +20,50 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.models.Checkpoint
+import com.example.myapplication.model.CrearCarreraViewModel
 import com.example.myapplication.repository.RaceRepository
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.launch
 
+
+private val checkpointsDemo = listOf(
+    Checkpoint(
+        name = "Museo del Oro",
+        description = "Uno de los museos más importantes de Bogotá.",
+        coordinates = GeoPoint(4.6019, -74.0720),
+        geofenceRadiusM = 50,
+        points = 100,
+        order = 1
+    ),
+    Checkpoint(
+        name = "Plaza de Bolívar",
+        description = "Centro histórico y político de Colombia.",
+        coordinates = GeoPoint(4.5981, -74.0758),
+        geofenceRadiusM = 50,
+        points = 100,
+        order = 2
+    ),
+    Checkpoint(
+        name = "Chorro de Quevedo",
+        description = "Lugar emblemático de La Candelaria.",
+        coordinates = GeoPoint(4.5973, -74.0695),
+        geofenceRadiusM = 50,
+        points = 100,
+        order = 3
+    )
+)
+
 @Composable
 fun CrearCarrera(
     onCerrar: () -> Unit,
-    onCarreraCreada: () -> Unit
+    onCarreraCreada: () -> Unit,
+    viewModel: CrearCarreraViewModel = viewModel()
 ) {
     val scope = rememberCoroutineScope()
     val raceRepository = remember { RaceRepository() }
-
-    var nombre by remember { mutableStateOf("") }
-    var descripcion by remember { mutableStateOf("") }
-    var isPublic by remember { mutableStateOf(true) }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-
-    val checkpointsDemo = remember {
-        listOf(
-            Checkpoint(
-                name = "Museo del Oro",
-                description = "Uno de los museos más importantes de Bogotá.",
-                coordinates = GeoPoint(4.6019, -74.0720),
-                geofenceRadiusM = 50,
-                points = 100,
-                order = 1
-            ),
-            Checkpoint(
-                name = "Plaza de Bolívar",
-                description = "Centro histórico y político de Colombia.",
-                coordinates = GeoPoint(4.5981, -74.0758),
-                geofenceRadiusM = 50,
-                points = 100,
-                order = 2
-            ),
-            Checkpoint(
-                name = "Chorro de Quevedo",
-                description = "Lugar emblemático de La Candelaria.",
-                coordinates = GeoPoint(4.5973, -74.0695),
-                geofenceRadiusM = 50,
-                points = 100,
-                order = 3
-            )
-        )
-    }
+    val state by viewModel.crearCarreraState.collectAsState()
 
     Box(
         modifier = Modifier
@@ -76,8 +73,7 @@ fun CrearCarrera(
         Card(
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
             shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
 
@@ -93,18 +89,18 @@ fun CrearCarrera(
                     item {
                         CampoTextoCarrera(
                             titulo = "Nombre de la carrera",
-                            valor = nombre,
+                            valor = state.nombre,
                             placeholder = "Ej: Ruta La Candelaria",
-                            onChange = { nombre = it }
+                            onChange = { viewModel.updateNombre(it) }
                         )
                     }
 
                     item {
                         CampoTextoCarrera(
                             titulo = "Descripción",
-                            valor = descripcion,
+                            valor = state.descripcion,
                             placeholder = "Describe la ruta y el objetivo de la carrera",
-                            onChange = { descripcion = it },
+                            onChange = { viewModel.updateDescripcion(it) },
                             multilinea = true
                         )
                     }
@@ -116,24 +112,21 @@ fun CrearCarrera(
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold
                         )
-
                         Spacer(modifier = Modifier.height(10.dp))
-
                         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             OpcionVisibilidad(
                                 titulo = "Pública",
-                                activa = isPublic,
+                                activa = state.isPublic,
                                 icon = Icons.Default.Public,
                                 modifier = Modifier.weight(1f),
-                                onClick = { isPublic = true }
+                                onClick = { viewModel.updateIsPublic(true) }
                             )
-
                             OpcionVisibilidad(
                                 titulo = "Privada",
-                                activa = !isPublic,
+                                activa = !state.isPublic,
                                 icon = Icons.Default.Lock,
                                 modifier = Modifier.weight(1f),
-                                onClick = { isPublic = false }
+                                onClick = { viewModel.updateIsPublic(false) }
                             )
                         }
                     }
@@ -159,9 +152,7 @@ fun CrearCarrera(
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
-
                                 Spacer(modifier = Modifier.height(12.dp))
-
                                 checkpointsDemo.forEachIndexed { index, checkpoint ->
                                     Text(
                                         "${index + 1}. ${checkpoint.name}",
@@ -170,9 +161,7 @@ fun CrearCarrera(
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                 }
-
                                 Spacer(modifier = Modifier.height(8.dp))
-
                                 Text(
                                     "Por ahora usamos puntos demo. Después los seleccionaremos desde el mapa.",
                                     color = Color.Gray,
@@ -182,10 +171,10 @@ fun CrearCarrera(
                         }
                     }
 
-                    if (errorMessage != null) {
+                    if (state.errorMessage != null) {
                         item {
                             Text(
-                                errorMessage!!,
+                                state.errorMessage!!,
                                 color = Color(0xFFFF6B6B),
                                 fontSize = 13.sp
                             )
@@ -196,29 +185,31 @@ fun CrearCarrera(
                 Button(
                     onClick = {
                         scope.launch {
-                            isLoading = true
-                            errorMessage = null
+                            viewModel.updateIsLoading(true)
+                            viewModel.updateErrorMessage(null)
 
                             val result = raceRepository.createRace(
-                                name = nombre,
-                                description = descripcion,
-                                isPublic = isPublic,
+                                name = state.nombre,
+                                description = state.descripcion,
+                                isPublic = state.isPublic,
                                 checkpoints = checkpointsDemo
                             )
 
                             result.fold(
                                 onSuccess = {
-                                    isLoading = false
+                                    viewModel.updateIsLoading(false)
                                     onCarreraCreada()
                                 },
                                 onFailure = { e ->
-                                    isLoading = false
-                                    errorMessage = e.message ?: "No se pudo crear la carrera"
+                                    viewModel.updateIsLoading(false)
+                                    viewModel.updateErrorMessage(
+                                        e.message ?: "No se pudo crear la carrera"
+                                    )
                                 }
                             )
                         }
                     },
-                    enabled = nombre.isNotBlank() && descripcion.isNotBlank() && !isLoading,
+                    enabled = state.nombre.isNotBlank() && state.descripcion.isNotBlank() && !state.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp)
@@ -229,7 +220,7 @@ fun CrearCarrera(
                     ),
                     shape = RoundedCornerShape(14.dp)
                 ) {
-                    if (isLoading) {
+                    if (state.isLoading) {
                         CircularProgressIndicator(
                             color = Color.White,
                             modifier = Modifier.size(22.dp),
@@ -264,7 +255,6 @@ fun HeaderCrearCarreraReal(onCerrar: () -> Unit) {
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
-
         Box(
             modifier = Modifier
                 .size(36.dp)
@@ -292,9 +282,7 @@ fun CampoTextoCarrera(
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold
         )
-
         Spacer(modifier = Modifier.height(8.dp))
-
         TextField(
             value = valor,
             onValueChange = onChange,

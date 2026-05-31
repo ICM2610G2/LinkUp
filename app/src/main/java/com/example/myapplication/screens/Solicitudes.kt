@@ -17,13 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.data.models.Friendship
-import com.example.myapplication.data.models.User
 import com.example.myapplication.model.SolicitudConUsuario
 import com.example.myapplication.model.SolicitudesViewModel
-import com.example.myapplication.repository.FriendsRepository
-import com.example.myapplication.repository.UserRepository
-import kotlinx.coroutines.launch
 import kotlin.collections.isNotEmpty
 
 @Composable

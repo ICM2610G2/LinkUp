@@ -22,7 +22,8 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun Carreras(){
+fun Carreras(onCrearCarrera: () -> Unit,
+             onAbrirLobby: (String) -> Unit){
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()

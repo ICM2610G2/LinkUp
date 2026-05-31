@@ -23,7 +23,7 @@ import com.example.myapplication.screens.LobbyCarreraScreen
 import com.example.myapplication.screens.Login
 import com.example.myapplication.screens.Mapa
 import com.example.myapplication.screens.Perfil
-import com.example.myapplication.ui.theme.screens.*
+import com.example.myapplication.screens.*
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 

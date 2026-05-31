@@ -19,8 +19,9 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.myapplication.screens.BuscarAmigosScreen
+import com.example.myapplication.screens.BuscarAmigos
 import com.example.myapplication.screens.CarreraActivaScreen
 import com.example.myapplication.screens.Carreras
 import com.example.myapplication.screens.Chat
@@ -31,7 +32,7 @@ import com.example.myapplication.screens.ListaAmigos
 import com.example.myapplication.screens.LobbyCarreraScreen
 import com.example.myapplication.screens.Mapa
 import com.example.myapplication.screens.Perfil
-import com.example.myapplication.screens.SolicitudesScreen
+import com.example.myapplication.screens.Solicitudes
 
 
 @Composable
@@ -64,7 +65,7 @@ fun MainScaffold(
                     NavItem("home", "Home", Icons.Default.Home),
                     NavItem("mapa", "Mapa", Icons.Default.Map),
                     NavItem("carreras", "Carreras", Icons.Default.EmojiEvents),
-                    NavItem("chat", "Chat", Icons.Default.Chat),
+                    NavItem("chat", "Chat", Icons.AutoMirrored.Filled.Chat),
                     NavItem("perfil", "Perfil", Icons.Default.Person)
                 )
 
@@ -227,11 +228,11 @@ fun MainScaffold(
 
 
             composable("buscar_amigos") {
-                BuscarAmigosScreen(onBack = { navController.popBackStack() })
+                BuscarAmigos(onBack = { navController.popBackStack() })
             }
 
             composable("solicitudes") {
-                SolicitudesScreen(onBack = { navController.popBackStack() })
+                Solicitudes(onBack = { navController.popBackStack() })
             }
 
 
