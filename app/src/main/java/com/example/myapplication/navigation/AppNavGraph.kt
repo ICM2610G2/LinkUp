@@ -65,6 +65,7 @@ fun AppNavGraph(
         modifier = modifier
     ) {
         composable(Screen.Login.route) {
+            //Cambiar esto por el amor de cristo
             val context = LocalContext.current
             val fragmentActivity = remember(context) {
                 var currentContext = context

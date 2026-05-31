@@ -168,7 +168,7 @@ fun MainScaffold(
 
 
             composable("buscar_amigos") {
-                BuscarAmigosScreen(onBack = { navController.popBackStack() })
+                BuscarAmigos(onBack = { navController.popBackStack() })
             }
 
             composable("solicitudes") {

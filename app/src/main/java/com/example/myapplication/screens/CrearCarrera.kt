@@ -34,9 +34,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.model.CrearCarreraViewModel
-import com.google.android.gms.location.places.Place
 
 @Composable
 fun CrearCarrera(
@@ -132,6 +128,17 @@ fun CrearCarrera(
                     }
                 )
             }
+        }
+
+        if (state.mostrarSeleccionMapa) {
+            SeleccionMapa(
+                onPuntoSeleccionado = { lat, lng ->
+                    viewModel.onPuntoSeleccionado(lat, lng)
+                },
+                onCerrar = {
+                    viewModel.onCerrarSeleccionMapa()
+                }
+            )
         }
     }
 }
