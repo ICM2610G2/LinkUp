@@ -17,18 +17,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.CrearPuntoViewModel
 
 @Composable
 fun CrearPunto(
     onCerrar: () -> Unit,
-    onPublicar: () -> Unit
+    onPublicar: () -> Unit,
+    viewModel: CrearPuntoViewModel = viewModel()
 ) {
-    var nombre by remember { mutableStateOf("") }
-    var descripcion by remember { mutableStateOf("") }
-    var categoria by remember { mutableStateOf("cultural") }
-    var dificultad by remember { mutableStateOf("facil") }
-    var obteniendo by remember { mutableStateOf(false) }
-    var ubicacion by remember { mutableStateOf<Pair<Double, Double>?>(null) }
+    val state by viewModel.crearPuntoState.collectAsState()
 
     Box(
         modifier = Modifier
@@ -61,23 +59,23 @@ fun CrearPunto(
                 ) {
                     item {
                         SeccionNombrePunto(
-                            nombre = nombre,
-                            onNombreChange = { nombre = it }
+                            nombre = state.nombre,
+                            onNombreChange = { viewModel.updateNombre(it)}
                         )
                     }
 
                     item {
                         SeccionDescripcion(
-                            descripcion = descripcion,
-                            onDescripcionChange = { descripcion = it }
+                            descripcion = state.descripcion,
+                            onDescripcionChange = { viewModel.updateDescripcion(it) }
                         )
                     }
 
                     item {
                         SeccionCategoria(
-                            categoria = categoria,
+                            categoria = state.categoria,
                             onCategoriaChange = {
-                                categoria = it
+                                viewModel.updateCategoria(it)
                                 Log.i("MyApp", "Categoria seleccionada: $it")
                             }
                         )
@@ -85,9 +83,9 @@ fun CrearPunto(
 
                     item {
                         SeccionDificultad(
-                            dificultad = dificultad,
+                            dificultad = state.dificultad,
                             onDificultadChange = {
-                                dificultad = it
+                                viewModel.updateDificultad(it)
                                 Log.i("MyApp", "Dificultad seleccionada: $it")
                             }
                         )
@@ -95,14 +93,14 @@ fun CrearPunto(
 
                     item {
                         SeccionUbicacion(
-                            ubicacion = ubicacion,
-                            obteniendo = obteniendo,
+                            ubicacion = state.ubicacion,
+                            obteniendo = state.obteniendo,
                             onObtenerUbicacion = {
-                                obteniendo = true
+                                viewModel.updateObteniendo(true)
                                 Log.i("MyApp", "Obtener ubicación clicked")
                                 android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                                    ubicacion = Pair(4.5981, -74.0758)
-                                    obteniendo = false
+                                    viewModel.updateUbicacion(Pair(4.5981, -74.0758))
+                                    viewModel.updateObteniendo(false)
                                     Log.i("MyApp", "Ubicación obtenida")
                                 }, 1000)
                             }
@@ -113,9 +111,9 @@ fun CrearPunto(
                 }
 
                 FooterCrearPunto(
-                    habilitado = nombre.isNotBlank() && descripcion.isNotBlank() && ubicacion != null,
+                    habilitado = state.nombre.isNotBlank() && state.descripcion.isNotBlank() && state.ubicacion != null,
                     onPublicar = {
-                        Log.i("MyApp", "Publicar punto clicked: $nombre")
+                        Log.i("MyApp", "Publicar punto clicked: ${state.nombre}")
                         onPublicar()
                         onCerrar()
                     }
@@ -140,7 +138,6 @@ fun HeaderCrearPunto(onCerrar: () -> Unit) {
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold
         )
-
         Box(
             modifier = Modifier
                 .size(36.dp)
@@ -151,7 +148,6 @@ fun HeaderCrearPunto(onCerrar: () -> Unit) {
             Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(18.dp))
         }
     }
-
     Box(
         modifier = Modifier
             .fillMaxWidth()

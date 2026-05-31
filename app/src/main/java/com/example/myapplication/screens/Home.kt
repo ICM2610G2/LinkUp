@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,15 +28,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.HomeViewModel
 
 @Composable
-fun Home () {
-    var mostrarCrearPunto by remember { mutableStateOf(false) }
-    var mostrarMenuFlotante by remember { mutableStateOf(false) }
-    var mostrarCrearCarrera by remember { mutableStateOf(false) }
-    var mostrarNFC by remember { mutableStateOf(false) }
-    var mostrarAmigos by remember { mutableStateOf(false) }
-    var lugarSeleccionado by remember { mutableStateOf<String?>(null) }
+fun Home (viewModel: HomeViewModel = viewModel()) {
+    val state by viewModel.homeState.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()){
         LazyColumn(
@@ -50,7 +48,7 @@ fun Home () {
             item {
                 RutasHeader({
                     Log.i("MyApp", "Crear ruta")
-                    mostrarCrearCarrera = true})
+                    viewModel.updateMostrarCrearCarrera(true)})
             }
             item {
                 RutaItem(
@@ -60,8 +58,9 @@ fun Home () {
                     dificultad = "Media",
                     dificultadColor = Color(0xFFFFB300),
                     imageRes = R.drawable.la_candelaria,
-                    onClick = {Log.i("MyApp", "La Candelaria")
-                    lugarSeleccionado = "La Candelaria"}
+                    onClick = {
+                        Log.i("MyApp", "La Candelaria")
+                        viewModel.updateLugarSeleccionado("La Candelaria")  }
                 )
             }
             item {
@@ -72,15 +71,16 @@ fun Home () {
                     dificultad = "Difícil",
                     dificultadColor = Color(0xFFE53935),
                     imageRes = R.drawable.monserrate,
-                    onClick = {Log.i("MyApp", "Monserrate")
-                    lugarSeleccionado = "Monserrate"}
+                    onClick = {
+                        Log.i("MyApp", "Monserrate")
+                        viewModel.updateLugarSeleccionado("Monserrate")}
                 )
             }
             item {
                 Spacer(modifier = Modifier.height(24.dp))
                 InvitarCard(onNFC = {
                     Log.i("MyApp", "Compartir NFC")
-                    mostrarNFC = true
+                    viewModel.updateMostrarNFC(true)
                 })
             }
             item{Spacer(modifier = Modifier.height(24.dp))}
@@ -93,55 +93,53 @@ fun Home () {
                 .background(Color(0xFF2A9D8F), CircleShape)
                 .clickable {
                     Log.i("MyApp", "Menu flotante clicked")
-                    mostrarMenuFlotante = true
+                    viewModel.updateMostrarMenuFlotante(true)
                 },
             contentAlignment = Alignment.Center
         ) {
             Icon(Icons.Default.Add, null, tint = Color.White, modifier = Modifier.size(28.dp))
         }
 
-        // Modales
-        if (mostrarMenuFlotante) {
+        if (state.mostrarMenuFlotante) {
             MenuFlotante(
-                onCerrar = { mostrarMenuFlotante = false },
-                onCrearCarrera = { mostrarCrearCarrera = true },
-                onInvitarNFC = { mostrarNFC = true },
-                onVerAmigos = { mostrarAmigos = true }
+                onCerrar = { viewModel.updateMostrarMenuFlotante(false) },
+                onCrearCarrera = { viewModel.updateMostrarCrearCarrera(true) },
+                onInvitarNFC = { viewModel.updateMostrarNFC(true) },
+                onVerAmigos = { viewModel.updateMostrarAmigos(true) }
             )
         }
-
-        if (mostrarCrearCarrera) {
+        if (state.mostrarCrearCarrera) {
             CrearCarrera(
-                onCerrar = { mostrarCrearCarrera = false },
+                onCerrar = { viewModel.updateMostrarCrearCarrera(false) },
                 onIniciar = {
                     Log.i("MyApp", "Carrera iniciada desde Home")
-                    mostrarCrearCarrera = false
+                    viewModel.updateMostrarCrearCarrera(false)
                 }
             )
         }
 
-        if (mostrarCrearPunto) {
+        if (state.mostrarCrearPunto) {
             CrearPunto(
-                onCerrar = { mostrarCrearPunto = false },
+                onCerrar = { viewModel.updateMostrarCrearPunto(false) },
                 onPublicar = {
                     Log.i("MyApp", "Punto publicado desde Home")
-                    mostrarCrearPunto = false
+                    viewModel.updateMostrarCrearPunto(false)
                 }
             )
         }
 
-        if (mostrarNFC) {
-            InvitarNFC(onCerrar = { mostrarNFC = false })
+        if (state.mostrarNFC) {
+            InvitarNFC(onCerrar = { viewModel.updateMostrarNFC(false) })
         }
 
-        if (mostrarAmigos) {
-            ListaAmigos(onCerrar = { mostrarAmigos = false })
+        if (state.mostrarAmigos) {
+            ListaAmigos(onCerrar = { viewModel.updateMostrarAmigos(false) })
         }
 
-        if (lugarSeleccionado != null) {
+        if (state.lugarSeleccionado != null) {
             GaleriaLugar(
-                nombreLugar = lugarSeleccionado!!,
-                onCerrar = { lugarSeleccionado = null }
+                nombreLugar = state.lugarSeleccionado!!,
+                onCerrar = { viewModel.updateLugarSeleccionado(null) }
             )
         }
     }

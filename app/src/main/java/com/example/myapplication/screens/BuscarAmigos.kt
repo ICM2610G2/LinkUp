@@ -18,7 +18,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.models.User
+import com.example.myapplication.model.BuscarAmigosViewModel
 import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -26,70 +28,60 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 @Composable
-fun BuscarAmigosScreen(
-    onBack: () -> Unit
+fun BuscarAmigos(
+    onBack: () -> Unit,
+    viewModel: BuscarAmigosViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val friendsRepository = remember { FriendsRepository() }
     val userRepository = remember { UserRepository() }
-    val firestore = remember { FirebaseFirestore.getInstance() }
 
-    var searchQuery by remember { mutableStateOf("") }
-    var searchResult by remember { mutableStateOf<User?>(null) }
-    var isLoadingUser by remember { mutableStateOf(true) }
-    var isSearching by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var friendStatus by remember { mutableStateOf<String?>(null) }
-    var isSending by remember { mutableStateOf(false) }
-    var currentUser by remember { mutableStateOf<User?>(null) }
+    val state by viewModel.buscarAmigosState.collectAsState()
 
-    // Cargar usuario actual
     LaunchedEffect(Unit) {
-        isLoadingUser = true
-        currentUser = userRepository.getCurrentUser()
-        isLoadingUser = false
+        viewModel.updateIsLoadingUser(true)
+        viewModel.updateCurrentUser(userRepository.getCurrentUser())
+        viewModel.updateIsLoadingUser(false)
     }
 
     fun searchUser() {
-        val query = searchQuery.trim().lowercase()
+        val query = state.searchQuery.trim().lowercase()
         if (query.isBlank()) return
 
-        if (isLoadingUser) {
-            errorMessage = "Espera un momento..."
+        if (state.isLoadingUser) {
+            viewModel.updateErrorMessage("Espere un momento...")
             return
         }
 
         scope.launch {
-            isSearching = true
-            errorMessage = null
-            searchResult = null
-            friendStatus = null
+            viewModel.updateIsSearching(true)
+            viewModel.updateErrorMessage(null)
+            viewModel.updateSearchResult(null)
+            viewModel.updateFriendStatus(null)
 
             val user = friendsRepository.searchUserByGameId(query)
 
             when {
                 user == null -> {
-                    errorMessage = "No se encontró ningún usuario con Game ID: $query"
+                    viewModel.updateErrorMessage("No se encontró ningún usuario con Game ID: $query")
                 }
-                user.uid == currentUser?.uid -> {
-                    errorMessage = "Ese es tu propio Game ID 😅"
+                user.uid == state.currentUser?.uid -> {
+                    viewModel.updateErrorMessage("Ese es tu propio Game ID")
                 }
                 else -> {
-                    searchResult = user
-                    friendStatus = friendsRepository.getFriendshipStatus(user.uid)
+                    viewModel.updateSearchResult(user)
+                    viewModel.updateFriendStatus(friendsRepository.getFriendshipStatus(user.uid))
                 }
             }
-            isSearching = false
+            viewModel.updateIsSearching(false)
         }
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0A0A0A))
     ) {
-        // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -108,10 +100,7 @@ fun BuscarAmigosScreen(
                 modifier = Modifier.weight(1f)
             )
         }
-
         Spacer(modifier = Modifier.height(20.dp))
-
-        // Buscador
         Card(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
@@ -127,13 +116,13 @@ fun BuscarAmigosScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     TextField(
-                        value = searchQuery,
+                        value = state.searchQuery,
                         onValueChange = {
-                            searchQuery = it
-                            if (searchResult != null || errorMessage != null) {
-                                searchResult = null
-                                errorMessage = null
-                                friendStatus = null
+                            viewModel.updateSearchQuery(it)
+                            if (state.searchResult != null || state.errorMessage != null) {
+                                viewModel.updateSearchResult(null)
+                                viewModel.updateErrorMessage(null)
+                                viewModel.updateFriendStatus(null)
                             }
                         },
                         modifier = Modifier.weight(1f),
@@ -153,11 +142,11 @@ fun BuscarAmigosScreen(
 
                     Button(
                         onClick = { searchUser() },
-                        enabled = !isSearching && searchQuery.isNotBlank(),
+                        enabled = !state.isSearching && state.searchQuery.isNotBlank(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        if (isSearching) {
+                        if (state.isSearching) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
                                 color = Color.White,
@@ -171,8 +160,7 @@ fun BuscarAmigosScreen(
             }
         }
 
-        // Error
-        if (errorMessage != null) {
+        if (state.errorMessage != null) {
             Card(
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0x33FF4444)),
@@ -181,7 +169,7 @@ fun BuscarAmigosScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
-                    errorMessage!!,
+                    state.errorMessage!!,
                     color = Color(0xFFFF6B6B),
                     modifier = Modifier.padding(12.dp),
                     fontSize = 14.sp
@@ -189,8 +177,7 @@ fun BuscarAmigosScreen(
             }
         }
 
-        // Resultado
-        searchResult?.let { user ->
+        state.searchResult?.let { user ->
             Card(
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
@@ -232,7 +219,7 @@ fun BuscarAmigosScreen(
                         )
                     }
 
-                    when (friendStatus) {
+                    when (state.friendStatus) {
                         "accepted" -> {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
@@ -260,24 +247,24 @@ fun BuscarAmigosScreen(
                             Button(
                                 onClick = {
                                     scope.launch {
-                                        isSending = true
-                                        errorMessage = null
+                                        viewModel.updateIsSending(true)
+                                        viewModel.updateErrorMessage(null)
                                         friendsRepository.sendFriendRequest(user.uid).fold(
                                             onSuccess = {
-                                                friendStatus = "pending"
+                                                viewModel.updateFriendStatus("Pendiente")
                                             },
                                             onFailure = { e ->
-                                                errorMessage = e.message
+                                                viewModel.updateErrorMessage(e.message)
                                             }
                                         )
-                                        isSending = false
+                                        viewModel.updateIsSending(false)
                                     }
                                 },
-                                enabled = !isSending,
+                                enabled = !state.isSending,
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
-                                if (isSending) {
+                                if (state.isSending) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(16.dp),
                                         color = Color.White,
@@ -297,7 +284,6 @@ fun BuscarAmigosScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Tu Game ID
         Card(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
@@ -313,21 +299,20 @@ fun BuscarAmigosScreen(
                 ) {
                     Text("Tu Game ID", color = Color.Gray, fontSize = 12.sp)
 
-                    // Botón para forzar recarga - CORREGIDO
                     TextButton(
                         onClick = {
                             scope.launch {
-                                isLoadingUser = true
-                                currentUser = userRepository.getCurrentUser()
-                                isLoadingUser = false
-                                if (currentUser?.gameId.isNullOrEmpty()) {
-                                    errorMessage = "⚠️ Game ID no encontrado. Reintentando..."
+                                viewModel.updateIsLoadingUser(true)
+                                viewModel.updateCurrentUser(userRepository.getCurrentUser())
+                                viewModel.updateIsLoadingUser(false)
+                                if (state.currentUser?.gameId.isNullOrEmpty()) {
+                                    viewModel.updateErrorMessage("⚠️ Game ID no encontrado. Reintentando...")
                                     val firebaseUser = FirebaseAuth.getInstance().currentUser
-                                    if (firebaseUser != null && currentUser != null) {
+                                    if (firebaseUser != null && state.currentUser != null) {
                                         val newGameId = "linkup#${(1000..9999).random()}"
-                                        val updatedUser = currentUser!!.copy(gameId = newGameId)
+                                        val updatedUser = state.currentUser!!.copy(gameId = newGameId)
                                         userRepository.updateUser(updatedUser)
-                                        currentUser = updatedUser
+                                        viewModel.updateCurrentUser(updatedUser)
                                     }
                                 }
                             }
@@ -346,7 +331,7 @@ fun BuscarAmigosScreen(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                if (isLoadingUser) {
+                if (state.isLoadingUser) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
                         color = Color(0xFFFF9800),
@@ -358,19 +343,18 @@ fun BuscarAmigosScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            currentUser?.gameId?.takeIf { it.isNotEmpty() } ?: "No disponible",
-                            color = if (currentUser?.gameId.isNullOrEmpty()) Color.Red else Color(0xFFFF9800),
+                            state.currentUser?.gameId?.takeIf { it.isNotEmpty() } ?: "No disponible",
+                            color = if (state.currentUser?.gameId.isNullOrEmpty()) Color.Red else Color(0xFFFF9800),
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold
                         )
 
-                        if (!currentUser?.gameId.isNullOrEmpty()) {
+                        if (!state.currentUser?.gameId.isNullOrEmpty()) {
                             val clipboardManager = LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             IconButton(
                                 onClick = {
-                                    val clip = ClipData.newPlainText("Game ID", currentUser!!.gameId)
+                                    val clip = ClipData.newPlainText("Game ID", state.currentUser!!.gameId)
                                     clipboardManager.setPrimaryClip(clip)
-                                    // ✅ CORREGIDO: Usar Snackbar o Toast de manera correcta
                                     android.widget.Toast.makeText(
                                         context,
                                         "Game ID copiado",
@@ -388,14 +372,13 @@ fun BuscarAmigosScreen(
                         }
                     }
                 }
-
                 Text(
                     "Comparte este código con tus amigos",
                     color = Color.Gray,
                     fontSize = 12.sp
                 )
 
-                if (!isLoadingUser && currentUser?.gameId.isNullOrEmpty()) {
+                if (!state.isLoadingUser && state.currentUser?.gameId.isNullOrEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         "⚠️ Error: No se encontró tu Game ID. Toca 'Recargar' para generarlo.",

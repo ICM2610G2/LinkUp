@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,18 +43,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.CrearCarreraViewModel
 import com.google.android.gms.location.places.Place
 
 @Composable
 fun CrearCarrera(
     onCerrar: () -> Unit,
-    onIniciar: () -> Unit
+    onIniciar: () -> Unit,
+    viewModel: CrearCarreraViewModel = viewModel()
 ) {
-    var nombre by remember { mutableStateOf("") }
-    var tipoOrden by remember { mutableStateOf("libre") }
-    var tiempoLimite by remember { mutableStateOf("sin-limite") }
-    var tipoCarrera by remember { mutableStateOf("rapida") }
-    var lugaresSeleccionados by remember { mutableStateOf(0) }
+    val state by viewModel.crearCarreraState.collectAsState()
 
     Box(
         modifier = Modifier
@@ -82,51 +82,51 @@ fun CrearCarrera(
                 ) {
                     item {
                         SeccionNombre(
-                            nombre = nombre,
-                            onNombreChange = { nombre = it }
+                            nombre = state.nombre,
+                            onNombreChange = { viewModel.updateNombre(it) }
                         )
                     }
                     item {
                         SeccionTipoOrden(
-                            tipoOrden = tipoOrden,
+                            tipoOrden = state.tipoOrden,
                             onTipoOrdenChange = {
-                                tipoOrden = it
+                                viewModel.updateTipoOrden(it)
                                 Log.i("MyApp", "Tipo orden seleccionado: $it")
                             }
                         )
                     }
                     item {
                         SeccionTiempoLimite(
-                            tiempoLimite = tiempoLimite,
+                            tiempoLimite = state.tiempoLimite,
                             onTiempoChange = {
-                                tiempoLimite = it
+                                viewModel.updateTiempoLimite(it)
                                 Log.i("MyApp", "Tiempo límite seleccionado: $it")
                             }
                         )
                     }
                     item {
                         SeccionTipoCarrera(
-                            tipoCarrera = tipoCarrera,
+                            tipoCarrera = state.tipoCarrera,
                             onTipoCarreraChange = {
-                                tipoCarrera = it
+                                viewModel.updateTipoCarrera(it)
                                 Log.i("MyApp", "Tipo carrera seleccionado: $it")
                             }
                         )
                     }
                     item {
                         SeccionLugares(
-                            lugaresSeleccionados = lugaresSeleccionados,
+                            lugaresSeleccionados = state.lugaresSeleccionados,
                             onAgregarLugar = {
-                                lugaresSeleccionados = minOf(lugaresSeleccionados + 1, 10)
-                                Log.i("MyApp", "Lugares seleccionados: $lugaresSeleccionados")
+                                viewModel.agregarLugar()
+                                Log.i("MyApp", "Lugares seleccionados: ${state.lugaresSeleccionados}")
                             }
                         )
                     }
                 }
                 FooterCrearCarrera(
-                    habilitado = nombre.isNotBlank() && lugaresSeleccionados >= 2,
+                    habilitado = state.nombre.isNotBlank() && state.lugaresSeleccionados >= 2,
                     onIniciar = {
-                        Log.i("MyApp", "Iniciar carrera clicked: $nombre")
+                        Log.i("MyApp", "Iniciar carrera clicked: ${state.nombre}")
                         onIniciar()
                         onCerrar()
                     }

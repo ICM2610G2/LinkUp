@@ -21,11 +21,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
 import com.example.myapplication.auth.*
 import com.example.myapplication.auth.BiometricAuthManager
 import com.example.myapplication.auth.BiometricAuthResult
 import com.example.myapplication.auth.BiometricAvailability
+import com.example.myapplication.model.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -33,17 +35,11 @@ fun Login(
     onLoginSuccess: () -> Unit,
     authManager: FirebaseAuthManager,
     biometricManager: BiometricAuthManager,
-    encryptedPrefs: EncryptedPreferences
+    encryptedPrefs: EncryptedPreferences,
+    viewModel: LoginViewModel = viewModel()
 ) {
     val scope = rememberCoroutineScope()
-
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var esRegistro by remember { mutableStateOf(false) }
-    var passwordVisible by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var name by remember { mutableStateOf("") }
+    val state by viewModel.loginState.collectAsState()
 
     // Verificar credenciales guardadas para huella
     LaunchedEffect(Unit) {
@@ -51,8 +47,8 @@ fun Login(
         if (isBiometricEnabled) {
             val (savedEmail, savedPassword) = encryptedPrefs.getUserCredentials()
             if (savedEmail != null && savedPassword != null) {
-                email = savedEmail
-                password = savedPassword
+                viewModel.updateEmail(savedEmail)
+                viewModel.updatePassword(savedPassword)
                 biometricManager.setupBiometricPrompt()
                 biometricManager.authenticate()
             }
@@ -64,21 +60,21 @@ fun Login(
         biometricManager.authResult.collect { result ->
             when (result) {
                 is BiometricAuthResult.Success -> {
-                    isLoading = true
+                    viewModel.updateIsLoading(true)
                     val (savedEmail, savedPassword) = encryptedPrefs.getUserCredentials()
                     if (savedEmail != null && savedPassword != null) {
                         // Login con email/password — Firestore lo maneja MainActivity
                         authManager.loginWithEmail(savedEmail, savedPassword).fold(
-                            onSuccess = { isLoading = false },  // authState cambia solo
+                            onSuccess = { viewModel.updateIsLoading(false) },  // authState cambia solo
                             onFailure = { e ->
-                                errorMessage = "Error al iniciar con huella: ${e.message}"
-                                isLoading = false
+                                viewModel.updateErrorMessage("Error al iniciar con huella: ${e.message}")
+                                viewModel.updateIsLoading(false)
                             }
                         )
                     }
                 }
-                is BiometricAuthResult.Error -> errorMessage = result.message
-                is BiometricAuthResult.Failed -> { /* no-op */ }
+                is BiometricAuthResult.Error -> viewModel.updateErrorMessage(result.message)
+                is BiometricAuthResult.Failed -> {  }
             }
         }
     }
@@ -111,14 +107,14 @@ fun Login(
             LogoSection()
             Spacer(modifier = Modifier.height(32.dp))
 
-            if (errorMessage != null) {
+            if (state.errorMessage != null) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = Color(0xCCFF0000)),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
                 ) {
                     Text(
-                        text = errorMessage!!,
+                        text = state.errorMessage!!,
                         color = Color.White,
                         modifier = Modifier.padding(12.dp),
                         fontSize = 14.sp
@@ -127,50 +123,46 @@ fun Login(
             }
 
             FormularioLogin(
-                email = email,
-                onEmailChange = { email = it },
-                password = password,
-                onPasswordChange = { password = it },
-                passwordVisible = passwordVisible,
-                onPasswordVisibleChange = { passwordVisible = it },
-                esRegistro = esRegistro,
-                name = name,
-                onNameChange = { name = it },
-                isLoading = isLoading,
+                email = state.email,
+                onEmailChange = { viewModel.updateEmail(it) },
+                password = state.password,
+                onPasswordChange = { viewModel.updatePassword(it) },
+                passwordVisible = state.passwordVisible,
+                onPasswordVisibleChange = { viewModel.updatePasswordVisible(it) },
+                esRegistro = state.esRegistro,
+                name = state.name,
+                onNameChange = { viewModel.updateName(it)  },
+                isLoading = state.isLoading,
                 onLogin = {
                     scope.launch {
-                        isLoading = true
-                        errorMessage = null
+                        viewModel.updateIsLoading(true)
+                        viewModel.updateErrorMessage(null)
 
-                        if (email.isBlank() || password.isBlank()) {
-                            errorMessage = "Ingresa email y contraseña"
-                            isLoading = false
+                        if (state.email.isBlank() || state.password.isBlank()) {
+                            viewModel.updateErrorMessage("Ingresa email y contraseña")
+                            viewModel.updateIsLoading(false)
                             return@launch
                         }
-                        if (esRegistro && name.isBlank()) {
-                            errorMessage = "Ingresa tu nombre"
-                            isLoading = false
+                        if (state.esRegistro && state.name.isBlank()) {
+                            viewModel.updateErrorMessage("Ingresa tu nombre")
+                            viewModel.updateIsLoading(false)
                             return@launch
                         }
 
-                        val result = if (esRegistro) {
-                            authManager.registerWithEmail(email, password, name)
+                        val result = if (state.esRegistro) {
+                            authManager.registerWithEmail(state.email, state.password, state.name)
                         } else {
-                            authManager.loginWithEmail(email, password)
+                            authManager.loginWithEmail(state.email, state.password)
                         }
 
                         result.fold(
                             onSuccess = {
-                                // ✅ NO tocar Firestore aquí
-                                // MainActivity.LaunchedEffect detecta el cambio de authState
-                                // y se encarga de crear/cargar el usuario en Firestore
-                                encryptedPrefs.saveUserCredentials(email, password)
-                                // isLoading no hace falta en false: este composable
-                                // se destruye cuando authState cambia a Authenticated
+                                encryptedPrefs.saveUserCredentials(state.email, state.password)
                             },
                             onFailure = { e ->
                                 Log.e("AUTH", "Error: ${e.message}", e)
-                                errorMessage = when {
+                                viewModel.updateErrorMessage(
+                                    when {
                                     e.message?.contains("already in use", ignoreCase = true) == true ->
                                         "Email ya registrado"
                                     e.message?.contains("invalid-credential", ignoreCase = true) == true ->
@@ -184,16 +176,16 @@ fun Login(
                                     e.message?.contains("network", ignoreCase = true) == true ->
                                         "Error de red. Verifica tu conexión"
                                     else -> "Error: ${e.message}"
-                                }
-                                isLoading = false
+                                })
+                                viewModel.updateIsLoading(false)
                             }
                         )
                     }
                 },
                 onToggleRegistro = {
-                    esRegistro = !esRegistro
-                    errorMessage = null
-                    name = ""
+                    viewModel.updateEsRegistro(!state.esRegistro)
+                    viewModel.updateErrorMessage(null)
+                    viewModel.updateName("")
                 },
                 onBiometric = {
                     biometricManager.setupBiometricPrompt()

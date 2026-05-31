@@ -27,20 +27,16 @@ import java.util.*
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.ChatViewModel
 import java.io.File
 
 @Composable
-fun Chat() {
+fun Chat(viewModel: ChatViewModel = viewModel()) {
 
     val context = LocalContext.current
+    val state by viewModel.chatState.collectAsState()
 
-    val messages = remember { mutableStateListOf<ChatMessage>() }
-    var inputText by remember { mutableStateOf("") }
-
-    var previewImage by remember { mutableStateOf<Uri?>(null) }
-    var fullScreenImage by remember { mutableStateOf<Uri?>(null) }
-
-    // 📸 FILE + URI (stable)
     val imageFile = remember {
         File(context.filesDir, "camera_${System.currentTimeMillis()}.jpg")
     }
@@ -53,11 +49,10 @@ fun Chat() {
         )
     }
 
-    // 📷 Camera launcher
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success) previewImage = cameraUri
+        if (success) viewModel.updatePreviewImage(cameraUri)
     }
 
     // 🛡️ Camera permission
@@ -69,11 +64,10 @@ fun Chat() {
         }
     }
 
-    // 🖼 Gallery launcher
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
-        previewImage = uri
+        viewModel.updatePreviewImage(uri)
     }
 
     Column(
@@ -119,7 +113,7 @@ fun Chat() {
                 reverseLayout = true,
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
-                itemsIndexed(messages.asReversed()) { _, message ->
+                itemsIndexed(state.messages.asReversed()) { _, message ->
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -146,7 +140,7 @@ fun Chat() {
                                             .size(200.dp)
                                             .clip(RoundedCornerShape(12.dp))
                                             .clickable {
-                                                fullScreenImage = message.imageUri
+                                                viewModel.updateFullScreenImage(message.imageUri)
                                             },
                                         contentScale = ContentScale.Crop
                                     )
@@ -169,8 +163,7 @@ fun Chat() {
             }
         }
 
-        // 📸 PREVIEW MODE
-        if (previewImage != null) {
+        if (state.previewImage != null) {
 
             Column(
                 modifier = Modifier
@@ -178,10 +171,9 @@ fun Chat() {
                     .background(Color.Black)
                     .padding(12.dp)
             ) {
-
                 Box {
                     AsyncImage(
-                        model = previewImage,
+                        model = state.previewImage,
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -189,23 +181,21 @@ fun Chat() {
                             .clip(RoundedCornerShape(12.dp)),
                         contentScale = ContentScale.Crop
                     )
-
                     IconButton(
                         onClick = {
-                            previewImage = null
-                            inputText = ""
+                            viewModel.updatePreviewImage(null)
+                            viewModel.updateInputText("")
                         },
                         modifier = Modifier.align(Alignment.TopEnd)
                     ) {
                         Icon(Icons.Default.Close, null, tint = Color.White)
                     }
                 }
-
                 Spacer(modifier = Modifier.height(8.dp))
 
                 TextField(
-                    value = inputText,
-                    onValueChange = { inputText = it },
+                    value = state.inputText,
+                    onValueChange = {viewModel.updateInputText(it)},
                     placeholder = { Text("Agregar mensaje...") },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color(0xFF252525),
@@ -215,27 +205,24 @@ fun Chat() {
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
-
                 Spacer(modifier = Modifier.height(8.dp))
 
                 IconButton(
                     onClick = {
                         val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-
-                        messages.add(
+                        viewModel.addMessage(
                             ChatMessage(
-                                id = messages.size + 1,
+                                id = state.messages.size + 1,
                                 sender = "Tú",
                                 initial = "TÚ",
-                                text = if (inputText.isBlank()) null else inputText,
-                                imageUri = previewImage,
+                                text = if (state.inputText.isBlank()) null else state.inputText,
+                                imageUri = state.previewImage,
                                 time = now,
                                 isMe = true
                             )
                         )
-
-                        previewImage = null
-                        inputText = ""
+                        viewModel.updatePreviewImage(null)
+                        viewModel.updateInputText("")
                     },
                     modifier = Modifier
                         .align(Alignment.End)
@@ -282,8 +269,8 @@ fun Chat() {
                 Spacer(modifier = Modifier.width(8.dp))
 
                 TextField(
-                    value = inputText,
-                    onValueChange = { inputText = it },
+                    value = state.inputText,
+                    onValueChange = { viewModel.updateInputText(it) },
                     modifier = Modifier.weight(1f),
                     placeholder = { Text("Mensaje...") },
                     colors = TextFieldDefaults.colors(
@@ -298,21 +285,19 @@ fun Chat() {
 
                 IconButton(
                     onClick = {
-                        if (inputText.isNotBlank()) {
+                        if (state.inputText.isNotBlank()) {
                             val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-
-                            messages.add(
+                            viewModel.addMessage(
                                 ChatMessage(
-                                    id = messages.size + 1,
+                                    id = state.messages.size + 1,
                                     sender = "Tú",
                                     initial = "TÚ",
-                                    text = inputText,
+                                    text = state.inputText,
                                     time = now,
                                     isMe = true
                                 )
                             )
-
-                            inputText = ""
+                            viewModel.updateInputText("")
                         }
                     },
                     modifier = Modifier
@@ -325,24 +310,23 @@ fun Chat() {
         }
     }
 
-    // 🔍 FULLSCREEN IMAGE
-    if (fullScreenImage != null) {
+    if (state.fullScreenImage != null) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black)
-                .clickable { fullScreenImage = null },
+                .clickable { viewModel.updateFullScreenImage(null) },
             contentAlignment = Alignment.Center
         ) {
             AsyncImage(
-                model = fullScreenImage,
+                model = state.fullScreenImage,
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Fit
             )
 
             IconButton(
-                onClick = { fullScreenImage = null },
+                onClick = { viewModel.updateFullScreenImage(null) },
                 modifier = Modifier.align(Alignment.TopEnd)
             ) {
                 Icon(Icons.Default.Close, null, tint = Color.White)

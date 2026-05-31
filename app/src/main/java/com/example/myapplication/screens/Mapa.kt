@@ -49,6 +49,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.CameraViewModel
 import com.example.myapplication.model.Destino
 import com.example.myapplication.model.MapsViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -105,22 +106,13 @@ fun Mapa(
     )
     SideEffect { activityPermission.launchPermissionRequest() }
 
-    // UI STATE
-    var isDarkMode by remember { mutableStateOf(true) }
-    var mostrarValidarFoto by remember { mutableStateOf(false) }
-
-    // SENSOR STATE
-    var stepCount by remember { mutableStateOf(0) }
-    var isWalking by remember { mutableStateOf(false) }
-
+    // estos son los unicos que dejo aca en ligar del viewmodel pq son calculos y creo que mejor van aca
     var accelMagnitude by remember { mutableStateOf(0f) }
     var lastAccel by remember { mutableStateOf(0f) }
     var smoothedAccel by remember { mutableStateOf(0f) }
-
     var stepCooldown by remember { mutableStateOf(0L) }
     var lastCheckTime by remember { mutableStateOf(0L) }
 
-    // SENSORS
     val sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
     val lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
     val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -132,7 +124,7 @@ fun Mapa(
 
                 Sensor.TYPE_LIGHT -> {
                     val lux = event.values[0]
-                    isDarkMode = lux < 20f
+                    viewModel.updateIsDarkMode(lux < 20f)
                 }
 
                 Sensor.TYPE_ACCELEROMETER -> {
@@ -142,41 +134,30 @@ fun Mapa(
 
                     val magnitude = sqrt(x * x + y * y + z * z)
                     accelMagnitude = magnitude
-
                     val delta = abs(magnitude - lastAccel)
                     lastAccel = magnitude
-
-                    // LOW PASS FILTER
                     smoothedAccel = smoothedAccel * 0.8f + delta * 0.2f
-
                     val now = System.currentTimeMillis()
 
-                    // CHECK ONLY EVERY 1 SECOND
                     if (now - lastCheckTime > 1000) {
-
-                        // MORE SENSITIVE WALK DETECTION
-                        isWalking = smoothedAccel > 0.6f
-
-                        // STEP DETECTION (fallback)
+                        viewModel.updateIsWalking(smoothedAccel > 0.6f)
                         if (stepDetector == null && smoothedAccel > 1.2f) {
-                            stepCount++
+                            viewModel.updateStepCount(state.stepCount + 1)
                         }
-
                         lastCheckTime = now
                     }
 
-                    // COOLDOWN STEP DETECTION
                     if (stepDetector == null) {
                         if (delta > 1.8f && (now - stepCooldown) > 500) {
-                            stepCount++
+                            viewModel.updateStepCount(state.stepCount + 1)
                             stepCooldown = now
                         }
                     }
                 }
 
                 Sensor.TYPE_STEP_DETECTOR -> {
-                    stepCount++
-                    isWalking = true
+                    viewModel.updateStepCount(state.stepCount + 1)
+                    viewModel.updateIsWalking(true)
                 }
             }
         }
@@ -243,7 +224,7 @@ fun Mapa(
                 val userMarker = tags[0] as Marker
                 var changed = false
 
-                if (isDarkMode) {
+                if (state.isDarkMode) {
                     val inverse = ColorMatrix(floatArrayOf(
                         -1f,0f,0f,0f,255f,
                         0f,-1f,0f,0f,255f,
@@ -304,15 +285,15 @@ fun Mapa(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(14.dp),
-                onValidarFoto = { mostrarValidarFoto = true }
+                onValidarFoto = { viewModel.updateMostrarValidarFoto(true)}
             )
         }
 
-        if (mostrarValidarFoto) {
+        if (state.mostrarValidarFoto) {
             ValidarFoto(
                 nombreLugar = state.selectedDestino?.nombre ?: "Destino",
-                onCerrar = { mostrarValidarFoto = false },
-                onConfirmar = { mostrarValidarFoto = false }
+                onCerrar = { viewModel.updateMostrarValidarFoto(false) },
+                onConfirmar = { viewModel.updateMostrarValidarFoto(false) }
             )
         }
 
@@ -325,10 +306,10 @@ fun Mapa(
             Column(modifier = Modifier.padding(10.dp)) {
                 Text("Actividad", color = Color.White.copy(0.6f))
                 Text(
-                    if (isWalking) "Caminando 🚶" else "Quieto 🧍",
-                    color = if (isWalking) Color(0xFF22C55E) else Color.Gray
+                    if (state.isWalking) "Caminando 🚶" else "Quieto 🧍",
+                    color = if (state.isWalking) Color(0xFF22C55E) else Color.Gray
                 )
-                Text("Pasos: $stepCount", color = Color(0xFFFF9800))
+                Text("Pasos: ${state.stepCount}", color = Color(0xFFFF9800))
             }
         }
     }
@@ -347,7 +328,6 @@ fun DestinoCard(
         distanciaMetros < 1000 -> "${distanciaMetros.toInt()} m"
         else -> "${"%.1f".format(distanciaMetros / 1000)} km"
     }
-    // Estimación de tiempo caminando (~5 km/h = 83 m/min)
     val minutos = if (distanciaMetros != null) (distanciaMetros / 83).toInt().coerceAtLeast(1) else null
 
     Card(
@@ -357,8 +337,6 @@ fun DestinoCard(
         border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-
-            // Encabezado con título y botón cerrar
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -377,10 +355,7 @@ fun DestinoCard(
 
             Row(verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-
-                //Spacer(modifier = Modifier.height(8.dp))
                 Column(modifier = Modifier.weight(75f)) {
-                    // Nombre del destino
                     Text(
                         destino.nombre,
                         color = Color.White,
@@ -389,16 +364,12 @@ fun DestinoCard(
                     )
 
                     Spacer(modifier = Modifier.height(2.dp))
-
-                    // Descripción breve
                     Text(
                         destino.descripcion,
                         color = Color.White.copy(alpha = 0.55f),
                         fontSize = 11.sp
                     )
                 }
-
-                // Imagen del sitio
                 Image(
                     painter = painterResource(id = destino.imagenRes),
                     contentDescription = destino.nombre,
@@ -524,10 +495,14 @@ fun BotonesLaterales(
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun CardInferior(modifier: Modifier = Modifier, onValidarFoto: () -> Unit) {
+fun CardInferior(
+    modifier: Modifier = Modifier,
+    onValidarFoto: () -> Unit,
+    viewModel: CameraViewModel = viewModel()
+) {
     val context = LocalContext.current
     val permissionStatus = rememberPermissionState(cameraPerm)
-    var imageUri by remember{ mutableStateOf<Uri?>(null) }
+    val cameraState by viewModel.cameraState.collectAsState()
     val cameraUri = FileProvider.getUriForFile(context,
         "${context.packageName}.fileprovider",
         File(context.filesDir, "cameraPic.jpg")
@@ -536,7 +511,7 @@ fun CardInferior(modifier: Modifier = Modifier, onValidarFoto: () -> Unit) {
     val camera = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()){ it ->
         if(it){
-            imageUri = cameraUri
+            viewModel.updateImageUri(cameraUri)
         }
     }
 
@@ -602,14 +577,14 @@ fun CardInferior(modifier: Modifier = Modifier, onValidarFoto: () -> Unit) {
 
             Button(
                 onClick = {
-                    onValidarFoto
+                    onValidarFoto()
                     if(!permissionStatus.status.isGranted){
                         permissionStatus.launchPermissionRequest()
                     }
                     if(permissionStatus.status.isGranted ){
                         camera.launch(cameraUri)
                     }else{
-                        imageUri = null
+                        viewModel.updateImageUri(null)
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),

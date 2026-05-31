@@ -69,16 +69,21 @@ data class MapsState(
     val locationHistory: List<GeoPoint> = emptyList(),
     val roadOverlay: Polyline? = null,
 
-    // Destino seleccionado al tocar un marcador
     val selectedDestino: Destino? = null,
-    // Distancia en metros al destino seleccionado
     val distanciaAlDestino: Double? = null,
-    // true = mostrar ruta por todos los destinos
-    val mostrandoRutaCompleta: Boolean = false
+    val mostrandoRutaCompleta: Boolean = false,
+
+    val isDarkMode: Boolean = true,
+    val mostrarValidarFoto: Boolean = false,
+    val stepCount: Int = 0,
+    val isWalking: Boolean = false
 )
 
 class MapsViewModel(app: Application) : AndroidViewModel(app) {
-
+    private var lastAccel = 0f
+    private var smoothedAccel = 0f
+    private var stepCooldown = 0L
+    private var lastCheckTime = 0L
     private val _state = MutableStateFlow(MapsState())
     val state: StateFlow<MapsState> = _state.asStateFlow()
     private val geocoder = Geocoder(app)
@@ -213,5 +218,21 @@ class MapsViewModel(app: Application) : AndroidViewModel(app) {
                 Math.sin(dLon / 2) * Math.sin(dLon / 2)
         val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
         return 6371 * c * 1000
+    }
+
+
+
+
+    fun updateIsDarkMode(newValue: Boolean) {
+        _state.update { it.copy(isDarkMode = newValue) }
+    }
+    fun updateMostrarValidarFoto(newValue: Boolean) {
+        _state.update { it.copy(mostrarValidarFoto = newValue) }
+    }
+    fun updateStepCount(newValue: Int) {
+        _state.update { it.copy(stepCount = newValue) }
+    }
+    fun updateIsWalking(newValue: Boolean) {
+        _state.update { it.copy(isWalking = newValue) }
     }
 }

@@ -31,6 +31,8 @@ import com.example.myapplication.auth.FirebaseAuthManager
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.PerfilViewModel
 
 @Composable
 fun Perfil(
@@ -40,7 +42,8 @@ fun Perfil(
     onAccountDeleted: () -> Unit,
     onEditProfile: () -> Unit,
     onVerAmigos: () -> Unit,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    viewModel: PerfilViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -48,12 +51,7 @@ fun Perfil(
     val authManager = remember { FirebaseAuthManager(activity) }
     val biometricManager = remember { BiometricAuthManager(activity) }
 
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var showPasswordDialog by remember { mutableStateOf(false) }
-    var deletePassword by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var showBiometricConfirm by remember { mutableStateOf(false) }
+    val state by viewModel.perfilState.collectAsState()
 
     val displayName = user?.displayName ?: userData?.displayName ?: "Usuario"
     val email = user?.email ?: "correo@ejemplo.com"
@@ -72,23 +70,23 @@ fun Perfil(
             when (result) {
                 is com.example.myapplication.auth.BiometricAuthResult.Success -> {
                     scope.launch {
-                        isLoading = true
+                        viewModel.updateIsLoading(true)
                         val deleteResult = authManager.deleteAccount()
                         deleteResult.fold(
                             onSuccess = {
                                 onAccountDeleted()
                             },
                             onFailure = { e ->
-                                errorMessage = "Error al borrar cuenta: ${e.message}"
-                                isLoading = false
-                                showBiometricConfirm = false
+                                viewModel.updateErrorMessage("Error al borrar cuenta: ${e.message}")
+                                viewModel.updateIsLoading(false)
+                                viewModel.updateShowBiometricConfirm(false)
                             }
                         )
                     }
                 }
                 is com.example.myapplication.auth.BiometricAuthResult.Error -> {
-                    errorMessage = result.message
-                    showBiometricConfirm = false
+                    viewModel.updateErrorMessage(result.message)
+                    viewModel.updateShowBiometricConfirm(false)
                 }
                 else -> {}
             }
@@ -112,13 +110,13 @@ fun Perfil(
                 onLogout()
             }
         },
-        onDeleteClick = { showDeleteDialog = true }
+        onDeleteClick = { viewModel.updateShowDeleteDialog(true) }
     )
 
     // Diálogo de confirmación para borrar cuenta
-    if (showDeleteDialog) {
+    if (state.showDeleteDialog) {
         Dialog(
-            onDismissRequest = { showDeleteDialog = false },
+            onDismissRequest = { viewModel.updateShowDeleteDialog(false) },
             properties = DialogProperties(usePlatformDefaultWidth = false)
         ) {
             Card(
@@ -158,8 +156,8 @@ fun Perfil(
                     if (biometricManager.isBiometricAvailable() is com.example.myapplication.auth.BiometricAvailability.Available) {
                         Button(
                             onClick = {
-                                showDeleteDialog = false
-                                showBiometricConfirm = true
+                                viewModel.updateShowDeleteDialog(false)
+                                viewModel.updateShowBiometricConfirm(true)
                                 biometricManager.setupBiometricPrompt()
                                 biometricManager.authenticate()
                             },
@@ -177,8 +175,8 @@ fun Perfil(
                     // Botón: Usar contraseña
                     Button(
                         onClick = {
-                            showDeleteDialog = false
-                            showPasswordDialog = true
+                            viewModel.updateShowDeleteDialog(false)
+                            viewModel.updateShowPasswordDialog(true)
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
@@ -191,7 +189,7 @@ fun Perfil(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     TextButton(
-                        onClick = { showDeleteDialog = false }
+                        onClick = { viewModel.updateShowDeleteDialog(false) }
                     ) {
                         Text("Cancelar", color = Color.Gray)
                     }
@@ -201,12 +199,12 @@ fun Perfil(
     }
 
     // Diálogo para ingresar contraseña
-    if (showPasswordDialog) {
+    if (state.showPasswordDialog) {
         Dialog(
             onDismissRequest = {
-                showPasswordDialog = false
-                deletePassword = ""
-                errorMessage = null
+                viewModel.updateShowPasswordDialog(false)
+                viewModel.updateDeletePassword("")
+                viewModel.updateErrorMessage(null)
             }
         ) {
             Card(
@@ -227,9 +225,9 @@ fun Perfil(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    if (errorMessage != null) {
+                    if (state.errorMessage != null) {
                         Text(
-                            text = errorMessage!!,
+                            text = state.errorMessage!!,
                             color = Color(0xFFFF6B6B),
                             fontSize = 12.sp
                         )
@@ -237,8 +235,8 @@ fun Perfil(
                     }
 
                     OutlinedTextField(
-                        value = deletePassword,
-                        onValueChange = { deletePassword = it },
+                        value = state.deletePassword,
+                        onValueChange = {viewModel.updateDeletePassword(it)},
                         label = { Text("Contraseña") },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth()
@@ -248,15 +246,15 @@ fun Perfil(
                     Button(
                         onClick = {
                             scope.launch {
-                                isLoading = true
-                                val result = authManager.deleteAccountWithPassword(deletePassword)
+                                viewModel.updateIsLoading(true)
+                                val result = authManager.deleteAccountWithPassword(state.deletePassword)
                                 result.fold(
                                     onSuccess = {
                                         onAccountDeleted()
                                     },
                                     onFailure = { e ->
-                                        errorMessage = e.message
-                                        isLoading = false
+                                        viewModel.updateErrorMessage(e.message)
+                                        viewModel.updateIsLoading(false)
                                     }
                                 )
                             }
@@ -264,9 +262,9 @@ fun Perfil(
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B6B)),
                         shape = RoundedCornerShape(12.dp),
-                        enabled = !isLoading
+                        enabled = !state.isLoading
                     ) {
-                        if (isLoading) {
+                        if (state.isLoading) {
                             CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White)
                         } else {
                             Text("Confirmar y borrar cuenta")
@@ -276,9 +274,9 @@ fun Perfil(
 
                     TextButton(
                         onClick = {
-                            showPasswordDialog = false
-                            deletePassword = ""
-                            errorMessage = null
+                            viewModel.updateShowPasswordDialog(false)
+                            viewModel.updateDeletePassword("")
+                            viewModel.updateErrorMessage(null)
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
