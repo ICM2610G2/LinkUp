@@ -20,7 +20,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.models.User
+import com.example.myapplication.model.FriendMapLocation
+import com.example.myapplication.model.MapaViewModel
 import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.repository.LocationRepository
 import com.example.myapplication.repository.UserRepository
@@ -33,38 +36,33 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.maps.android.compose.*
 
-data class FriendMapLocation(
-    val user: User,
-    val location: LatLng
-)
-
 @Composable
-fun Mapa() {
+fun Mapa(
+    viewModel: MapaViewModel = viewModel()
+) {
     val context = LocalContext.current
-
-    var hasLocationPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
+    val state by viewModel.mapaState.collectAsState()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
-        hasLocationPermission = granted
+        viewModel.updateHasLocationPermission(granted)
     }
 
     LaunchedEffect(Unit) {
-        if (!hasLocationPermission) {
+        val granted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        viewModel.updateHasLocationPermission(granted)
+
+        if (!granted) {
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
-    if (hasLocationPermission) {
-        MapaConUbicacion()
+    if (state.hasLocationPermission) {
+        MapaConUbicacion(viewModel = viewModel)
     } else {
         MapaSinPermiso(
             onRequestPermission = {
@@ -76,8 +74,11 @@ fun Mapa() {
 
 @SuppressLint("MissingPermission")
 @Composable
-fun MapaConUbicacion() {
+fun MapaConUbicacion(
+    viewModel: MapaViewModel = viewModel()
+) {
     val context = LocalContext.current
+    val state by viewModel.mapaState.collectAsState()
 
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
@@ -88,12 +89,6 @@ fun MapaConUbicacion() {
     val friendsRepository = remember { FriendsRepository() }
     val locationRepository = remember { LocationRepository() }
     val realtimeDb = remember { FirebaseDatabase.getInstance().reference }
-
-    var shareLocationMode by remember { mutableStateOf("always") }
-
-    var userLocation by remember { mutableStateOf<LatLng?>(null) }
-    var acceptedFriends by remember { mutableStateOf<List<User>>(emptyList()) }
-    var friendLocations by remember { mutableStateOf<List<FriendMapLocation>>(emptyList()) }
 
     val bogota = LatLng(4.6097, -74.0817)
 
@@ -112,22 +107,20 @@ fun MapaConUbicacion() {
 
     LaunchedEffect(Unit) {
         val uid = auth.currentUser?.uid ?: return@LaunchedEffect
-
         val user = userRepository.getUser(uid)
-        shareLocationMode = user?.shareLocationMode ?: "always"
-
-        acceptedFriends = friendsRepository.getAcceptedFriends()
+        viewModel.updateShareLocationMode(user?.shareLocationMode ?: "always")
+        viewModel.updateAcceptedFriends(friendsRepository.getAcceptedFriends())
     }
 
     DisposableEffect(Unit) {
         val callback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 val location = result.lastLocation ?: return
-
                 val latLng = LatLng(location.latitude, location.longitude)
-                userLocation = latLng
+                viewModel.updateUserLocation(latLng)
 
-                val shouldShare = shareLocationMode == "always" || shareLocationMode == "in_race"
+                val shouldShare = state.shareLocationMode == "always" ||
+                        state.shareLocationMode == "in_race"
 
                 locationRepository.updateUserLocation(
                     lat = location.latitude,
@@ -149,10 +142,10 @@ fun MapaConUbicacion() {
         }
     }
 
-    DisposableEffect(acceptedFriends) {
+    DisposableEffect(state.acceptedFriends) {
         val listeners = mutableListOf<Pair<DatabaseReference, ValueEventListener>>()
 
-        acceptedFriends.forEach { friend ->
+        state.acceptedFriends.forEach { friend ->
             val ref = realtimeDb
                 .child("user_live")
                 .child(friend.uid)
@@ -164,17 +157,16 @@ fun MapaConUbicacion() {
                     val lat = snapshot.child("lat").getValue(Double::class.java)
                     val lng = snapshot.child("lng").getValue(Double::class.java)
 
-                    friendLocations = if (visible && lat != null && lng != null) {
+                    val updatedList = if (visible && lat != null && lng != null) {
                         val newLocation = FriendMapLocation(
                             user = friend,
                             location = LatLng(lat, lng)
                         )
-
-                        friendLocations
-                            .filterNot { it.user.uid == friend.uid } + newLocation
+                        state.friendLocations.filterNot { it.user.uid == friend.uid } + newLocation
                     } else {
-                        friendLocations.filterNot { it.user.uid == friend.uid }
+                        state.friendLocations.filterNot { it.user.uid == friend.uid }
                     }
+                    viewModel.updateFriendLocations(updatedList)
                 }
 
                 override fun onCancelled(error: DatabaseError) {}
@@ -191,8 +183,8 @@ fun MapaConUbicacion() {
         }
     }
 
-    LaunchedEffect(userLocation) {
-        userLocation?.let { location ->
+    LaunchedEffect(state.userLocation) {
+        state.userLocation?.let { location ->
             cameraPositionState.move(
                 CameraUpdateFactory.newLatLngZoom(location, 16f)
             )
@@ -207,15 +199,13 @@ fun MapaConUbicacion() {
         GoogleMap(
             modifier = Modifier.matchParentSize(),
             cameraPositionState = cameraPositionState,
-            properties = MapProperties(
-                isMyLocationEnabled = true
-            ),
+            properties = MapProperties(isMyLocationEnabled = true),
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = false,
                 myLocationButtonEnabled = true
             )
         ) {
-            userLocation?.let { location ->
+            state.userLocation?.let { location ->
                 Marker(
                     state = MarkerState(position = location),
                     title = "Mi ubicación",
@@ -223,7 +213,7 @@ fun MapaConUbicacion() {
                 )
             }
 
-            friendLocations.forEach { friendLocation ->
+            state.friendLocations.forEach { friendLocation ->
                 Marker(
                     state = MarkerState(position = friendLocation.location),
                     title = friendLocation.user.displayName.ifBlank { "Amigo" },
@@ -252,14 +242,12 @@ fun MapaConUbicacion() {
                     tint = Color(0xFFFF9800),
                     modifier = Modifier.size(20.dp)
                 )
-
                 Spacer(modifier = Modifier.width(8.dp))
-
                 Text(
-                    text = if (userLocation == null) {
+                    text = if (state.userLocation == null) {
                         "Obteniendo ubicación..."
                     } else {
-                        "Ubicación activa · Amigos visibles: ${friendLocations.size}"
+                        "Ubicación activa · Amigos visibles: ${state.friendLocations.size}"
                     },
                     color = Color.White
                 )
