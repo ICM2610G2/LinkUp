@@ -26,6 +26,8 @@ import com.example.myapplication.screens.Carreras
 import com.example.myapplication.screens.Chat
 import com.example.myapplication.screens.homeScreens.CrearCarrera
 import com.example.myapplication.screens.EditProfileScreen
+import com.example.myapplication.screens.EscanearQR
+import com.example.myapplication.screens.InvitarNFC
 import com.example.myapplication.screens.homeScreens.Home
 import com.example.myapplication.screens.ListaAmigos
 import com.example.myapplication.screens.LobbyCarreraScreen
@@ -105,7 +107,7 @@ fun MainScaffold(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") {
-                Home()
+                Home(onEscanearQR = { navController.navigate(Screen.EscanearQR.route) })
             }
 
             composable("mapa") {
@@ -223,6 +225,20 @@ fun MainScaffold(
                         )
                     }
                 }
+            }
+
+            composable("invitar_nfc") {
+                InvitarNFC(
+                    onCerrar = { navController.popBackStack() },
+                    onEscanearQR = { navController.navigate("escanear_qr") }
+                )
+            }
+
+            composable("escanear_qr") {
+                EscanearQR(
+                    onBack = { navController.popBackStack() },
+                    onInviteSent = { navController.popBackStack() }
+                )
             }
 
 

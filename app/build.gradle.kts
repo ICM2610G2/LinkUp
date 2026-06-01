@@ -81,6 +81,10 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.firebase:firebase-database-ktx")
 
+    // QR
+    implementation("com.google.zxing:core:3.5.3")
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+
     // Carga de imágenes
     implementation("io.coil-kt:coil-compose:2.6.0")
 

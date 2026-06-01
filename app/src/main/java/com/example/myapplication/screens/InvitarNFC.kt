@@ -1,6 +1,9 @@
 package com.example.myapplication.screens
 
+import android.content.Intent
+import android.graphics.Bitmap
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,24 +15,29 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.model.InvitarNFCViewModel
-import kotlin.random.Random
+import com.example.myapplication.utils.InviteUtils
+import com.example.myapplication.utils.QRGenerator
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun InvitarNFC(
     onCerrar: () -> Unit,
+    onEscanearQR: () -> Unit,
     viewModel: InvitarNFCViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -75,13 +83,27 @@ fun InvitarNFC(
                         icono = Icons.Default.QrCode,
                         onClick = {
                             viewModel.updateMostrarQR(!state.mostrarQR)
-                            Log.i("MyApp", "QR toggled: ${state.mostrarQR}")
+                            Log.i("MyApp", "QR toggled: ${!state.mostrarQR}")
                         }
                     )
 
-                    if (state.mostrarQR) {
-                        CodigoQR()
+                    if (state.mostrarQR && currentUser != null) {
+                        // El QR usa el Custom URI Scheme (linkup://) para apertura directa e instantánea
+                        val qrBitmap = remember(currentUser.uid) {
+                            QRGenerator.generate(InviteUtils.createQrLink(currentUser.uid))
+                        }
+                        CodigoQR(qrBitmap)
                     }
+
+                    BotonOpcion(
+                        emoji = null,
+                        iconoColor = Color(0xFF3B82F6),
+                        fondoIcono = Color(0x333B82F6),
+                        titulo = "Escanear código QR",
+                        descripcion = "Escanear el código de un amigo",
+                        icono = Icons.Default.QrCodeScanner,
+                        onClick = onEscanearQR
+                    )
 
                     BotonOpcion(
                         emoji = null,
@@ -92,6 +114,19 @@ fun InvitarNFC(
                         icono = Icons.Default.Share,
                         onClick = {
                             Log.i("MyApp", "Compartir enlace clicked")
+                            currentUser?.uid?.let { uid ->
+                                // Usamos el enlace HTTPS para que apps externas lo reconozcan como clickable
+                                val link = InviteUtils.createShareableLink(uid)
+                                Log.d("INVITE_SHARE", "Link compartido: $link")
+
+                                val sendIntent: Intent = Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    putExtra(Intent.EXTRA_TEXT, "¡Agrégame en LinkUp para correr juntos! $link")
+                                    type = "text/plain"
+                                }
+                                val shareIntent = Intent.createChooser(sendIntent, null)
+                                context.startActivity(shareIntent)
+                            }
                         }
                     )
 
@@ -288,11 +323,7 @@ fun BotonOpcion(
 }
 
 @Composable
-fun CodigoQR() {
-    val celdas = remember {
-        List(64) { Random.nextBoolean() }
-    }
-
+fun CodigoQR(bitmap: Bitmap) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp),
@@ -310,25 +341,11 @@ fun CodigoQR() {
                     .background(Color.White, RoundedCornerShape(12.dp))
                     .padding(8.dp)
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    for (fila in 0 until 8) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                            for (col in 0 until 8) {
-                                val index = fila * 8 + col
-                                Box(
-                                    modifier = Modifier
-                                        .size(20.dp)
-                                        .background(
-                                            if (celdas[index]) Color.Black else Color.White,
-                                            RoundedCornerShape(2.dp)
-                                        )
-                                )
-                            }
-                        }
-                    }
-                }
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = "Código QR de invitación",
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))

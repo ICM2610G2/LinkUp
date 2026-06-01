@@ -33,6 +33,7 @@ import com.example.myapplication.screens.MenuFlotante
 
 @Composable
 fun Home(
+    onEscanearQR: () -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
     val state by viewModel.homeState.collectAsState()
@@ -136,7 +137,13 @@ fun Home(
         }
 
         if (state.mostrarNFC) {
-            InvitarNFC(onCerrar = { viewModel.updateMostrarNFC(false) })
+            InvitarNFC(
+                onCerrar = { viewModel.updateMostrarNFC(false) },
+                onEscanearQR = {
+                    viewModel.updateMostrarNFC(false)
+                    onEscanearQR()
+                }
+            )
         }
 
         if (state.mostrarAmigos) {

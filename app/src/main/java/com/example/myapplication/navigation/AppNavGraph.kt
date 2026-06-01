@@ -34,6 +34,7 @@ sealed class Screen(val route: String) {
     object Perfil : Screen("perfil")
     object Login : Screen("login")
     object EditProfile : Screen("edit_profile")
+    object EscanearQR : Screen("escanear_qr")
 }
 
 @Composable
@@ -92,7 +93,7 @@ fun AppNavGraph(
         }
 
         composable(Screen.Home.route) {
-            Home()
+            Home(onEscanearQR = { navController.navigate(Screen.EscanearQR.route) })
         }
 
         composable(Screen.Mapa.route) {
