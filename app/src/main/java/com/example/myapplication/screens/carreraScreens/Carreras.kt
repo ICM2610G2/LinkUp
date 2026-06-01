@@ -81,7 +81,7 @@ fun Carreras(
                     }
                 }
             } else {
-                // ACTIVE SESSIONS SECTION
+                //ASIADIAhsdoikuHASDSaskuasdhkasd
                 if (state.activeSessions.isNotEmpty()) {
                     item {
                         SectionTitle("Tus Carreras Activas")
@@ -94,7 +94,6 @@ fun Carreras(
                     }
                 }
 
-                // OTHER RACES SECTION
                 item {
                     SectionTitle(if (state.activeSessions.isEmpty()) "Explorar Carreras" else "Otras Carreras")
                 }

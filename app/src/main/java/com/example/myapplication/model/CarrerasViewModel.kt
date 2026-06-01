@@ -1,5 +1,6 @@
 package com.example.myapplication.model
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.models.Race
@@ -27,9 +28,10 @@ class CarrerasViewModel : ViewModel() {
             val repo = _carrerasState.value.raceRepository
             
             val activeSessions = repo.getUserActiveSessions()
+            Log.d("CarrerasViewModel", "Active sessions: $activeSessions")
             val allPublicRaces = repo.getPublicRaces()
-            
-            // Filter out races that are already in active sessions for this user
+            Log.d("CarrerasViewModel", "All public races: $allPublicRaces")
+
             val activeRaceIds = activeSessions.map { it.raceId }.toSet()
             val otherRaces = allPublicRaces.filter { it.id !in activeRaceIds }
 

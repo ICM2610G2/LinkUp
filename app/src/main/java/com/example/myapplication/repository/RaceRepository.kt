@@ -1,6 +1,7 @@
 package com.example.myapplication.repository
 
 import android.net.Uri
+import android.util.Log
 import com.example.myapplication.data.models.Checkpoint
 import com.example.myapplication.data.models.Race
 import com.example.myapplication.data.models.RaceSession
