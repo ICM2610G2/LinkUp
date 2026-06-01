@@ -14,6 +14,7 @@ import com.example.myapplication.auth.FirebaseAuthManager
 import com.example.myapplication.data.models.User
 import com.example.myapplication.repository.UserRepository
 import com.example.myapplication.screens.carreraScreens.CarreraActivaScreen
+import com.example.myapplication.screens.carreraScreens.CarreraScreen
 import com.example.myapplication.screens.carreraScreens.Carreras
 import com.example.myapplication.screens.grupoScreens.Chat
 import com.example.myapplication.screens.homeScreens.CrearCarrera
@@ -105,8 +106,24 @@ fun AppNavGraph(
                 onCrearCarrera = {
                     navController.navigate("crear_carrera")
                 },
+                onVerCarrera = { raceId ->
+                    navController.navigate("carrera_detail/$raceId")
+                },
                 onAbrirLobby = { sessionId ->
                     navController.navigate("lobby_carrera/$sessionId")
+                }
+            )
+        }
+
+        composable("carrera_detail/{raceId}") { backStackEntry ->
+            val raceId = backStackEntry.arguments?.getString("raceId") ?: ""
+            CarreraScreen(
+                raceId = raceId,
+                onBack = { navController.popBackStack() },
+                onAbrirLobby = { sessionId ->
+                    navController.navigate("lobby_carrera/$sessionId") {
+                        popUpTo("carreras")
+                    }
                 }
             )
         }
@@ -124,31 +141,25 @@ fun AppNavGraph(
 
         composable("lobby_carrera/{sessionId}") { backStackEntry ->
             val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
+            LobbyCarreraScreen(
+                sessionId = sessionId,
+                onBack = {
+                    navController.popBackStack()
+                },
+                onRaceStarted = { id ->
+                    navController.navigate("carrera_activa/$id")
+                }
+            )
+        }
 
-            composable("lobby_carrera/{sessionId}") { backStackEntry ->
-                val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
-
-                LobbyCarreraScreen(
-                    sessionId = sessionId,
-                    onBack = {
-                        navController.popBackStack()
-                    },
-                    onRaceStarted = { id ->
-                        navController.navigate("carrera_activa/$id")
-                    }
-                )
-            }
-
-            composable("carrera_activa/{sessionId}") { backStackEntry ->
-                val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
-
-                CarreraActivaScreen(
-                    sessionId = sessionId,
-                    onBack = {
-                        navController.popBackStack()
-                    }
-                )
-            }
+        composable("carrera_activa/{sessionId}") { backStackEntry ->
+            val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
+            CarreraActivaScreen(
+                sessionId = sessionId,
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         composable(Screen.Chat.route) {

@@ -1,5 +1,6 @@
 package com.example.myapplication.model
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.models.Checkpoint
 import com.google.firebase.firestore.GeoPoint
@@ -17,7 +18,8 @@ data class CrearCarreraState(
     val tiempoLimite: String = "sin-limite",
     val tipoCarrera: String = "rapida",
     val checkpoints: List<Checkpoint> = emptyList(),
-    val mostrarSeleccionMapa: Boolean = false
+    val mostrarSeleccionMapa: Boolean = false,
+    val imageUri: Uri? = null
 ) {
     val lugaresSeleccionados: Int get() = checkpoints.size
 }
@@ -40,6 +42,9 @@ class CrearCarreraViewModel : ViewModel() {
     }
     fun updateErrorMessage(newValue: String?) {
         _crearCarreraState.update { it.copy(errorMessage = newValue) }
+    }
+    fun updateImageUri(uri: Uri?) {
+        _crearCarreraState.update { it.copy(imageUri = uri) }
     }
 
     fun setMostrarSeleccionMapa(mostrar: Boolean) {

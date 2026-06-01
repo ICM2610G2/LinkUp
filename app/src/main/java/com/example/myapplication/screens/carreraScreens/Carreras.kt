@@ -12,40 +12,37 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Route
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.myapplication.data.models.Race
-import com.example.myapplication.repository.RaceRepository
-import kotlinx.coroutines.launch
+import com.example.myapplication.data.models.RaceSession
+import com.example.myapplication.model.CarrerasViewModel
 
 @Composable
 fun Carreras(
     onCrearCarrera: () -> Unit,
-    onAbrirLobby: (String) -> Unit
+    onVerCarrera: (String) -> Unit,
+    onAbrirLobby: (String) -> Unit,
+    viewModel: CarrerasViewModel = viewModel()
 ) {
-    val scope = rememberCoroutineScope()
-    val raceRepository = remember { RaceRepository() }
-
-    var carreras by remember { mutableStateOf<List<Race>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-
-    suspend fun cargarCarreras() {
-        isLoading = true
-        carreras = raceRepository.getPublicRaces()
-        isLoading = false
-    }
+    val state by viewModel.carrerasState.collectAsState()
 
     LaunchedEffect(Unit) {
-        cargarCarreras()
+        viewModel.cargarDatos()
     }
 
     Box(
@@ -67,47 +64,113 @@ fun Carreras(
                 HeaderCarreras(
                     onCrearCarrera = onCrearCarrera,
                     onRefresh = {
-                        scope.launch { cargarCarreras() }
+                        viewModel.cargarDatos()
                     }
                 )
             }
 
-            when {
-                isLoading -> {
+            if (state.isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = Color(0xFFFF9800))
+                    }
+                }
+            } else {
+                // ACTIVE SESSIONS SECTION
+                if (state.activeSessions.isNotEmpty()) {
                     item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(300.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = Color(0xFFFF9800))
-                        }
+                        SectionTitle("Tus Carreras Activas")
+                    }
+                    items(state.activeSessions, key = { it.id }) { session ->
+                        CarreraActivaCard(
+                            session = session,
+                            onClick = { onAbrirLobby(session.id) }
+                        )
                     }
                 }
 
-                carreras.isEmpty() -> {
+                // OTHER RACES SECTION
+                item {
+                    SectionTitle(if (state.activeSessions.isEmpty()) "Explorar Carreras" else "Otras Carreras")
+                }
+
+                if (state.otherRaces.isEmpty()) {
                     item {
                         EstadoVacioCarreras(onCrearCarrera = onCrearCarrera)
                     }
-                }
-
-                else -> {
-                    items(carreras, key = { it.id }) { carrera ->
+                } else {
+                    items(state.otherRaces, key = { it.id }) { carrera ->
                         CarreraPublicaCard(
                             carrera = carrera,
-                            onClick = {
-                                scope.launch {
-                                    val result = raceRepository.findOrJoinLobby(carrera)
-                                    result.onSuccess { sessionId ->
-                                        onAbrirLobby(sessionId)
-                                    }
-                                }
-                            }
+                            onClick = { onVerCarrera(carrera.id) }
                         )
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        color = Color.White,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(vertical = 8.dp)
+    )
+}
+
+@Composable
+fun CarreraActivaCard(
+    session: RaceSession,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF2E2E2E)),
+        border = BorderStroke(2.dp, Color(0xFFFF9800).copy(alpha = 0.5f))
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFFFF9800)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.Route, null, tint = Color.White)
+            }
+            
+            Spacer(modifier = Modifier.width(16.dp))
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    session.raceName,
+                    color = Color.White,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Estado: ${session.status.replaceFirstChar { it.uppercase() }}",
+                    color = Color(0xFFFF9800),
+                    fontSize = 13.sp
+                )
+            }
+            
+            Icon(Icons.Default.PlayArrow, null, tint = Color.White)
         }
     }
 }
@@ -246,16 +309,26 @@ fun CarreraPublicaCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(46.dp)
-                        .background(Color(0x26FF9800), RoundedCornerShape(14.dp)),
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(Color(0x26FF9800)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        Icons.Default.Route,
-                        null,
-                        tint = Color(0xFFFF9800),
-                        modifier = Modifier.size(24.dp)
-                    )
+                    if (carrera.photoUrl.isNotEmpty()) {
+                        AsyncImage(
+                            model = carrera.photoUrl,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.Route,
+                            null,
+                            tint = Color(0xFFFF9800),
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))

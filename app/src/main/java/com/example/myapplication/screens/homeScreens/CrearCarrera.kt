@@ -1,5 +1,8 @@
 package com.example.myapplication.screens.homeScreens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Place
@@ -17,12 +21,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.myapplication.model.CrearCarreraViewModel
 import com.example.myapplication.repository.RaceRepository
 import kotlinx.coroutines.launch
@@ -36,6 +43,12 @@ fun CrearCarrera(
     val scope = rememberCoroutineScope()
     val raceRepository = remember { RaceRepository() }
     val state by viewModel.crearCarreraState.collectAsState()
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        viewModel.updateImageUri(uri)
+    }
 
     Box(
         modifier = Modifier
@@ -58,6 +71,56 @@ fun CrearCarrera(
                     contentPadding = PaddingValues(vertical = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
+                    item {
+                        Column {
+                            Text(
+                                "Foto de la carrera",
+                                color = Color.White,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(Color(0xFF252525))
+                                    .clickable { launcher.launch("image/*") },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (state.imageUri != null) {
+                                    AsyncImage(
+                                        model = state.imageUri,
+                                        contentDescription = "Previsualización",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    IconButton(
+                                        onClick = { viewModel.updateImageUri(null) },
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .padding(8.dp)
+                                            .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                                    ) {
+                                        Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                                    }
+                                } else {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Icon(
+                                            Icons.Default.AddAPhoto,
+                                            null,
+                                            tint = Color.Gray,
+                                            modifier = Modifier.size(40.dp)
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text("Subir foto", color = Color.Gray, fontSize = 13.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     item {
                         CampoTextoCarrera(
                             titulo = "Nombre de la carrera",
@@ -198,7 +261,8 @@ fun CrearCarrera(
                                 name = state.nombre,
                                 description = state.descripcion,
                                 isPublic = state.isPublic,
-                                checkpoints = state.checkpoints
+                                checkpoints = state.checkpoints,
+                                imageUri = state.imageUri
                             )
 
                             result.fold(

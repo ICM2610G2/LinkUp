@@ -1,30 +1,44 @@
 package com.example.myapplication.repository
 
+import android.net.Uri
 import com.example.myapplication.data.models.Checkpoint
 import com.example.myapplication.data.models.Race
+import com.example.myapplication.data.models.RaceSession
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 import kotlin.math.*
 
 class RaceRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
 ) {
 
     suspend fun createRace(
         name: String,
         description: String,
         isPublic: Boolean,
-        checkpoints: List<Checkpoint>
+        checkpoints: List<Checkpoint>,
+        imageUri: Uri? = null
     ): Result<String> {
         return try {
             val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
 
             if (name.isBlank()) return Result.failure(Exception("El nombre es obligatorio"))
             if (checkpoints.size < 2) return Result.failure(Exception("Debes seleccionar al menos 2 checkpoints"))
+
+            var photoUrl = ""
+            if (imageUri != null) {
+                val fileName = "races/${UUID.randomUUID()}.jpg"
+                val imageRef = storage.reference.child(fileName)
+                imageRef.putFile(imageUri).await()
+                photoUrl = imageRef.downloadUrl.await().toString()
+            }
 
             val distanceKm = calculateTotalDistanceKm(checkpoints)
 
@@ -45,7 +59,8 @@ class RaceRepository(
                 estimatedDistanceKm = distanceKm,
                 checkpointCount = checkpoints.size,
                 isPublic = isPublic,
-                createdAt = Timestamp.now()
+                createdAt = Timestamp.now(),
+                photoUrl = photoUrl
             )
 
             raceRef.set(race).await()
@@ -75,6 +90,69 @@ class RaceRepository(
         }
     }
 
+    suspend fun getRaceById(raceId: String): Race? {
+        return try {
+            firestore.collection("races").document(raceId).get().await().toObject(Race::class.java)?.copy(id = raceId)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun getUserActiveSessions(): List<RaceSession> {
+        return try {
+            val uid = auth.currentUser?.uid ?: return emptyList()
+            firestore.collection("race_sessions")
+                .whereNotEqualTo("status", "finished")
+                .get()
+                .await()
+                .documents
+                .mapNotNull { it.toObject(RaceSession::class.java)?.copy(id = it.id) }
+                .filter { it.participants.containsKey(uid) }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun getSessionForRace(raceId: String): RaceSession? {
+        return try {
+            firestore.collection("race_sessions")
+                .whereEqualTo("raceId", raceId)
+                .whereEqualTo("status", "lobby")
+                .limit(1)
+                .get()
+                .await()
+                .documents
+                .firstOrNull()
+                ?.toObject(RaceSession::class.java)
+                ?.let { it.copy(id = it.id) }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun joinRaceSession(sessionId: String): Result<Unit> {
+        return try {
+            val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
+
+            firestore.collection("race_sessions")
+                .document(sessionId)
+                .update(
+                    "participants.$uid",
+                    mapOf(
+                        "joinedAt" to Timestamp.now(),
+                        "completedAt" to null,
+                        "position" to null,
+                        "checkpointsDone" to emptyList<String>()
+                    )
+                )
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun findOrJoinLobby(race: Race): Result<String> {
         return try {
             val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
@@ -89,22 +167,10 @@ class RaceRepository(
                 .firstOrNull()
 
             if (existingLobby != null) {
-                val sessionId = existingLobby.id
-
-                firestore.collection("race_sessions")
-                    .document(sessionId)
-                    .update(
-                        "participants.$uid",
-                        mapOf(
-                            "joinedAt" to Timestamp.now(),
-                            "completedAt" to null,
-                            "position" to null,
-                            "checkpointsDone" to emptyList<String>()
-                        )
-                    )
-                    .await()
-
-                Result.success(sessionId)
+                joinRaceSession(existingLobby.id).fold(
+                    onSuccess = { Result.success(existingLobby.id) },
+                    onFailure = { Result.failure(it) }
+                )
             } else {
                 createLobby(race)
             }

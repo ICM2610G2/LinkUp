@@ -15,5 +15,6 @@ data class Race(
     val estimatedDistanceKm: Double = 0.0,
     val checkpointCount: Int = 0,
     val isPublic: Boolean = true,
-    val createdAt: Timestamp = Timestamp.now()
+    val createdAt: Timestamp = Timestamp.now(),
+    val photoUrl: String = ""
 )

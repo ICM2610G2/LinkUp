@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,7 +35,9 @@ fun LobbyCarreraScreen(
     var status by remember { mutableStateOf("lobby") }
     var participantsCount by remember { mutableStateOf(0) }
     var createdBy by remember { mutableStateOf("") }
+    var isParticipant by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
 
     DisposableEffect(sessionId) {
         val listener = FirebaseFirestore.getInstance()
@@ -48,8 +51,9 @@ fun LobbyCarreraScreen(
 
                     val participants = snapshot.get("participants") as? Map<*, *>
                     participantsCount = participants?.size ?: 0
+                    isParticipant = participants?.containsKey(currentUid) == true
 
-                    if (status == "active") {
+                    if (status == "active" && isParticipant) {
                         onRaceStarted(sessionId)
                     }
                 }
@@ -121,7 +125,14 @@ fun LobbyCarreraScreen(
 
             Text("Estado: $status", color = Color.Gray)
 
-            if (currentUid != createdBy) {
+            if (isParticipant) {
+                Text("Ya eres parte de esta carrera", color = Color(0xFF22C55E), fontSize = 13.sp, fontWeight = FontWeight.Medium)
+            } else if (status == "lobby") {
+                Text("Aún no te has unido a esta carrera", color = Color.Gray, fontSize = 13.sp)
+            }
+
+            if (currentUid != createdBy && isParticipant && status == "lobby") {
+                Spacer(modifier = Modifier.height(8.dp))
                 Text("Esperando que el creador inicie la carrera", color = Color.Gray, fontSize = 12.sp)
             }
 
@@ -132,27 +143,64 @@ fun LobbyCarreraScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Button(
-                onClick = {
-                    scope.launch {
-                        errorMessage = null
-                        val result = raceRepository.startRaceSession(sessionId)
-                        result.onFailure { e -> errorMessage = e.message }
+            if (!isParticipant && status == "lobby") {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            isLoading = true
+                            errorMessage = null
+                            val result = raceRepository.joinRaceSession(sessionId)
+                            result.onFailure { e -> errorMessage = e.message }
+                            isLoading = false
+                        }
+                    },
+                    enabled = !isLoading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF22C55E)),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    } else {
+                        Icon(Icons.Default.PersonAdd, null, tint = Color.White)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Unirse a la carrera", color = Color.White, fontWeight = FontWeight.Bold)
                     }
-                },
-                enabled = participantsCount >= 2 && currentUid == createdBy && status == "lobby",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(54.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFF9800),
-                    disabledContainerColor = Color(0xFFFF9800).copy(alpha = 0.4f)
-                ),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Icon(Icons.Default.PlayArrow, null, tint = Color.White)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Iniciar carrera", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            if (currentUid == createdBy) {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            isLoading = true
+                            errorMessage = null
+                            val result = raceRepository.startRaceSession(sessionId)
+                            result.onFailure { e -> errorMessage = e.message }
+                            isLoading = false
+                        }
+                    },
+                    enabled = participantsCount >= 2 && status == "lobby" && !isLoading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFF9800),
+                        disabledContainerColor = Color(0xFFFF9800).copy(alpha = 0.4f)
+                    ),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    } else {
+                        Icon(Icons.Default.PlayArrow, null, tint = Color.White)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Iniciar carrera", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
             }
         }
     }

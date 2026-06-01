@@ -34,6 +34,7 @@ import com.example.myapplication.screens.LobbyCarreraScreen
 import com.example.myapplication.screens.mapaScreens.Mapa
 import com.example.myapplication.screens.perfilScreens.Perfil
 import com.example.myapplication.screens.Solicitudes
+import com.example.myapplication.screens.carreraScreens.CarreraScreen
 
 
 @Composable
@@ -121,7 +122,11 @@ fun MainScaffold(
                     },
                     onAbrirLobby = { sessionId ->
                         navController.navigate("lobby_carrera/$sessionId")
-                    }
+                    },
+                    onVerCarrera = { raceId ->
+                        navController.navigate("carrera_detail/$raceId")
+                    },
+
                 )
             }
 
@@ -138,6 +143,19 @@ fun MainScaffold(
                             popUpTo("lobby_carrera/$id") {
                                 inclusive = true
                             }
+                        }
+                    }
+                )
+            }
+
+            composable("carrera_detail/{raceId}") { backStackEntry ->
+                val raceId = backStackEntry.arguments?.getString("raceId") ?: ""
+                CarreraScreen(
+                    raceId = raceId,
+                    onBack = { navController.popBackStack() },
+                    onAbrirLobby = { sessionId ->
+                        navController.navigate("lobby_carrera/$sessionId") {
+                            popUpTo("carreras")
                         }
                     }
                 )
