@@ -23,6 +23,7 @@ import com.example.myapplication.screens.LobbyCarreraScreen
 import com.example.myapplication.screens.Login
 import com.example.myapplication.screens.mapaScreens.Mapa
 import com.example.myapplication.screens.Perfil
+import com.example.myapplication.screens.*
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
@@ -34,6 +35,7 @@ sealed class Screen(val route: String) {
     object Perfil : Screen("perfil")
     object Login : Screen("login")
     object EditProfile : Screen("edit_profile")
+    object EscanearQR : Screen("escanear_qr")
 }
 
 @Composable
@@ -92,7 +94,7 @@ fun AppNavGraph(
         }
 
         composable(Screen.Home.route) {
-            Home()
+            Home(onEscanearQR = { navController.navigate(Screen.EscanearQR.route) })
         }
 
         composable(Screen.Mapa.route) {
@@ -124,30 +126,26 @@ fun AppNavGraph(
         composable("lobby_carrera/{sessionId}") { backStackEntry ->
             val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
 
-            composable("lobby_carrera/{sessionId}") { backStackEntry ->
-                val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
+            LobbyCarreraScreen(
+                sessionId = sessionId,
+                onBack = {
+                    navController.popBackStack()
+                },
+                onRaceStarted = { id ->
+                    navController.navigate("carrera_activa/$id")
+                }
+            )
+        }
 
-                LobbyCarreraScreen(
-                    sessionId = sessionId,
-                    onBack = {
-                        navController.popBackStack()
-                    },
-                    onRaceStarted = { id ->
-                        navController.navigate("carrera_activa/$id")
-                    }
-                )
-            }
+        composable("carrera_activa/{sessionId}") { backStackEntry ->
+            val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
 
-            composable("carrera_activa/{sessionId}") { backStackEntry ->
-                val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
-
-                CarreraActivaScreen(
-                    sessionId = sessionId,
-                    onBack = {
-                        navController.popBackStack()
-                    }
-                )
-            }
+            CarreraActivaScreen(
+                sessionId = sessionId,
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         composable(Screen.Chat.route) {
@@ -186,6 +184,9 @@ fun AppNavGraph(
                     onVerAmigos = {
                         navController.navigate("lista_amigos")
                     },
+                    onInvitarAmigos = {
+                        navController.navigate("invitar_nfc")
+                    },
                     onRefresh = {
                         scope.launch {
                             userData = user?.let { userRepository.getUser(it.uid) }
@@ -208,6 +209,26 @@ fun AppNavGraph(
                     }
                 )
             }
+        }
+
+        composable("lista_amigos") {
+            ListaAmigos(
+                onCerrar = { navController.popBackStack() }
+            )
+        }
+
+        composable("invitar_nfc") {
+            InvitarNFC(
+                onCerrar = { navController.popBackStack() },
+                onEscanearQR = { navController.navigate(Screen.EscanearQR.route) }
+            )
+        }
+
+        composable(Screen.EscanearQR.route) {
+            EscanearQR(
+                onBack = { navController.popBackStack() },
+                onInviteSent = { navController.popBackStack() }
+            )
         }
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,10 +17,11 @@ import com.example.myapplication.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.myapplication.screens.BuscarAmigos
 import com.example.myapplication.screens.CarreraActivaScreen
 import com.example.myapplication.screens.Carreras
@@ -33,6 +35,7 @@ import com.example.myapplication.screens.mapaScreens.Mapa
 import com.example.myapplication.screens.Perfil
 import com.example.myapplication.screens.Solicitudes
 
+import com.example.myapplication.screens.*
 
 @Composable
 fun MainScaffold(
@@ -105,7 +108,7 @@ fun MainScaffold(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") {
-                Home()
+                Home(onEscanearQR = { navController.navigate("escanear_qr") })
             }
 
             composable("mapa") {
@@ -179,8 +182,9 @@ fun MainScaffold(
                     onVerAmigos = {
                         navController.navigate("lista_amigos")
                     },
-
-
+                    onInvitarAmigos = {
+                        navController.navigate("invitar_nfc")
+                    },
                     onRefresh = {
                         scope.launch {
                             firebaseUser?.uid?.let { uid ->
@@ -234,7 +238,19 @@ fun MainScaffold(
                 Solicitudes(onBack = { navController.popBackStack() })
             }
 
+            composable("invitar_nfc") {
+                InvitarNFC(
+                    onCerrar = { navController.popBackStack() },
+                    onEscanearQR = { navController.navigate("escanear_qr") }
+                )
+            }
 
+            composable("escanear_qr") {
+                EscanearQR(
+                    onBack = { navController.popBackStack() },
+                    onInviteSent = { navController.popBackStack() }
+                )
+            }
         }
     }
 }

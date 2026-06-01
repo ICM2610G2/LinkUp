@@ -42,6 +42,7 @@ fun Perfil(
     onAccountDeleted: () -> Unit,
     onEditProfile: () -> Unit,
     onVerAmigos: () -> Unit,
+    onInvitarAmigos: () -> Unit,
     onRefresh: () -> Unit,
     viewModel: PerfilViewModel = viewModel()
 ) {
@@ -102,6 +103,7 @@ fun Perfil(
         totalPoints = totalPoints,
         onEditClick = onEditProfile,
         onVerAmigosClick = onVerAmigos,
+        onInvitarAmigosClick = onInvitarAmigos,
         onLogoutClick = {
             scope.launch {
                 authManager.logout()
@@ -295,6 +297,7 @@ fun PerfilContent(
     totalPoints: Int,
     onEditClick: () -> Unit,
     onVerAmigosClick: () -> Unit,
+    onInvitarAmigosClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -469,6 +472,14 @@ fun PerfilContent(
             subtitle = "Gestiona tus amigos",
             accent = accent,
             onClick = onVerAmigosClick
+        )
+
+        MenuItem(
+            icon = Icons.Default.PersonAdd,
+            title = "Invitar Amigos",
+            subtitle = "QR, Enlace, NFC",
+            accent = Color(0xFF22C55E),
+            onClick = onInvitarAmigosClick
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -650,6 +661,7 @@ fun PerfilPreview() {
             totalPoints = 1250,
             onEditClick = {},
             onVerAmigosClick = {},
+            onInvitarAmigosClick = {},
             onLogoutClick = {},
             onDeleteClick = {}
         )
