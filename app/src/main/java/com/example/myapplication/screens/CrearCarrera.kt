@@ -4,10 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Lock
@@ -24,36 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.models.Checkpoint
 import com.example.myapplication.model.CrearCarreraViewModel
 import com.example.myapplication.repository.RaceRepository
-import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.launch
-
-
-private val checkpointsDemo = listOf(
-    Checkpoint(
-        name = "Museo del Oro",
-        description = "Uno de los museos más importantes de Bogotá.",
-        coordinates = GeoPoint(4.6019, -74.0720),
-        geofenceRadiusM = 50,
-        points = 100,
-        order = 1
-    ),
-    Checkpoint(
-        name = "Plaza de Bolívar",
-        description = "Centro histórico y político de Colombia.",
-        coordinates = GeoPoint(4.5981, -74.0758),
-        geofenceRadiusM = 50,
-        points = 100,
-        order = 2
-    ),
-    Checkpoint(
-        name = "Chorro de Quevedo",
-        description = "Lugar emblemático de La Candelaria.",
-        coordinates = GeoPoint(4.5973, -74.0695),
-        geofenceRadiusM = 50,
-        points = 100,
-        order = 3
-    )
-)
 
 @Composable
 fun CrearCarrera(
@@ -138,35 +112,69 @@ fun CrearCarrera(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        Icons.Default.Place,
-                                        null,
-                                        tint = Color(0xFFFF9800),
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        "Checkpoints seleccionados",
-                                        color = Color.White,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            Icons.Default.Place,
+                                            null,
+                                            tint = Color(0xFFFF9800),
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            "Checkpoints",
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                    
+                                    IconButton(
+                                        onClick = { viewModel.setMostrarSeleccionMapa(true) },
+                                        modifier = Modifier.size(32.dp).background(Color(0xFFFF9800), CircleShape)
+                                    ) {
+                                        Icon(Icons.Default.Add, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                                    }
                                 }
+                                
                                 Spacer(modifier = Modifier.height(12.dp))
-                                checkpointsDemo.forEachIndexed { index, checkpoint ->
+                                
+                                if (state.checkpoints.isEmpty()) {
                                     Text(
-                                        "${index + 1}. ${checkpoint.name}",
-                                        color = Color.White.copy(alpha = 0.8f),
+                                        "No hay checkpoints agregados.",
+                                        color = Color.Gray,
                                         fontSize = 13.sp
                                     )
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                } else {
+                                    state.checkpoints.forEach { checkpoint ->
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(
+                                                "${checkpoint.order}. ${checkpoint.name}",
+                                                color = Color.White.copy(alpha = 0.8f),
+                                                fontSize = 13.sp,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                            IconButton(
+                                                onClick = { viewModel.removeCheckpoint(checkpoint) },
+                                                modifier = Modifier.size(24.dp)
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.Delete,
+                                                    null,
+                                                    tint = Color(0xFFFF6B6B),
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    "Por ahora usamos puntos demo. Después los seleccionaremos desde el mapa.",
-                                    color = Color.Gray,
-                                    fontSize = 12.sp
-                                )
                             }
                         }
                     }
@@ -192,7 +200,7 @@ fun CrearCarrera(
                                 name = state.nombre,
                                 description = state.descripcion,
                                 isPublic = state.isPublic,
-                                checkpoints = checkpointsDemo
+                                checkpoints = state.checkpoints
                             )
 
                             result.fold(
@@ -209,7 +217,7 @@ fun CrearCarrera(
                             )
                         }
                     },
-                    enabled = state.nombre.isNotBlank() && state.descripcion.isNotBlank() && !state.isLoading,
+                    enabled = state.nombre.isNotBlank() && state.descripcion.isNotBlank() && state.checkpoints.isNotEmpty() && !state.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp)
@@ -234,6 +242,19 @@ fun CrearCarrera(
                         )
                     }
                 }
+            }
+        }
+
+        if (state.mostrarSeleccionMapa) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                SeleccionMapa(
+                    onPuntoSeleccionado = { lat, lng ->
+                        viewModel.onPuntoSeleccionado(lat, lng)
+                    },
+                    onCerrar = {
+                        viewModel.setMostrarSeleccionMapa(false)
+                    }
+                )
             }
         }
     }

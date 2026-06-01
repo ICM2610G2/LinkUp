@@ -1,372 +1,339 @@
 package com.example.myapplication.screens
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.runtime.Composable
-
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Route
 import androidx.compose.material3.*
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.example.myapplication.data.models.Race
+import com.example.myapplication.repository.RaceRepository
+import kotlinx.coroutines.launch
 
 @Composable
-fun Carreras(onCrearCarrera: () -> Unit,
-             onAbrirLobby: (String) -> Unit){
-    LazyColumn(
+fun Carreras(
+    onCrearCarrera: () -> Unit,
+    onAbrirLobby: (String) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    val raceRepository = remember { RaceRepository() }
+
+    var carreras by remember { mutableStateOf<List<Race>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    suspend fun cargarCarreras() {
+        isLoading = true
+        carreras = raceRepository.getPublicRaces()
+        isLoading = false
+    }
+
+    LaunchedEffect(Unit) {
+        cargarCarreras()
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0A0A0A))
-            .padding(horizontal = 16.dp),
-        contentPadding = PaddingValues(bottom = 100.dp)
     ) {
-        item { Spacer(modifier = Modifier.height(16.dp)) }
-        item { CarreraActivaBadge() }
-        item { Spacer(modifier = Modifier.height(8.dp)) }
-        item { HeaderRuta() }
-        item { Spacer(modifier = Modifier.height(20.dp)) }
-        item { ProgresoSection() }
-        item { Spacer(modifier = Modifier.height(24.dp)) }
-        item { PuntosDeControlSection() }
-        item { Spacer(modifier = Modifier.height(24.dp)) }
-        item { ClasificacionSection() }
-        item { Spacer(modifier = Modifier.height(24.dp)) }
-    }
-}
-
-@Composable
-fun CarreraActivaBadge() {
-    Box(
-        modifier = Modifier
-            .background(
-                Color(0xFFFF9800),
-                RoundedCornerShape(50)
-            )
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-    ) {
-        Text(
-            "CARRERA ACTIVA",
-            color = Color.Black,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-fun HeaderRuta() {
-    Column {
-        Text(
-            text = "Ruta Centro Histórico",
-            color = Color.White,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                top = 20.dp,
+                bottom = 100.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.AccessTime,
-                    null,
-                    tint = Color.White.copy(alpha = 0.6f),
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("32 min", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.Place,
-                    null,
-                    tint = Color.White.copy(alpha = 0.6f),
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("5 puntos", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Group,
-                    null,
-                    tint = Color.White.copy(alpha = 0.6f),
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("4 jugadores", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
-
-            }
-        }
-    }
-}
-
-@Composable
-fun ProgresoSection() {
-    Column {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Progreso", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
-            Text("2/5", color = Color(0xFFFF9800), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LinearProgressIndicator(
-            progress = { 0.4f },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(8.dp)
-                .clip(RoundedCornerShape(50)),
-            color = Color(0xFFFF9800),
-            trackColor = Color(0xFF1A1A1A),
-            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-        )
-    }
-}
-
-@Composable
-fun PuntosDeControlSection() {
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.LocationOn,
-                null,
-                tint = Color(0xFFFF9800),
-                modifier = Modifier.size(16.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                "Puntos de control",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-
-        val checkpoints = listOf(
-            Triple("Museo del Oro", "14:23", true),
-            Triple("Iglesia de San Francisco", "14:41", true),
-            Triple("Plaza de Bolívar", "", false),
-            Triple("La Candelaria", "", false),
-            Triple("Torre Colpatria", "", false)
-        )
-
-        checkpoints.forEachIndexed { index, (nombre, hora, completado) ->
-            PuntoItem(
-                titulo = nombre,
-                hora = hora,
-                completado = completado,
-                siguiente = !completado && index == 2,
-                tieneConector = index < checkpoints.size - 1
-            )
-        }
-    }
-}
-
-@Composable
-fun PuntoItem(
-    titulo: String,
-    hora: String,
-    completado: Boolean = false,
-    siguiente: Boolean = false,
-    tieneConector: Boolean = false
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .background(
-                        if (completado) Color(0xFFFF9800) else Color(0xFF252525),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                if (completado) {
-                    Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(18.dp))
-                }
-            }
-
-            if (tieneConector) {
-                Box(
-                    modifier = Modifier
-                        .width(2.dp)
-                        .height(24.dp)
-                        .background(
-                            if (completado) Color(0xFFFF9800) else Color(0x1AFFFFFF)
-                        )
+            item {
+                HeaderCarreras(
+                    onCrearCarrera = onCrearCarrera,
+                    onRefresh = {
+                        scope.launch { cargarCarreras() }
+                    }
                 )
             }
-        }
-        Spacer(modifier = Modifier.width(12.dp))
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = if (tieneConector) 0.dp else 0.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
 
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        titulo,
-                        color = if (completado) Color.White else Color.White.copy(alpha = 0.4f),
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp
-                    )
-
-                    if (hora.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            when {
+                isLoading -> {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text(hora, color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    Icons.Default.CameraAlt,
-                                    null,
-                                    tint = Color(0xFF22C55E),
-                                    modifier = Modifier.size(12.dp)
-                                )
-                                Spacer(modifier = Modifier.width(2.dp))
-                                Text("Foto ✓", color = Color(0xFF22C55E), fontSize = 10.sp)
-                            }
+                            CircularProgressIndicator(color = Color(0xFFFF9800))
                         }
                     }
                 }
 
-                if (siguiente) {
-                    Box(
-                        modifier = Modifier
-                            .background(Color(0xFFFF9800), RoundedCornerShape(50))
-                            .padding(horizontal = 10.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            "Siguiente",
-                            color = Color.White,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold
+                carreras.isEmpty() -> {
+                    item {
+                        EstadoVacioCarreras(onCrearCarrera = onCrearCarrera)
+                    }
+                }
+
+                else -> {
+                    items(carreras, key = { it.id }) { carrera ->
+                        CarreraPublicaCard(
+                            carrera = carrera,
+                            onClick = {
+                                scope.launch {
+                                    val result = raceRepository.findOrJoinLobby(carrera)
+                                    result.onSuccess { sessionId ->
+                                        onAbrirLobby(sessionId)
+                                    }
+                                }
+                            }
                         )
                     }
                 }
             }
         }
     }
-
-    if (tieneConector) {
-        Spacer(modifier = Modifier.height(0.dp))
-    } else {
-        Spacer(modifier = Modifier.height(8.dp))
-    }
 }
 
 @Composable
-fun ClasificacionSection() {
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Star,
-                null,
-                tint = Color(0xFFFF9800),
-                modifier = Modifier.size(16.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                "Clasificación",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        RankingItem(1, "Camila R.", "CR", avatarColor = Color(0xFFFF9800), esYo = false)
-        RankingItem(2, "Andrés M.", "AM", avatarColor = Color(0xFF4B4B4B), esYo = false)
-        RankingItem(3, "TÚ", "TÚ", avatarColor = Color(0xFFFFA500), esYo = true)
-        RankingItem(4, "Laura P.", "LP", avatarColor = Color(0xFF3A3A3A), esYo = false)
-    }
-}
-
-@Composable
-fun RankingItem(
-    posicion: Int,
-    nombre: String,
-    iniciales: String,
-    avatarColor: Color,
-    esYo: Boolean
+fun HeaderCarreras(
+    onCrearCarrera: () -> Unit,
+    onRefresh: () -> Unit
 ) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        border = if (esYo) {
-            BorderStroke(1.dp, Color(0xFFFF9800))
-        } else {
-            BorderStroke(1.dp, Color(0x0DFFFFFF))
-        }
-    ) {
+    Column {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                posicion.toString(),
-                color = Color.White.copy(alpha = 0.6f),
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                modifier = Modifier.width(20.dp)
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .background(avatarColor, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
+            Column {
                 Text(
-                    iniciales,
+                    "Carreras",
                     color = Color.White,
-                    fontSize = 12.sp,
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.Bold
                 )
+                Text(
+                    "Explora rutas públicas o crea una nueva",
+                    color = Color.Gray,
+                    fontSize = 13.sp
+                )
             }
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                nombre,
-                color = Color.White,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                modifier = Modifier.weight(1f)
-            )
-            Text(
-                "3 pts",
-                color = Color.White.copy(alpha = 0.6f),
-                fontSize = 12.sp
-            )
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                IconButton(onClick = onRefresh) {
+                    Icon(
+                        Icons.Default.Refresh,
+                        contentDescription = "Actualizar",
+                        tint = Color.White
+                    )
+                }
+
+                Button(
+                    onClick = onCrearCarrera,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Icon(Icons.Default.Add, null, tint = Color.White, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Crear", color = Color.White)
+                }
+            }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+fun EstadoVacioCarreras(
+    onCrearCarrera: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 40.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+        border = BorderStroke(1.dp, Color(0x1AFFFFFF))
+    ) {
+        Column(
+            modifier = Modifier.padding(28.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(Color(0x26FF9800), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Default.EmojiEvents,
+                    null,
+                    tint = Color(0xFFFF9800),
+                    modifier = Modifier.size(34.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                "No hay carreras públicas todavía",
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                "Crea la primera ruta para que otros jugadores puedan unirse.",
+                color = Color.Gray,
+                fontSize = 13.sp
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(
+                onClick = onCrearCarrera,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Text("Crear carrera")
+            }
+        }
+    }
+}
+
+@Composable
+fun CarreraPublicaCard(
+    carrera: Race,
+    onClick: () -> Unit
+) {
+    val difficultyColor = when (carrera.difficulty) {
+        "facil" -> Color(0xFF22C55E)
+        "media" -> Color(0xFFEAB308)
+        "dificil" -> Color(0xFFEF4444)
+        else -> Color(0xFFFF9800)
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+        border = BorderStroke(1.dp, Color(0x12FFFFFF))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(46.dp)
+                        .background(Color(0x26FF9800), RoundedCornerShape(14.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Route,
+                        null,
+                        tint = Color(0xFFFF9800),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        carrera.name,
+                        color = Color.White,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    if (carrera.description.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            carrera.description,
+                            color = Color.Gray,
+                            fontSize = 12.sp,
+                            maxLines = 2
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                InfoChip(
+                    text = "${"%.1f".format(carrera.estimatedDistanceKm)} km",
+                    icon = Icons.Default.Place
+                )
+
+                InfoChip(
+                    text = "${carrera.checkpointCount} puntos",
+                    icon = Icons.Default.EmojiEvents
+                )
+
+                Box(
+                    modifier = Modifier
+                        .background(difficultyColor, RoundedCornerShape(50))
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                ) {
+                    Text(
+                        carrera.difficulty.uppercase(),
+                        color = Color.White,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun InfoChip(
+    text: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector
+) {
+    Row(
+        modifier = Modifier
+            .background(Color(0xFF252525), RoundedCornerShape(50))
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            icon,
+            null,
+            tint = Color.White.copy(alpha = 0.7f),
+            modifier = Modifier.size(14.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text,
+            color = Color.White.copy(alpha = 0.75f),
+            fontSize = 11.sp
+        )
     }
 }
