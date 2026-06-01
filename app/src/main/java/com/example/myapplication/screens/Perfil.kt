@@ -57,14 +57,12 @@ fun Perfil(
     val email = user?.email ?: "correo@ejemplo.com"
     val userId = user?.uid ?: userData?.uid?.take(8) ?: ""
 
-    // Datos reales de Firestore
     val totalPlaces = userData?.totalPlacesVisited ?: 0
     val currentStreak = userData?.currentStreak ?: 0
     val bestStreak = userData?.bestStreak ?: 0
     val totalPoints = userData?.totalPoints ?: 0
     val gameId = userData?.gameId ?: "linkup#0000"
 
-    // Observar resultado de biometría para borrar cuenta
     LaunchedEffect(Unit) {
         biometricManager.authResult.collect { result ->
             when (result) {
@@ -113,7 +111,6 @@ fun Perfil(
         onDeleteClick = { viewModel.updateShowDeleteDialog(true) }
     )
 
-    // Diálogo de confirmación para borrar cuenta
     if (state.showDeleteDialog) {
         Dialog(
             onDismissRequest = { viewModel.updateShowDeleteDialog(false) },
@@ -172,7 +169,6 @@ fun Perfil(
                         Spacer(modifier = Modifier.height(12.dp))
                     }
 
-                    // Botón: Usar contraseña
                     Button(
                         onClick = {
                             viewModel.updateShowDeleteDialog(false)
@@ -198,7 +194,6 @@ fun Perfil(
         }
     }
 
-    // Diálogo para ingresar contraseña
     if (state.showPasswordDialog) {
         Dialog(
             onDismissRequest = {
@@ -313,7 +308,6 @@ fun PerfilContent(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        // Header con foto y nombre
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -365,7 +359,6 @@ fun PerfilContent(
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
-
                 Text(
                     text = email,
                     fontSize = 14.sp,
@@ -373,7 +366,6 @@ fun PerfilContent(
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -399,8 +391,6 @@ fun PerfilContent(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Tarjetas de estadísticas
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -433,7 +423,6 @@ fun PerfilContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Menú de opciones
         MenuItem(
             icon = Icons.Default.Settings,
             title = "Configuración",
@@ -484,7 +473,6 @@ fun PerfilContent(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Botón de cerrar sesión
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -516,7 +504,6 @@ fun PerfilContent(
             }
         }
 
-        // Botón de borrar cuenta
         Card(
             modifier = Modifier
                 .fillMaxWidth()

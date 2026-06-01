@@ -17,4 +17,6 @@ data class User(
     val shareLocationMode: String = "in_race",
     val fcmToken: String? = null,
     val createdAt: Timestamp = Timestamp.now()
+
+
 )

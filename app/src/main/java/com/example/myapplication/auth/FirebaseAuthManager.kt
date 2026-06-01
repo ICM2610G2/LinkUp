@@ -18,7 +18,8 @@ import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
 import android.util.Log
-
+import com.example.myapplication.R
+import com.example.myapplication.data.models.User
 
 
 class FirebaseAuthManager(private val activity: Activity) {
@@ -29,7 +30,7 @@ class FirebaseAuthManager(private val activity: Activity) {
 
     private val googleSignInClient: GoogleSignInClient by lazy {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(activity.getString(com.example.myapplication.R.string.default_web_client_id))
+            .requestIdToken(activity.getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
         GoogleSignIn.getClient(activity, gso)
@@ -145,7 +146,7 @@ class FirebaseAuthManager(private val activity: Activity) {
             val db = FirebaseFirestore.getInstance()
 
 
-            val userModel = com.example.myapplication.data.models.User(
+            val userModel = User(
                 uid = user.uid,
                 displayName = user.displayName ?: "",
                 email = user.email ?: "",

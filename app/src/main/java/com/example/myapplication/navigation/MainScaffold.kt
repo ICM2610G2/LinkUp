@@ -2,7 +2,6 @@ package com.example.myapplication.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
@@ -14,12 +13,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.*
 import com.example.myapplication.data.models.User
 import com.example.myapplication.repository.UserRepository
-import com.example.myapplication.screens.*
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.myapplication.screens.BuscarAmigos
+import com.example.myapplication.screens.CarreraActivaScreen
+import com.example.myapplication.screens.Carreras
+import com.example.myapplication.screens.Chat
+import com.example.myapplication.screens.homeScreens.CrearCarrera
+import com.example.myapplication.screens.EditProfileScreen
+import com.example.myapplication.screens.homeScreens.Home
+import com.example.myapplication.screens.ListaAmigos
+import com.example.myapplication.screens.LobbyCarreraScreen
+import com.example.myapplication.screens.mapaScreens.Mapa
+import com.example.myapplication.screens.Perfil
+import com.example.myapplication.screens.Solicitudes
 
 
 @Composable
@@ -49,10 +61,10 @@ fun MainScaffold(
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 val items = listOf(
-                    NavItem("home", "Home", Icons.Default.Home),
+                    NavItem("home", "Inicio", Icons.Default.Home),
                     NavItem("mapa", "Mapa", Icons.Default.Map),
                     NavItem("carreras", "Carreras", Icons.Default.EmojiEvents),
-                    NavItem("chat", "Chat", Icons.Default.Chat),
+                    NavItem("chat", "Chat", Icons.AutoMirrored.Filled.Chat),
                     NavItem("perfil", "Perfil", Icons.Default.Person)
                 )
 
@@ -101,7 +113,54 @@ fun MainScaffold(
             }
 
             composable("carreras") {
-                Carreras()
+                Carreras(
+                    onCrearCarrera = {
+                        navController.navigate("crear_carrera")
+                    },
+                    onAbrirLobby = { sessionId ->
+                        navController.navigate("lobby_carrera/$sessionId")
+                    }
+                )
+            }
+
+            composable("lobby_carrera/{sessionId}") { backStackEntry ->
+                val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
+
+                LobbyCarreraScreen(
+                    sessionId = sessionId,
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                    onRaceStarted = { id ->
+                        navController.navigate("carrera_activa/$id") {
+                            popUpTo("lobby_carrera/$id") {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
+
+            composable("carrera_activa/{sessionId}") { backStackEntry ->
+                val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
+
+                CarreraActivaScreen(
+                    sessionId = sessionId,
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable("crear_carrera") {
+                CrearCarrera(
+                    onCerrar = {
+                        navController.popBackStack()
+                    },
+                    onCarreraCreada = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable("chat") {
@@ -172,7 +231,7 @@ fun MainScaffold(
             }
 
             composable("solicitudes") {
-                SolicitudesScreen(onBack = { navController.popBackStack() })
+                Solicitudes(onBack = { navController.popBackStack() })
             }
 
 
@@ -183,5 +242,5 @@ fun MainScaffold(
 data class NavItem(
     val route: String,
     val title: String,
-    val icon: androidx.compose.ui.graphics.vector.ImageVector
+    val icon: ImageVector
 )

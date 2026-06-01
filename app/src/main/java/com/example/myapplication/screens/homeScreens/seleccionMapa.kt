@@ -1,4 +1,4 @@
-package com.example.myapplication.screens
+package com.example.myapplication.screens.homeScreens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -42,7 +42,7 @@ fun SeleccionMapa(
                     controller.setCenter(GeoPoint(4.6097, -74.0817)) // Bogotá center
 
                     val marker = Marker(this)
-                    
+
                     val overlayEvents = MapEventsOverlay(object : MapEventsReceiver {
                         override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
                             p?.let {
@@ -77,7 +77,7 @@ fun SeleccionMapa(
             ) {
                 Icon(Icons.Default.Close, null, tint = Color.White)
             }
-            
+
             Text(
                 "Selecciona un punto",
                 color = Color.White,
@@ -85,7 +85,7 @@ fun SeleccionMapa(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.background(Color(0xCC1A1A1A), RoundedCornerShape(12.dp)).padding(horizontal = 16.dp, vertical = 8.dp)
             )
-            
+
             Spacer(modifier = Modifier.width(48.dp))
         }
 

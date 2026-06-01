@@ -16,54 +16,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.data.models.Friendship
-import com.example.myapplication.data.models.User
-import com.example.myapplication.repository.FriendsRepository
-import com.example.myapplication.repository.UserRepository
-import kotlinx.coroutines.launch
-
-// Par de solicitud + datos del solicitante ya cargados
-data class SolicitudConUsuario(
-    val friendship: Friendship,
-    val solicitante: User
-)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.SolicitudConUsuario
+import com.example.myapplication.model.SolicitudesViewModel
+import kotlin.collections.isNotEmpty
 
 @Composable
-fun SolicitudesScreen(
-    onBack: () -> Unit
+fun Solicitudes(
+    onBack: () -> Unit,
+    viewModel: SolicitudesViewModel = viewModel()
 ) {
-    val scope = rememberCoroutineScope()
-    val friendsRepository = remember { FriendsRepository() }
-    val userRepository = remember { UserRepository() }
-
-    // Lista ya enriquecida con los datos del solicitante
-    var solicitudes by remember { mutableStateOf<List<SolicitudConUsuario>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-
-    suspend fun loadRequests() {
-        isLoading = true
-        val pending = friendsRepository.getPendingRequests()
-
-        // Cargamos los usuarios de todos los solicitantes de una vez,
-        // fuera del LazyColumn — sin parpadeos
-        val enriched = pending.mapNotNull { friendship ->
-            val user = userRepository.getUser(friendship.userA)
-            if (user != null) SolicitudConUsuario(friendship, user) else null
-        }
-        solicitudes = enriched
-        isLoading = false
-    }
-
-    LaunchedEffect(Unit) {
-        loadRequests()
-    }
+    val state by viewModel.state.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0A0A0A))
     ) {
-        // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -82,7 +51,7 @@ fun SolicitudesScreen(
                 modifier = Modifier.weight(1f)
             )
             // Badge con cantidad
-            if (solicitudes.isNotEmpty()) {
+            if (state.solicitudes.isNotEmpty()) {
                 Box(
                     modifier = Modifier
                         .size(28.dp)
@@ -90,7 +59,7 @@ fun SolicitudesScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        solicitudes.size.toString(),
+                        state.solicitudes.size.toString(),
                         color = Color.White,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
@@ -100,13 +69,13 @@ fun SolicitudesScreen(
         }
 
         when {
-            isLoading -> {
+            state.isLoading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Color(0xFFFF9800))
                 }
             }
 
-            solicitudes.isEmpty() -> {
+            state.solicitudes.isEmpty() -> {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -136,27 +105,13 @@ fun SolicitudesScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(
-                        items = solicitudes,
+                        items = state.solicitudes,
                         key = { it.friendship.id }
                     ) { item ->
                         SolicitudCard(
                             item = item,
-                            onAccept = {
-                                scope.launch {
-                                    friendsRepository.acceptRequest(item.friendship.id).fold(
-                                        onSuccess = { loadRequests() },
-                                        onFailure = { /* podrías mostrar snackbar */ }
-                                    )
-                                }
-                            },
-                            onReject = {
-                                scope.launch {
-                                    friendsRepository.rejectRequest(item.friendship.id).fold(
-                                        onSuccess = { loadRequests() },
-                                        onFailure = { }
-                                    )
-                                }
-                            }
+                            onAccept = { viewModel.acceptRequest(item.friendship.id) },
+                            onReject = { viewModel.rejectRequest(item.friendship.id) }
                         )
                     }
                 }

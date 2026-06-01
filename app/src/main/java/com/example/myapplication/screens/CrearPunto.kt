@@ -1,6 +1,9 @@
 package com.example.myapplication.screens
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,16 +20,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.model.CrearPuntoViewModel
 
 @Composable
 fun CrearPunto(
     onCerrar: () -> Unit,
-    onPublicar: () -> Unit,
-    viewModel: CrearPuntoViewModel = viewModel()
+    onPublicar: () -> Unit
 ) {
-    val state by viewModel.crearPuntoState.collectAsState()
+    var nombre by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var categoria by remember { mutableStateOf("cultural") }
+    var dificultad by remember { mutableStateOf("facil") }
+    var obteniendo by remember { mutableStateOf(false) }
+    var ubicacion by remember { mutableStateOf<Pair<Double, Double>?>(null) }
 
     Box(
         modifier = Modifier
@@ -41,7 +46,7 @@ fun CrearPunto(
                 .fillMaxHeight(0.9f)
                 .align(Alignment.BottomCenter)
                 .padding(horizontal = 0.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
+            border = BorderStroke(1.dp, Color(0x1AFFFFFF))
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
 
@@ -59,23 +64,23 @@ fun CrearPunto(
                 ) {
                     item {
                         SeccionNombrePunto(
-                            nombre = state.nombre,
-                            onNombreChange = { viewModel.updateNombre(it)}
+                            nombre = nombre,
+                            onNombreChange = { nombre = it }
                         )
                     }
 
                     item {
                         SeccionDescripcion(
-                            descripcion = state.descripcion,
-                            onDescripcionChange = { viewModel.updateDescripcion(it) }
+                            descripcion = descripcion,
+                            onDescripcionChange = { descripcion = it }
                         )
                     }
 
                     item {
                         SeccionCategoria(
-                            categoria = state.categoria,
+                            categoria = categoria,
                             onCategoriaChange = {
-                                viewModel.updateCategoria(it)
+                                categoria = it
                                 Log.i("MyApp", "Categoria seleccionada: $it")
                             }
                         )
@@ -83,9 +88,9 @@ fun CrearPunto(
 
                     item {
                         SeccionDificultad(
-                            dificultad = state.dificultad,
+                            dificultad = dificultad,
                             onDificultadChange = {
-                                viewModel.updateDificultad(it)
+                                dificultad = it
                                 Log.i("MyApp", "Dificultad seleccionada: $it")
                             }
                         )
@@ -93,14 +98,14 @@ fun CrearPunto(
 
                     item {
                         SeccionUbicacion(
-                            ubicacion = state.ubicacion,
-                            obteniendo = state.obteniendo,
+                            ubicacion = ubicacion,
+                            obteniendo = obteniendo,
                             onObtenerUbicacion = {
-                                viewModel.updateObteniendo(true)
+                                obteniendo = true
                                 Log.i("MyApp", "Obtener ubicación clicked")
-                                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                                    viewModel.updateUbicacion(Pair(4.5981, -74.0758))
-                                    viewModel.updateObteniendo(false)
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    ubicacion = Pair(4.5981, -74.0758)
+                                    obteniendo = false
                                     Log.i("MyApp", "Ubicación obtenida")
                                 }, 1000)
                             }
@@ -111,9 +116,9 @@ fun CrearPunto(
                 }
 
                 FooterCrearPunto(
-                    habilitado = state.nombre.isNotBlank() && state.descripcion.isNotBlank() && state.ubicacion != null,
+                    habilitado = nombre.isNotBlank() && descripcion.isNotBlank() && ubicacion != null,
                     onPublicar = {
-                        Log.i("MyApp", "Publicar punto clicked: ${state.nombre}")
+                        Log.i("MyApp", "Publicar punto clicked: $nombre")
                         onPublicar()
                         onCerrar()
                     }
@@ -138,6 +143,7 @@ fun HeaderCrearPunto(onCerrar: () -> Unit) {
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold
         )
+
         Box(
             modifier = Modifier
                 .size(36.dp)
@@ -148,6 +154,7 @@ fun HeaderCrearPunto(onCerrar: () -> Unit) {
             Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(18.dp))
         }
     }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -257,7 +264,7 @@ fun SeccionCategoria(categoria: String, onCategoriaChange: (String) -> Unit) {
                     modifier = Modifier
                         .weight(1f)
                         .clickable { onCategoriaChange(id) },
-                    border = androidx.compose.foundation.BorderStroke(
+                    border = BorderStroke(
                         1.dp,
                         if (seleccionada) Color(0xFFFF9800) else Color(0x1AFFFFFF)
                     )
@@ -311,7 +318,7 @@ fun SeccionDificultad(dificultad: String, onDificultadChange: (String) -> Unit) 
                     modifier = Modifier
                         .weight(1f)
                         .clickable { onDificultadChange(id) },
-                    border = androidx.compose.foundation.BorderStroke(
+                    border = BorderStroke(
                         1.dp,
                         if (seleccionada) color else Color(0x1AFFFFFF)
                     )
@@ -357,7 +364,7 @@ fun SeccionUbicacion(
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF252525)),
                 shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
+                border = BorderStroke(1.dp, Color(0x1AFFFFFF))
             ) {
                 if (obteniendo) {
                     CircularProgressIndicator(
@@ -378,7 +385,7 @@ fun SeccionUbicacion(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF252525)),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth(),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x4D22C55E))
+                border = BorderStroke(1.dp, Color(0x4D22C55E))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(
@@ -411,7 +418,7 @@ fun ConsejoPunto() {
         colors = CardDefaults.cardColors(containerColor = Color(0xFF252525)),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth(),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x1AFFFFFF))
+        border = BorderStroke(1.dp, Color(0x1AFFFFFF))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(

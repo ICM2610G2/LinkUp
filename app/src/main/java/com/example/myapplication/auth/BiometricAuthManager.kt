@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
+import java.util.concurrent.Executor
 
 class BiometricAuthManager(private val activity: FragmentActivity) {
 
@@ -14,7 +15,7 @@ class BiometricAuthManager(private val activity: FragmentActivity) {
     private val _authResult = Channel<BiometricAuthResult>()
     val authResult = _authResult.receiveAsFlow()
 
-    private lateinit var executor: java.util.concurrent.Executor
+    private lateinit var executor: Executor
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 

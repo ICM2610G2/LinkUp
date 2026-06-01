@@ -163,20 +163,20 @@ fun Login(
                                 Log.e("AUTH", "Error: ${e.message}", e)
                                 viewModel.updateErrorMessage(
                                     when {
-                                    e.message?.contains("already in use", ignoreCase = true) == true ->
-                                        "Email ya registrado"
-                                    e.message?.contains("invalid-credential", ignoreCase = true) == true ->
-                                        "Email o contraseña incorrectos"
-                                    e.message?.contains("wrong-password", ignoreCase = true) == true ->
-                                        "Contraseña incorrecta"
-                                    e.message?.contains("user-not-found", ignoreCase = true) == true ->
-                                        "Usuario no encontrado"
-                                    e.message?.contains("password", ignoreCase = true) == true ->
-                                        "La contraseña debe tener al menos 6 caracteres"
-                                    e.message?.contains("network", ignoreCase = true) == true ->
-                                        "Error de red. Verifica tu conexión"
-                                    else -> "Error: ${e.message}"
-                                })
+                                        e.message?.contains("already in use", ignoreCase = true) == true ->
+                                            "Email ya registrado"
+                                        e.message?.contains("invalid-credential", ignoreCase = true) == true ->
+                                            "Email o contraseña incorrectos"
+                                        e.message?.contains("wrong-password", ignoreCase = true) == true ->
+                                            "Contraseña incorrecta"
+                                        e.message?.contains("user-not-found", ignoreCase = true) == true ->
+                                            "Usuario no encontrado"
+                                        e.message?.contains("password", ignoreCase = true) == true ->
+                                            "La contraseña debe tener al menos 6 caracteres"
+                                        e.message?.contains("network", ignoreCase = true) == true ->
+                                            "Error de red. Verifica tu conexión"
+                                        else -> "Error: ${e.message}"
+                                    })
                                 viewModel.updateIsLoading(false)
                             }
                         )

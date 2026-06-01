@@ -34,19 +34,19 @@ import androidx.camera.core.Preview as CameraPreview
 import androidx.camera.core.ImageCapture
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.ValidarFotoViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ValidarFoto(
     nombreLugar: String,
     onCerrar: () -> Unit,
-    onConfirmar: () -> Unit
+    onConfirmar: () -> Unit,
+    viewModel: ValidarFotoViewModel = viewModel()
 ) {
-    var fotoTomada by remember { mutableStateOf(false) }
-    var validando by remember { mutableStateOf(false) }
-    var resultadoValidacion by remember { mutableStateOf<ResultadoValidacion?>(null) }
+    val state by viewModel.state.collectAsState()
     var imageCapture by remember { mutableStateOf<ImageCapture?>(null) }
-
     val context = LocalContext.current
 
     Box(
@@ -54,7 +54,7 @@ fun ValidarFoto(
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        if (!fotoTomada) {
+        if (!state.fotoTomada) {
             VistaCamera(
                 onImageCaptureReady = { imageCapture = it }
             )
@@ -83,36 +83,26 @@ fun ValidarFoto(
             }
         )
 
-        if (resultadoValidacion != null) {
+        if (state.resultadoValidacion != null) {
             IndicadoresValidacion(
-                resultado = resultadoValidacion!!,
+                resultado = state.resultadoValidacion!!,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .padding(top = 100.dp, start = 16.dp, end = 16.dp)
             )
         }
 
-        if (validando) {
+        if (state.validando) {
             OverlayValidando()
         }
 
         ControlesInferiores(
-            fotoTomada = fotoTomada,
-            validando = validando,
-            resultadoValidacion = resultadoValidacion,
+            fotoTomada = state.fotoTomada,
+            validando = state.validando,
+            resultadoValidacion = state.resultadoValidacion,
             onTomarFoto = {
                 Log.i("MyApp", "Tomar foto clicked: $nombreLugar")
-                fotoTomada = true
-                validando = true
-                resultadoValidacion = null
-                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                    validando = false
-                    resultadoValidacion = ResultadoValidacion(
-                        ubicacion = true,
-                        movimiento = true,
-                        orientacion = true
-                    )
-                }, 2000)
+                viewModel.tomarFoto(nombreLugar)
             },
             onConfirmar = {
                 Log.i("MyApp", "Confirmar llegada clicked: $nombreLugar")
@@ -121,8 +111,7 @@ fun ValidarFoto(
             },
             onReintentar = {
                 Log.i("MyApp", "Reintentar foto clicked")
-                fotoTomada = false
-                resultadoValidacion = null
+                viewModel.reintentar()
             },
             modifier = Modifier
                 .align(Alignment.BottomCenter)

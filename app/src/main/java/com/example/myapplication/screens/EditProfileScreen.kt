@@ -1,5 +1,8 @@
 package com.example.myapplication.screens
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,32 +33,31 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 import kotlinx.coroutines.tasks.await
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.model.EditProfileViewModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.google.firebase.auth.UserProfileChangeRequest
 
 @Composable
 fun EditProfileScreen(
     userData: User,
     onSave: (User) -> Unit,
-    onCancel: () -> Unit,
-    viewModel: EditProfileViewModel = viewModel()
+    onCancel: () -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val userRepository = remember { UserRepository() }
     val auth = FirebaseAuth.getInstance()
 
-    val state by viewModel.editProfileState.collectAsState()
+    var displayName by remember { mutableStateOf(userData.displayName) }
+    var photoURL by remember { mutableStateOf(userData.photoURL) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    LaunchedEffect(userData) {
-        viewModel.initWithUser(userData.displayName, userData.photoURL)
-    }
-
+    // Launcher para seleccionar imagen de galería
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        viewModel.updateSelectedImageUri(uri)
+        selectedImageUri = uri
     }
 
     // Función para subir imagen a Firebase Storage
@@ -73,52 +75,64 @@ fun EditProfileScreen(
 
     EditProfileContent(
         userData = userData,
-        displayName = state.displayName,
-        onDisplayNameChange = { viewModel.updateDisplayName(it) },
-        photoURL = state.photoURL,
-        selectedImageUri = state.selectedImageUri,
-        isLoading = state.isLoading,
-        errorMessage = state.errorMessage,
+        displayName = displayName,
+        onDisplayNameChange = { displayName = it },
+        photoURL = photoURL,
+        selectedImageUri = selectedImageUri,
+        isLoading = isLoading,
+        errorMessage = errorMessage,
         onSaveClick = {
             scope.launch {
-                viewModel.updateIsLoading(true)
-                var newPhotoURL = state.photoURL
-                if (state.selectedImageUri != null) {
-                    val uploadedUrl = uploadImage(state.selectedImageUri!!)
+                isLoading = true
+
+                // Subir nueva foto si hay
+                var newPhotoURL = photoURL
+                if (selectedImageUri != null) {
+                    val uploadedUrl = uploadImage(selectedImageUri!!)
                     if (uploadedUrl != null) {
                         newPhotoURL = uploadedUrl
                     }
                 }
 
-                val result = userRepository.updateDisplayName(userData.uid, state.displayName)
+                // Actualizar en Firestore
+                val updatedUser = userData.copy(
+                    displayName = displayName.trim(),
+                    photoURL = selectedImageUri?.toString() ?: newPhotoURL
+                )
+
+                onSave(updatedUser)
+
+                val saveResult = userRepository.updateUser(updatedUser)
+
+                if (saveResult.isSuccess) {
+                    onSave(updatedUser)
+                } else {
+                    errorMessage = "No se pudo guardar el perfil"
+                }
+                val result = userRepository.updateUser(updatedUser)
+
                 if (result.isSuccess) {
-                    if (newPhotoURL != state.photoURL) {
-                        userRepository.updatePhotoURL(userData.uid, newPhotoURL)
-                    }
                     // Actualizar displayName en Firebase Auth
                     auth.currentUser?.updateProfile(
-                        com.google.firebase.auth.UserProfileChangeRequest.Builder()
-                            .setDisplayName(state.displayName)
+                        UserProfileChangeRequest.Builder()
+                            .setDisplayName(displayName)
                             .setPhotoUri(if (newPhotoURL.isNotEmpty()) Uri.parse(newPhotoURL) else null)
                             .build()
                     )?.await()
 
-                    val updatedUser = userData.copy(
-                        displayName = state.displayName,
-                        photoURL = newPhotoURL
-                    )
+
                     onSave(updatedUser)
                 } else {
-                    viewModel.updateErrorMessage("Error al guardar")
+                    errorMessage = "Error al guardar"
                 }
-                viewModel.updateIsLoading(false)
+                isLoading = false
             }
         },
         onCancelClick = onCancel,
         onImageClick = { galleryLauncher.launch("image/*") },
         onCopyGameId = {
-            val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-            val clip = android.content.ClipData.newPlainText("Game ID", userData.gameId)
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Game ID", userData.gameId)
             clipboard.setPrimaryClip(clip)
         }
     )

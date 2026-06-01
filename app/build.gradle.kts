@@ -39,6 +39,7 @@ android {
 }
 
 dependencies {
+    // Navegación
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.compose.ui:ui-tooling:1.6.0")
     // Material 3
@@ -80,6 +81,11 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.firebase:firebase-database-ktx")
 
+    // Carga de imágenes
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // AppCompat
+    implementation("androidx.appcompat:appcompat:1.7.0")
 
     // Librerías base de Compose (usando version catalog)
     implementation(libs.androidx.core.ktx)
@@ -97,7 +103,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.play.services.places)
-    implementation(libs.firebase.database.ktx)
 
     // Pruebas
     testImplementation(libs.junit)

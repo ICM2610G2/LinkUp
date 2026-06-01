@@ -17,7 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.models.User
+import com.example.myapplication.model.ListaAmigosViewModel
 import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.repository.UserRepository
 import kotlinx.coroutines.launch
@@ -26,34 +28,10 @@ import kotlinx.coroutines.launch
 fun ListaAmigos(
     onCerrar: () -> Unit,
     onBuscarAmigos: () -> Unit = {},
-    onVerSolicitudes: () -> Unit = {}
+    onVerSolicitudes: () -> Unit = {},
+    viewModel: ListaAmigosViewModel = viewModel()
 ) {
-    val scope = rememberCoroutineScope()
-    val friendsRepository = remember { FriendsRepository() }
-    val userRepository = remember { UserRepository() }
-
-    var amigos by remember { mutableStateOf<List<User>>(emptyList()) }
-    var solicitudes by remember { mutableStateOf<List<SolicitudConUsuario>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-    var tabActiva by remember { mutableStateOf("todos") }
-
-    suspend fun loadAll() {
-        isLoading = true
-
-        amigos = friendsRepository.getAcceptedFriends()
-
-        val pending = friendsRepository.getPendingRequests()
-        solicitudes = pending.mapNotNull { friendship ->
-            val user = userRepository.getUser(friendship.userA)
-            if (user != null) SolicitudConUsuario(friendship, user) else null
-        }
-
-        isLoading = false
-    }
-
-    LaunchedEffect(Unit) {
-        loadAll()
-    }
+    val state by viewModel.state.collectAsState()
 
     Box(
         modifier = Modifier
@@ -94,7 +72,7 @@ fun ListaAmigos(
                             IconButton(onClick = onVerSolicitudes) {
                                 Icon(Icons.Default.PersonAdd, null, tint = Color.White, modifier = Modifier.size(20.dp))
                             }
-                            if (solicitudes.isNotEmpty()) {
+                            if (state.solicitudes.isNotEmpty()) {
                                 Box(
                                     modifier = Modifier
                                         .size(16.dp)
@@ -103,7 +81,7 @@ fun ListaAmigos(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        solicitudes.size.toString(),
+                                        state.solicitudes.size.toString(),
                                         color = Color.White,
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.Bold
@@ -117,7 +95,6 @@ fun ListaAmigos(
                     }
                 }
 
-                // Tabs
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -125,20 +102,20 @@ fun ListaAmigos(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     TabAmigos(
-                        label = "Amigos (${amigos.size})",
-                        activa = tabActiva == "todos",
+                        label = "Amigos (${state.amigos.size})",
+                        activa = state.tabActiva == "todos",
                         color = Color(0xFF2A9D8F),
                         textColor = Color.White,
                         modifier = Modifier.weight(1f),
-                        onClick = { tabActiva = "todos" }
+                        onClick = { viewModel.updateTabActiva("todos") }
                     )
                     TabAmigos(
-                        label = "Solicitudes (${solicitudes.size})",
-                        activa = tabActiva == "solicitudes",
+                        label = "Solicitudes (${state.solicitudes.size})",
+                        activa = state.tabActiva == "solicitudes",
                         color = Color(0xFFE9C46A),
                         textColor = Color.Black,
                         modifier = Modifier.weight(1f),
-                        onClick = { tabActiva = "solicitudes" }
+                        onClick = { viewModel.updateTabActiva("solicitudes") }
                     )
                 }
 
@@ -149,14 +126,14 @@ fun ListaAmigos(
                         .background(Color(0x1AFFFFFF))
                 )
 
-                if (isLoading) {
+                if (state.isLoading) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(color = Color(0xFFFF9800))
                     }
                 } else {
-                    when (tabActiva) {
+                    when (state.tabActiva) {
                         "todos" -> {
-                            if (amigos.isEmpty()) {
+                            if (state.amigos.isEmpty()) {
                                 Column(
                                     modifier = Modifier.fillMaxSize(),
                                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -192,21 +169,11 @@ fun ListaAmigos(
                                     contentPadding = PaddingValues(16.dp),
                                     verticalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
-                                    items(amigos, key = { it.uid }) { amigo ->
+                                    items(state.amigos, key = { it.uid }) { amigo ->
                                         AmigoItem(
                                             amigo = amigo,
-                                            onRemove = {
-                                                scope.launch {
-                                                    friendsRepository.removeFriend(amigo.uid)
-                                                    amigos = friendsRepository.getAcceptedFriends()
-                                                }
-                                            },
-                                            onBlock = {
-                                                scope.launch {
-                                                    friendsRepository.blockUser(amigo.uid)
-                                                    amigos = friendsRepository.getAcceptedFriends()
-                                                }
-                                            }
+                                            onRemove = { viewModel.removeAmigo(amigo.uid) },
+                                            onBlock = { viewModel.blockAmigo(amigo.uid) }
                                         )
                                     }
                                 }
@@ -214,7 +181,7 @@ fun ListaAmigos(
                         }
 
                         "solicitudes" -> {
-                            if (solicitudes.isEmpty()) {
+                            if (state.solicitudes.isEmpty()) {
                                 Column(
                                     modifier = Modifier.fillMaxSize(),
                                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -235,21 +202,11 @@ fun ListaAmigos(
                                     contentPadding = PaddingValues(16.dp),
                                     verticalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
-                                    items(solicitudes, key = { it.friendship.id }) { item ->
+                                    items(state.solicitudes, key = { it.friendship.id }) { item ->
                                         SolicitudCard(
                                             item = item,
-                                            onAccept = {
-                                                scope.launch {
-                                                    friendsRepository.acceptRequest(item.friendship.id)
-                                                    loadAll()
-                                                }
-                                            },
-                                            onReject = {
-                                                scope.launch {
-                                                    friendsRepository.rejectRequest(item.friendship.id)
-                                                    loadAll()
-                                                }
-                                            }
+                                            onAccept = { viewModel.acceptRequest(item.friendship.id) },
+                                            onReject = { viewModel.rejectRequest(item.friendship.id) }
                                         )
                                     }
                                 }
@@ -280,7 +237,6 @@ fun AmigoItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Avatar
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -294,7 +250,6 @@ fun AmigoItem(
                     fontSize = 16.sp
                 )
             }
-
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     amigo.displayName,
@@ -309,8 +264,6 @@ fun AmigoItem(
                     fontSize = 11.sp
                 )
             }
-
-            // Menú de opciones
             Box {
                 Box(
                     modifier = Modifier
@@ -326,7 +279,6 @@ fun AmigoItem(
                         modifier = Modifier.size(16.dp)
                     )
                 }
-
                 DropdownMenu(
                     expanded = mostrarMenu,
                     onDismissRequest = { mostrarMenu = false },

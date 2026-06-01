@@ -53,21 +53,9 @@ fun LinkUpApp() {
     val activity = context as AppCompatActivity
     val scope = rememberCoroutineScope()
     val userRepository = remember { UserRepository() }
-    val authManager = remember {
-        _root_ide_package_.com.example.myapplication.auth.FirebaseAuthManager(
-            activity
-        )
-    }
-    val biometricManager = remember {
-        _root_ide_package_.com.example.myapplication.auth.BiometricAuthManager(
-            activity
-        )
-    }
-    val encryptedPrefs = remember {
-        _root_ide_package_.com.example.myapplication.auth.EncryptedPreferences(
-            context
-        )
-    }
+    val authManager = remember { FirebaseAuthManager(activity) }
+    val biometricManager = remember { BiometricAuthManager(activity) }
+    val encryptedPrefs = remember { EncryptedPreferences(context) }
 
     val authState by authManager.authState.collectAsState()
 

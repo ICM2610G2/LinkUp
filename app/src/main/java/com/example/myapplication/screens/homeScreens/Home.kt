@@ -1,9 +1,7 @@
-package com.example.myapplication.screens
-
+package com.example.myapplication.screens.homeScreens
 
 import android.util.Log
 import com.example.myapplication.R
-
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -16,9 +14,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
@@ -30,12 +25,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.model.HomeViewModel
+import com.example.myapplication.screens.CrearPunto
+import com.example.myapplication.screens.GaleriaLugar
+import com.example.myapplication.screens.InvitarNFC
+import com.example.myapplication.screens.ListaAmigos
+import com.example.myapplication.screens.MenuFlotante
 
 @Composable
-fun Home (viewModel: HomeViewModel = viewModel()) {
+fun Home(
+    viewModel: HomeViewModel = viewModel()
+) {
     val state by viewModel.homeState.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize()){
+    Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -48,7 +50,8 @@ fun Home (viewModel: HomeViewModel = viewModel()) {
             item {
                 RutasHeader({
                     Log.i("MyApp", "Crear ruta")
-                    viewModel.updateMostrarCrearCarrera(true)})
+                    viewModel.updateMostrarCrearCarrera(true)
+                })
             }
             item {
                 RutaItem(
@@ -60,7 +63,8 @@ fun Home (viewModel: HomeViewModel = viewModel()) {
                     imageRes = R.drawable.la_candelaria,
                     onClick = {
                         Log.i("MyApp", "La Candelaria")
-                        viewModel.updateLugarSeleccionado("La Candelaria")  }
+                        viewModel.updateLugarSeleccionado("La Candelaria")
+                    }
                 )
             }
             item {
@@ -73,7 +77,8 @@ fun Home (viewModel: HomeViewModel = viewModel()) {
                     imageRes = R.drawable.monserrate,
                     onClick = {
                         Log.i("MyApp", "Monserrate")
-                        viewModel.updateLugarSeleccionado("Monserrate")}
+                        viewModel.updateLugarSeleccionado("Monserrate")
+                    }
                 )
             }
             item {
@@ -83,8 +88,9 @@ fun Home (viewModel: HomeViewModel = viewModel()) {
                     viewModel.updateMostrarNFC(true)
                 })
             }
-            item{Spacer(modifier = Modifier.height(24.dp))}
+            item { Spacer(modifier = Modifier.height(24.dp)) }
         }
+
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -108,11 +114,12 @@ fun Home (viewModel: HomeViewModel = viewModel()) {
                 onVerAmigos = { viewModel.updateMostrarAmigos(true) }
             )
         }
+
         if (state.mostrarCrearCarrera) {
             CrearCarrera(
                 onCerrar = { viewModel.updateMostrarCrearCarrera(false) },
-                onIniciar = {
-                    Log.i("MyApp", "Carrera iniciada desde Home")
+                onCarreraCreada = {
+                    Log.i("MyApp", "Carrera creada desde Home")
                     viewModel.updateMostrarCrearCarrera(false)
                 }
             )
@@ -210,7 +217,7 @@ fun HeaderSection() {
 }
 
 @Composable
-fun StatBadge(valor: String, label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier = Modifier) {
+fun StatBadge(valor: String, label: String, icon: ImageVector, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .background(
@@ -228,26 +235,6 @@ fun StatBadge(valor: String, label: String, icon: androidx.compose.ui.graphics.v
     }
 }
 
-//@Composable
-//fun StatCard(valor: String, label: String, icon: ImageVector) {
-//    Card(
-//        colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1C)),
-//        shape = RoundedCornerShape(16.dp),
-//        modifier = Modifier
-//            .width(110.dp)
-//            .height(90.dp)
-//    ) {
-//        Column(
-//            modifier = Modifier.padding(12.dp),
-//            verticalArrangement = Arrangement.SpaceBetween
-//        ) {
-//            Icon(icon, contentDescription = null, tint = Color(0xFFFF9800))
-//            Text(valor, color = Color.White, fontWeight = FontWeight.Bold)
-//            Text(label, color = Color.Gray, fontSize = 12.sp)
-//        }
-//    }
-//}
-
 @Composable
 fun CarreraEnCursoCard() {
     Card(
@@ -256,11 +243,10 @@ fun CarreraEnCursoCard() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .clickable { Log.i("MyApp", "Carrera en curso clicked")}
+            .clickable { Log.i("MyApp", "Carrera en curso clicked") }
     ) {
         Row(
-            modifier = Modifier
-                .padding(20.dp),
+            modifier = Modifier.padding(20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -276,20 +262,20 @@ fun CarreraEnCursoCard() {
                 ) {
                     Icon(Icons.Default.AccessTime, null, tint = Color.White)
                 }
-            Column {
-                Text(
-                    "Carrera en curso",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-                Text(
-                    "La Candelaria · 3 de 5 puntos",
-                    color = Color.White.copy(alpha = 0.9f),
-                    fontSize = 12.sp
-                )
-            }
+                Column {
+                    Text(
+                        "Carrera en curso",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        "La Candelaria · 3 de 5 puntos",
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontSize = 12.sp
+                    )
                 }
+            }
             Icon(Icons.Default.ChevronRight, null, tint = Color.White)
         }
     }
@@ -357,7 +343,6 @@ fun RutaItem(
             Column(modifier = Modifier.weight(1f)) {
                 Text(titulo, color = Color.White, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
-
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
@@ -384,9 +369,7 @@ fun RutaItem(
                         )
                     }
                 }
-
                 Spacer(modifier = Modifier.height(6.dp))
-
                 Box(
                     modifier = Modifier
                         .background(dificultadColor, RoundedCornerShape(50))
@@ -431,9 +414,7 @@ fun InvitarCard(onNFC: () -> Unit) {
             Button(
                 onClick = onNFC,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFF9800)
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Icon(Icons.Default.Nfc, null, tint = Color.White)
