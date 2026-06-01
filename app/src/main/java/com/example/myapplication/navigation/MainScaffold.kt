@@ -35,6 +35,9 @@ import com.example.myapplication.screens.mapaScreens.Mapa
 import com.example.myapplication.screens.perfilScreens.Perfil
 import com.example.myapplication.screens.Solicitudes
 import com.example.myapplication.screens.carreraScreens.CarreraScreen
+import com.example.myapplication.screens.grupoScreens.ListaChatsScreen
+import com.example.myapplication.screens.grupoScreens.ChatDetailScreen
+
 
 
 @Composable
@@ -67,7 +70,8 @@ fun MainScaffold(
                     NavItem("home", "Inicio", Icons.Default.Home),
                     NavItem("mapa", "Mapa", Icons.Default.Map),
                     NavItem("carreras", "Carreras", Icons.Default.EmojiEvents),
-                    NavItem("chat", "Chat", Icons.AutoMirrored.Filled.Chat),
+                    NavItem("lista_chats", "Chat", Icons.AutoMirrored.Filled.Chat),
+
                     NavItem("perfil", "Perfil", Icons.Default.Person)
                 )
 
@@ -183,9 +187,29 @@ fun MainScaffold(
                 )
             }
 
-            composable("chat") {
-                Chat()
+            composable("lista_chats") {
+                ListaChatsScreen(
+                    onChatClick = { chatId, chatName, isGroup, isReadOnly ->
+                        navController.navigate("chat_detail/$chatId/$chatName/$isGroup/$isReadOnly")
+                    }
+                )
             }
+
+            composable("chat_detail/{chatId}/{chatName}/{isGroup}/{isReadOnly}") { backStackEntry ->
+                val chatId = backStackEntry.arguments?.getString("chatId") ?: ""
+                val chatName = backStackEntry.arguments?.getString("chatName") ?: ""
+                val isGroup = backStackEntry.arguments?.getString("isGroup")?.toBoolean() ?: false
+                val isReadOnly = backStackEntry.arguments?.getString("isReadOnly")?.toBoolean() ?: false
+
+                ChatDetailScreen(
+                    chatId = chatId,
+                    chatName = chatName,
+                    isGroup = isGroup,
+                    isReadOnly = isReadOnly,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
 
             composable("perfil") {
                 Perfil(

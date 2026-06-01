@@ -7,7 +7,9 @@ data class ChatMessage(
     val sender: String,
     val initial: String,
     val text: String? = null,
-    val imageUri: Uri? = null,   // ✅ NEW (for gallery images)
+    val imageUri: Uri? = null,
+    val senderId: String = "",
+    val photoURL: String = "",
     val time: String,
     val isMe: Boolean,
     val isImageVerified: Boolean = false

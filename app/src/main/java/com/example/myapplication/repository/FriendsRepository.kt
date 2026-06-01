@@ -1,6 +1,7 @@
 package com.example.myapplication.repository
 
 import android.util.Log
+import com.example.myapplication.data.models.Chat
 import com.example.myapplication.data.models.Friendship
 import com.example.myapplication.data.models.User
 import com.google.firebase.auth.FirebaseAuth
@@ -16,8 +17,14 @@ class FriendsRepository(
     private val currentUserId: String?
         get() = auth.currentUser?.uid
 
-    // Obtener lista de amigos aceptados
-    // Usa dos queries separadas (userA y userB) para evitar índice compuesto en Firestore
+    // ============================================================
+    // OBTENER AMIGOS
+    // ============================================================
+
+    /**
+     * Obtener lista de amigos aceptados
+     * Usa dos queries separadas (userA y userB) para evitar índice compuesto en Firestore
+     */
     suspend fun getAcceptedFriends(): List<User> {
         val userId = currentUserId ?: return emptyList()
 
@@ -59,7 +66,13 @@ class FriendsRepository(
         }
     }
 
-    // Obtener solicitudes pendientes recibidas
+    // ============================================================
+    // SOLICITUDES
+    // ============================================================
+
+    /**
+     * Obtener solicitudes pendientes recibidas
+     */
     suspend fun getPendingRequests(): List<Friendship> {
         val userId = currentUserId ?: return emptyList()
 
@@ -79,7 +92,9 @@ class FriendsRepository(
         }
     }
 
-    // Enviar solicitud de amistad
+    /**
+     * Enviar solicitud de amistad
+     */
     suspend fun sendFriendRequest(toUserId: String): Result<Unit> {
         val fromUserId = currentUserId
             ?: return Result.failure(Exception("Usuario no autenticado"))
@@ -94,10 +109,8 @@ class FriendsRepository(
             if (existing.exists()) {
                 return when (existing.getString("status")) {
                     "pending" -> {
-                        // Puede que el otro me haya enviado solicitud primero — aceptar directamente
                         val userA = existing.getString("userA")
                         if (userA == toUserId) {
-                            // El otro me envió solicitud, la acepto
                             acceptRequest(friendshipId)
                         } else {
                             Result.failure(Exception("Ya enviaste una solicitud a este usuario"))
@@ -125,23 +138,65 @@ class FriendsRepository(
         }
     }
 
-    // Aceptar solicitud
+    /**
+     * Aceptar solicitud de amistad
+     * Y automáticamente crea un chat 1-a-1 entre los usuarios
+     */
     suspend fun acceptRequest(friendshipId: String): Result<Unit> {
         return try {
+            val friendshipDoc = firestore.collection("friendships").document(friendshipId).get().await()
+            val userA = friendshipDoc.getString("userA") ?: ""
+            val userB = friendshipDoc.getString("userB") ?: ""
+
+            if (userA.isEmpty() || userB.isEmpty()) {
+                return Result.failure(Exception("No se encontraron los usuarios de la solicitud"))
+            }
+
+            Log.d("FriendsRepo", "Aceptando solicitud entre $userA y $userB")
+
             firestore.collection("friendships").document(friendshipId)
                 .update(
                     "status", "accepted",
                     "acceptedAt", com.google.firebase.Timestamp.now()
                 )
                 .await()
+
+            // Crear chat 1-a-1
+            val chatId = if (userA < userB) "${userA}_${userB}" else "${userB}_${userA}"
+            val existingChat = firestore.collection("chats").document(chatId).get().await()
+
+            if (!existingChat.exists()) {
+                // Obtener nombres de los usuarios para el mensaje inicial
+                val userARepo = UserRepository()
+                val userAData = userARepo.getUser(userA)
+                val userBData = userARepo.getUser(userB)
+
+                val newChat = com.example.myapplication.data.models.Chat(
+                    id = chatId,
+                    type = "direct",
+                    participants = listOf(userA, userB),
+                    lastMessage = "¡Ahora son amigos!",
+                    lastMessageAt = com.google.firebase.Timestamp.now(),
+                    sessionId = "",
+                    readOnly = false,
+                    deleteAt = null,
+                    createdAt = com.google.firebase.Timestamp.now()
+                )
+
+                firestore.collection("chats").document(chatId).set(newChat).await()
+                Log.d("FriendsRepo", "Chat creado exitosamente con ID: $chatId")
+            }
+
             Result.success(Unit)
         } catch (e: Exception) {
-            Log.e("FriendsRepo", "Error acceptRequest: ${e.message}")
+            Log.e("FriendsRepo", "Error acceptRequest: ${e.message}", e)
             Result.failure(e)
         }
     }
 
-    // Rechazar/eliminar solicitud
+    /**
+     * Rechazar/eliminar solicitud
+     */
     suspend fun rejectRequest(friendshipId: String): Result<Unit> {
         return try {
             firestore.collection("friendships").document(friendshipId).delete().await()
@@ -152,7 +207,9 @@ class FriendsRepository(
         }
     }
 
-    // Eliminar amigo (misma operación que rechazar — borra el documento)
+    /**
+     * Eliminar amigo (misma operación que rechazar — borra el documento)
+     */
     suspend fun removeFriend(friendUserId: String): Result<Unit> {
         val currentId = currentUserId
             ?: return Result.failure(Exception("No autenticado"))
@@ -160,14 +217,15 @@ class FriendsRepository(
         return rejectRequest(friendshipId)
     }
 
-    // Bloquear usuario
+    /**
+     * Bloquear usuario
+     */
     suspend fun blockUser(userId: String): Result<Unit> {
         val currentId = currentUserId
             ?: return Result.failure(Exception("No autenticado"))
         val friendshipId = Friendship.generateId(currentId, userId)
 
         return try {
-            // Usamos set con merge para que funcione aunque no exista el documento
             firestore.collection("friendships").document(friendshipId)
                 .set(
                     mapOf(
@@ -186,10 +244,15 @@ class FriendsRepository(
         }
     }
 
-    // Buscar usuario por Game ID (case-insensitive con toLowerCase)
+    // ============================================================
+    // BÚSQUEDA Y ESTADO
+    // ============================================================
+
+    /**
+     * Buscar usuario por Game ID
+     */
     suspend fun searchUserByGameId(gameId: String): User? {
         return try {
-            // Buscar tal como viene (el gameId siempre se guarda en minúsculas: "linkup#XXXX")
             val querySnapshot = firestore.collection("users")
                 .whereEqualTo("gameId", gameId.trim().lowercase())
                 .limit(1)
@@ -203,7 +266,9 @@ class FriendsRepository(
         }
     }
 
-    // Obtener estado de amistad con otro usuario
+    /**
+     * Obtener estado de amistad con otro usuario
+     */
     suspend fun getFriendshipStatus(otherUserId: String): String? {
         val currentId = currentUserId ?: return null
         val friendshipId = Friendship.generateId(currentId, otherUserId)
@@ -216,7 +281,9 @@ class FriendsRepository(
         }
     }
 
-    // Obtener solicitudes enviadas pendientes
+    /**
+     * Obtener solicitudes enviadas pendientes
+     */
     suspend fun getSentRequests(): List<Friendship> {
         val userId = currentUserId ?: return emptyList()
 

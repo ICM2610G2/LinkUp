@@ -1,6 +1,7 @@
 package com.example.myapplication.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,14 +13,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.myapplication.model.SolicitudConUsuario
 import com.example.myapplication.model.SolicitudesViewModel
-import kotlin.collections.isNotEmpty
+import androidx.compose.foundation.BorderStroke
 
 @Composable
 fun Solicitudes(
@@ -50,7 +54,6 @@ fun Solicitudes(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f)
             )
-            // Badge con cantidad
             if (state.solicitudes.isNotEmpty()) {
                 Box(
                     modifier = Modifier
@@ -74,19 +77,13 @@ fun Solicitudes(
                     CircularProgressIndicator(color = Color(0xFFFF9800))
                 }
             }
-
             state.solicitudes.isEmpty() -> {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        Icons.Default.PersonAdd,
-                        null,
-                        tint = Color.Gray,
-                        modifier = Modifier.size(64.dp)
-                    )
+                    Icon(Icons.Default.PersonAdd, null, tint = Color.Gray, modifier = Modifier.size(64.dp))
                     Spacer(modifier = Modifier.height(16.dp))
                     Text("No tienes solicitudes pendientes", color = Color.Gray)
                     Spacer(modifier = Modifier.height(8.dp))
@@ -97,7 +94,6 @@ fun Solicitudes(
                     )
                 }
             }
-
             else -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -132,34 +128,40 @@ fun SolicitudCard(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth(),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x4DE9C46A))
+        border = BorderStroke(1.dp, Color(0x4DE9C46A))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // Avatar con foto real o iniciales
                 Box(
                     modifier = Modifier
                         .size(52.dp)
-                        .background(Color(0xFFE9C46A), CircleShape),
+                        .clip(CircleShape)
+                        .background(Color(0xFFE9C46A)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        user.displayName.take(2).uppercase(),
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
+                    if (user.photoURL.isNotEmpty()) {
+                        AsyncImage(
+                            model = user.photoURL,
+                            contentDescription = "Foto de ${user.displayName}",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Text(
+                            user.displayName.take(2).uppercase(),
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    }
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        user.displayName,
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    Text(user.displayName, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     Text(user.gameId, color = Color.Gray, fontSize = 12.sp)
                     Text(
                         "${user.totalPoints} pts · ${user.totalPlacesVisited} lugares visitados",
@@ -174,9 +176,7 @@ fun SolicitudCard(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(
                     onClick = onAccept,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(44.dp),
+                    modifier = Modifier.weight(1f).height(44.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A9D8F)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -184,15 +184,12 @@ fun SolicitudCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Aceptar", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 }
-
                 Button(
                     onClick = onReject,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(44.dp),
+                    modifier = Modifier.weight(1f).height(44.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(12.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x33FFFFFF))
+                    border = BorderStroke(1.dp, Color(0x33FFFFFF))
                 ) {
                     Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))

@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -22,20 +23,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.myapplication.data.models.User
+import com.example.myapplication.repository.StorageRepository
 import com.example.myapplication.repository.UserRepository
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.launch
-import java.util.UUID
-import kotlinx.coroutines.tasks.await
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
+/**
+ * Pantalla de edición de perfil
+ * Permite al usuario cambiar su nombre público y foto de perfil
+ * La foto se sube a Firebase Storage y la URL se guarda en Firestore
+ * El nombre se actualiza tanto en Firestore como en Firebase Auth
+ */
 @Composable
 fun EditProfileScreen(
     userData: User,
@@ -45,34 +51,109 @@ fun EditProfileScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val userRepository = remember { UserRepository() }
+    val storageRepository = remember { StorageRepository() }
     val auth = FirebaseAuth.getInstance()
 
+    // Estado local para los campos editables
     var displayName by remember { mutableStateOf(userData.displayName) }
     var photoURL by remember { mutableStateOf(userData.photoURL) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Launcher para seleccionar imagen de galería
+    // Launcher para seleccionar imagen de la galería
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         selectedImageUri = uri
+        Log.d("EditProfile", "Imagen seleccionada: $uri")
     }
 
-    // Función para subir imagen a Firebase Storage
-    suspend fun uploadImage(uri: Uri): String? {
-        return try {
-            val storageRef = FirebaseStorage.getInstance().reference
-            val imageRef = storageRef.child("profile_images/${auth.currentUser?.uid}/${UUID.randomUUID()}.jpg")
-            imageRef.putFile(uri).await()
-            val downloadUrl = imageRef.downloadUrl.await()
-            downloadUrl.toString()
+    // ============================================================
+    // FUNCIÓN PRINCIPAL: Guardar cambios
+    // ============================================================
+    // 1. Sube la nueva imagen a Firebase Storage (si se seleccionó una)
+    // 2. Actualiza el nombre en Firestore
+    // 3. Actualiza la foto en Firestore (si cambió)
+    // 4. Actualiza el nombre y foto en Firebase Auth
+    // 5. Retorna el usuario actualizado a la pantalla anterior
+    // ============================================================
+    suspend fun saveChanges() {
+        isLoading = true
+        errorMessage = null
+
+        try {
+            var newPhotoURL = photoURL
+
+            // PASO 1: Subir imagen si hay una nueva seleccionada
+            if (selectedImageUri != null) {
+                Log.d("EditProfile", "Subiendo imagen a Storage...")
+                val uploadResult = storageRepository.uploadProfilePicture(selectedImageUri!!)
+                uploadResult.fold(
+                    onSuccess = { url ->
+                        newPhotoURL = url
+                        Log.d("EditProfile", "✅ Imagen subida: $url")
+                    },
+                    onFailure = { e ->
+                        errorMessage = "Error al subir imagen: ${e.message}"
+                        isLoading = false
+                        return
+                    }
+                )
+            }
+
+            // PASO 2: Actualizar nombre en Firestore
+            if (displayName != userData.displayName) {
+                Log.d("EditProfile", "Actualizando nombre en Firestore...")
+                val updateNameResult = userRepository.updateDisplayName(userData.uid, displayName)
+                if (updateNameResult.isFailure) {
+                    errorMessage = "Error al actualizar nombre"
+                    isLoading = false
+                    return
+                }
+            }
+
+            // PASO 3: Actualizar foto en Firestore (si cambió)
+            if (newPhotoURL != photoURL) {
+                Log.d("EditProfile", "Actualizando foto en Firestore...")
+                val updatePhotoResult = userRepository.updatePhotoURL(userData.uid, newPhotoURL)
+                if (updatePhotoResult.isFailure) {
+                    errorMessage = "Error al actualizar foto"
+                    isLoading = false
+                    return
+                }
+            }
+
+            // PASO 4: Actualizar perfil en Firebase Auth para persistencia
+            val currentUser = auth.currentUser
+            if (currentUser != null) {
+                Log.d("EditProfile", "Actualizando perfil en Firebase Auth...")
+                val profileUpdates = UserProfileChangeRequest.Builder()
+                    .setDisplayName(displayName)
+                    .setPhotoUri(if (newPhotoURL.isNotEmpty()) Uri.parse(newPhotoURL) else null)
+                    .build()
+                currentUser.updateProfile(profileUpdates).await()
+                Log.d("EditProfile", "✅ Perfil de Auth actualizado")
+            }
+
+            // PASO 5: Crear usuario actualizado para devolver
+            val updatedUser = userData.copy(
+                displayName = displayName,
+                photoURL = newPhotoURL
+            )
+
+            Log.d("EditProfile", "✅ Perfil guardado correctamente")
+            onSave(updatedUser)
+
         } catch (e: Exception) {
-            null
+            Log.e("EditProfile", "Error inesperado: ${e.message}", e)
+            errorMessage = "Error inesperado: ${e.message}"
+        } finally {
+            isLoading = false
         }
     }
 
+    // UI de la pantalla de edición
     EditProfileContent(
         userData = userData,
         displayName = displayName,
@@ -83,49 +164,7 @@ fun EditProfileScreen(
         errorMessage = errorMessage,
         onSaveClick = {
             scope.launch {
-                isLoading = true
-
-                // Subir nueva foto si hay
-                var newPhotoURL = photoURL
-                if (selectedImageUri != null) {
-                    val uploadedUrl = uploadImage(selectedImageUri!!)
-                    if (uploadedUrl != null) {
-                        newPhotoURL = uploadedUrl
-                    }
-                }
-
-                // Actualizar en Firestore
-                val updatedUser = userData.copy(
-                    displayName = displayName.trim(),
-                    photoURL = selectedImageUri?.toString() ?: newPhotoURL
-                )
-
-                onSave(updatedUser)
-
-                val saveResult = userRepository.updateUser(updatedUser)
-
-                if (saveResult.isSuccess) {
-                    onSave(updatedUser)
-                } else {
-                    errorMessage = "No se pudo guardar el perfil"
-                }
-                val result = userRepository.updateUser(updatedUser)
-
-                if (result.isSuccess) {
-                    // Actualizar displayName en Firebase Auth
-                    auth.currentUser?.updateProfile(
-                        UserProfileChangeRequest.Builder()
-                            .setDisplayName(displayName)
-                            .setPhotoUri(if (newPhotoURL.isNotEmpty()) Uri.parse(newPhotoURL) else null)
-                            .build()
-                    )?.await()
-
-
-                    onSave(updatedUser)
-                } else {
-                    errorMessage = "Error al guardar"
-                }
-                isLoading = false
+                saveChanges()
             }
         },
         onCancelClick = onCancel,
@@ -134,10 +173,15 @@ fun EditProfileScreen(
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Game ID", userData.gameId)
             clipboard.setPrimaryClip(clip)
+            Log.d("EditProfile", "Game ID copiado: ${userData.gameId}")
         }
     )
 }
 
+/**
+ * Componente UI de la pantalla de edición de perfil
+ * Separado de la lógica para mejor organización y preview
+ */
 @Composable
 fun EditProfileContent(
     userData: User,
@@ -157,7 +201,9 @@ fun EditProfileContent(
             .fillMaxSize()
             .background(Color(0xFF0B0B0B))
     ) {
-        // Header
+        // ============================================================
+        // HEADER: Barra superior con botones Cancelar y Guardar
+        // ============================================================
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -184,7 +230,11 @@ fun EditProfileContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Foto de perfil (clic para cambiar)
+        // ============================================================
+        // AVATAR: Foto de perfil clickeable
+        // Muestra la imagen seleccionada, la existente o el icono por defecto
+        // Al hacer clic, abre la galería para seleccionar nueva foto
+        // ============================================================
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -199,28 +249,34 @@ fun EditProfileContent(
                     .clickable { onImageClick() },
                 contentAlignment = Alignment.Center
             ) {
-                if (selectedImageUri != null) {
-                    AsyncImage(
-                        model = selectedImageUri,
-                        contentDescription = "Foto de perfil",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else if (photoURL.isNotEmpty()) {
-                    AsyncImage(
-                        model = photoURL,
-                        contentDescription = "Foto de perfil",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Icon(
-                        Icons.Default.Person,
-                        null,
-                        tint = Color.White.copy(alpha = 0.5f),
-                        modifier = Modifier.size(48.dp)
-                    )
+                // Prioridad: 1. Imagen seleccionada, 2. Imagen existente, 3. Icono por defecto
+                when {
+                    selectedImageUri != null -> {
+                        AsyncImage(
+                            model = selectedImageUri,
+                            contentDescription = "Foto de perfil (nueva)",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    photoURL.isNotEmpty() -> {
+                        AsyncImage(
+                            model = photoURL,
+                            contentDescription = "Foto de perfil actual",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    else -> {
+                        Icon(
+                            Icons.Default.Person,
+                            null,
+                            tint = Color.White.copy(alpha = 0.5f),
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
                 }
+                // Ícono de cámara/crayón para indicar que es editable
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -236,7 +292,9 @@ fun EditProfileContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Campo de nombre
+        // ============================================================
+        // CAMPO DE NOMBRE: Input para cambiar nombre público
+        // ============================================================
         Card(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
@@ -264,7 +322,9 @@ fun EditProfileContent(
             }
         }
 
-        // Game ID (solo lectura)
+        // ============================================================
+        // GAME ID: Solo lectura, con botón para copiar
+        // ============================================================
         Card(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
@@ -282,14 +342,15 @@ fun EditProfileContent(
                     Text("Game ID", color = Color.Gray, fontSize = 12.sp)
                     Text(userData.gameId, color = Color.White, fontWeight = FontWeight.Bold)
                 }
-                IconButton(
-                    onClick = onCopyGameId
-                ) {
+                IconButton(onClick = onCopyGameId) {
                     Icon(Icons.Default.ContentCopy, null, tint = Color(0xFFFF9800), modifier = Modifier.size(18.dp))
                 }
             }
         }
 
+        // ============================================================
+        // MENSAJE DE ERROR: Se muestra si ocurre algún problema
+        // ============================================================
         if (errorMessage != null) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
@@ -310,6 +371,7 @@ fun EditProfilePreview() {
             userData = User(
                 uid = "123",
                 displayName = "Juan Pérez",
+                email = "juan@example.com",
                 gameId = "linkup#4821",
                 photoURL = ""
             ),

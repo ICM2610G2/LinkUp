@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.myapplication.model.ChatMessage
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -29,6 +28,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.model.ChatViewModel
 import java.io.File
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun Chat(viewModel: ChatViewModel = viewModel()) {
@@ -54,7 +54,6 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
         if (success) viewModel.updatePreviewImage(cameraUri)
     }
 
-    // 🛡️ Camera permission
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -74,8 +73,7 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
             .fillMaxSize()
             .background(Color(0xFF0A0A0A))
     ) {
-
-        // 🔝 TOP BAR
+        // TOP BAR
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -92,9 +90,7 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
             ) {
                 Icon(Icons.Default.LocationOn, null, tint = Color.White)
             }
-
             Spacer(modifier = Modifier.width(12.dp))
-
             Column {
                 Text("Chat", color = Color.White, fontSize = 16.sp)
                 Text("En línea", color = Color.Gray, fontSize = 12.sp)
@@ -103,7 +99,7 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
 
         Divider(color = Color(0x22FFFFFF))
 
-        // 💬 MESSAGES
+        // MESSAGES
         Box(modifier = Modifier.weight(1f)) {
             LazyColumn(
                 modifier = Modifier
@@ -113,24 +109,49 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
                 itemsIndexed(state.messages.asReversed()) { _, message ->
-
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = if (message.isMe) Arrangement.End else Arrangement.Start
                     ) {
+                        // Avatar del remitente (solo para mensajes de otros)
+                        if (!message.isMe) {
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFFFF9800)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (message.photoURL.isNotEmpty()) {
+                                    AsyncImage(
+                                        model = message.photoURL,
+                                        contentDescription = "Avatar de ${message.sender}",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Text(
+                                        message.initial,
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+
+                        // Burbuja del mensaje
                         Box(
                             modifier = Modifier
                                 .background(
-                                    if (message.isMe) Color(0xFFFF9800)
-                                    else Color(0xFF1A1A1A),
+                                    if (message.isMe) Color(0xFFFF9800) else Color(0xFF1A1A1A),
                                     RoundedCornerShape(16.dp)
                                 )
                                 .padding(10.dp)
                         ) {
-
                             Column {
-
-                                // 🖼 IMAGE
+                                // IMAGE
                                 if (message.imageUri != null) {
                                     AsyncImage(
                                         model = message.imageUri,
@@ -143,27 +164,52 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
                                             },
                                         contentScale = ContentScale.Crop
                                     )
-
                                     if (message.text != null) {
                                         Spacer(modifier = Modifier.height(6.dp))
                                     }
                                 }
-
-                                // 💬 TEXT
+                                // TEXT
                                 if (message.text != null) {
                                     Text(message.text, color = Color.White)
                                 }
                             }
                         }
-                    }
 
+                        // Avatar para mensajes propios
+                        if (message.isMe) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFFFF9800)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (message.photoURL.isNotEmpty()) {
+                                    AsyncImage(
+                                        model = message.photoURL,
+                                        contentDescription = "Mi avatar",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Text(
+                                        message.initial,
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
         }
 
+        // PREVIEW MODE (cuando hay imagen seleccionada)
         if (state.previewImage != null) {
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -191,10 +237,9 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-
                 TextField(
                     value = state.inputText,
-                    onValueChange = {viewModel.updateInputText(it)},
+                    onValueChange = { viewModel.updateInputText(it) },
                     placeholder = { Text("Agregar mensaje...") },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color(0xFF252525),
@@ -205,23 +250,10 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-
                 IconButton(
                     onClick = {
-                        val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                        viewModel.addMessage(
-                            ChatMessage(
-                                id = state.messages.size + 1,
-                                sender = "Tú",
-                                initial = "TÚ",
-                                text = if (state.inputText.isBlank()) null else state.inputText,
-                                imageUri = state.previewImage,
-                                time = now,
-                                isMe = true
-                            )
-                        )
-                        viewModel.updatePreviewImage(null)
-                        viewModel.updateInputText("")
+                        viewModel.sendImageMessage(state.previewImage!!, state.inputText.takeIf { it.isNotBlank() })
+                        viewModel.clearPreviewAndInput()
                     },
                     modifier = Modifier
                         .align(Alignment.End)
@@ -231,10 +263,8 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
                     Icon(Icons.Default.Send, null, tint = Color.White)
                 }
             }
-
         } else {
-
-            // 🧾 INPUT
+            // INPUT MODE (sin imagen seleccionada)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -242,7 +272,6 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 IconButton(
                     onClick = { galleryLauncher.launch("image/*") },
                     modifier = Modifier
@@ -251,22 +280,16 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
                 ) {
                     Icon(Icons.Default.Photo, null, tint = Color.White)
                 }
-
                 Spacer(modifier = Modifier.width(6.dp))
-
                 IconButton(
-                    onClick = {
-                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                    },
+                    onClick = { cameraPermissionLauncher.launch(Manifest.permission.CAMERA) },
                     modifier = Modifier
                         .size(44.dp)
                         .background(Color(0xFF252525), CircleShape)
                 ) {
                     Icon(Icons.Default.CameraAlt, null, tint = Color.White)
                 }
-
                 Spacer(modifier = Modifier.width(8.dp))
-
                 TextField(
                     value = state.inputText,
                     onValueChange = { viewModel.updateInputText(it) },
@@ -279,25 +302,10 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
                         unfocusedTextColor = Color.White
                     )
                 )
-
                 Spacer(modifier = Modifier.width(8.dp))
-
                 IconButton(
                     onClick = {
-                        if (state.inputText.isNotBlank()) {
-                            val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                            viewModel.addMessage(
-                                ChatMessage(
-                                    id = state.messages.size + 1,
-                                    sender = "Tú",
-                                    initial = "TÚ",
-                                    text = state.inputText,
-                                    time = now,
-                                    isMe = true
-                                )
-                            )
-                            viewModel.updateInputText("")
-                        }
+                        viewModel.sendTextMessage(state.inputText)
                     },
                     modifier = Modifier
                         .size(44.dp)
@@ -309,6 +317,7 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
         }
     }
 
+    // FULLSCREEN IMAGE MODE
     if (state.fullScreenImage != null) {
         Box(
             modifier = Modifier
@@ -323,7 +332,6 @@ fun Chat(viewModel: ChatViewModel = viewModel()) {
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Fit
             )
-
             IconButton(
                 onClick = { viewModel.updateFullScreenImage(null) },
                 modifier = Modifier.align(Alignment.TopEnd)

@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,17 +15,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.myapplication.model.BuscarAmigosViewModel
 import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.BorderStroke
 
 @Composable
 fun BuscarAmigos(
@@ -76,11 +81,13 @@ fun BuscarAmigos(
             viewModel.updateIsSearching(false)
         }
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0A0A0A))
     ) {
+        // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -99,7 +106,10 @@ fun BuscarAmigos(
                 modifier = Modifier.weight(1f)
             )
         }
+
         Spacer(modifier = Modifier.height(20.dp))
+
+        // Campo de búsqueda
         Card(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
@@ -138,7 +148,6 @@ fun BuscarAmigos(
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true
                     )
-
                     Button(
                         onClick = { searchUser() },
                         enabled = !state.isSearching && state.searchQuery.isNotBlank(),
@@ -159,6 +168,7 @@ fun BuscarAmigos(
             }
         }
 
+        // Mensaje de error
         if (state.errorMessage != null) {
             Card(
                 shape = RoundedCornerShape(12.dp),
@@ -176,40 +186,48 @@ fun BuscarAmigos(
             }
         }
 
+        // Resultado de búsqueda
         state.searchResult?.let { user ->
             Card(
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                border = BorderStroke(1.dp, Color(0x33FFFFFF))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    // Avatar con foto real o iniciales
                     Box(
                         modifier = Modifier
                             .size(56.dp)
-                            .background(Color(0xFFFF9800), CircleShape),
+                            .clip(CircleShape)
+                            .background(Color(0xFFFF9800)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            user.displayName.take(2).uppercase(),
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        )
+                        if (user.photoURL.isNotEmpty()) {
+                            AsyncImage(
+                                model = user.photoURL,
+                                contentDescription = "Foto de ${user.displayName}",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Text(
+                                user.displayName.take(2).uppercase(),
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            )
+                        }
                     }
 
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            user.displayName,
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                        Text(user.displayName, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                         Text(user.gameId, color = Color.Gray, fontSize = 12.sp)
                         Text(
                             "${user.totalPoints} pts · ${user.totalPlacesVisited} lugares",
@@ -221,12 +239,7 @@ fun BuscarAmigos(
                     when (state.friendStatus) {
                         "accepted" -> {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    Icons.Default.Check,
-                                    null,
-                                    tint = Color(0xFF22C55E),
-                                    modifier = Modifier.size(16.dp)
-                                )
+                                Icon(Icons.Default.Check, null, tint = Color(0xFF22C55E), modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text("Amigos", color = Color(0xFF22C55E), fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             }
@@ -236,11 +249,12 @@ fun BuscarAmigos(
                                 "Solicitud\nenviada",
                                 color = Color(0xFFE9C46A),
                                 fontWeight = FontWeight.SemiBold,
-                                fontSize = 12.sp
+                                fontSize = 12.sp,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                         }
                         "blocked" -> {
-                            Text("Bloqueado", color = Color(0xFFEF4444), fontSize = 13.sp)
+                            Text("Bloqueado", color = Color(0xFFEF4444), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                         }
                         null -> {
                             Button(
@@ -250,7 +264,7 @@ fun BuscarAmigos(
                                         viewModel.updateErrorMessage(null)
                                         friendsRepository.sendFriendRequest(user.uid).fold(
                                             onSuccess = {
-                                                viewModel.updateFriendStatus("Pendiente")
+                                                viewModel.updateFriendStatus("pending")
                                             },
                                             onFailure = { e ->
                                                 viewModel.updateErrorMessage(e.message)
@@ -283,6 +297,7 @@ fun BuscarAmigos(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Tu Game ID
         Card(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
@@ -297,7 +312,6 @@ fun BuscarAmigos(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Tu Game ID", color = Color.Gray, fontSize = 12.sp)
-
                     TextButton(
                         onClick = {
                             scope.launch {
@@ -317,19 +331,12 @@ fun BuscarAmigos(
                             }
                         }
                     ) {
-                        Icon(
-                            Icons.Default.Refresh,
-                            null,
-                            tint = Color(0xFFFF9800),
-                            modifier = Modifier.size(16.dp)
-                        )
+                        Icon(Icons.Default.Refresh, null, tint = Color(0xFFFF9800), modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Recargar", color = Color(0xFFFF9800), fontSize = 12.sp)
                     }
                 }
-
                 Spacer(modifier = Modifier.height(4.dp))
-
                 if (state.isLoadingUser) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
@@ -347,36 +354,21 @@ fun BuscarAmigos(
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold
                         )
-
                         if (!state.currentUser?.gameId.isNullOrEmpty()) {
                             val clipboardManager = LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             IconButton(
                                 onClick = {
                                     val clip = ClipData.newPlainText("Game ID", state.currentUser!!.gameId)
                                     clipboardManager.setPrimaryClip(clip)
-                                    Toast.makeText(
-                                        context,
-                                        "Game ID copiado",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    Toast.makeText(context, "Game ID copiado", Toast.LENGTH_SHORT).show()
                                 }
                             ) {
-                                Icon(
-                                    Icons.Default.ContentCopy,
-                                    null,
-                                    tint = Color(0xFFFF9800),
-                                    modifier = Modifier.size(20.dp)
-                                )
+                                Icon(Icons.Default.ContentCopy, null, tint = Color(0xFFFF9800), modifier = Modifier.size(20.dp))
                             }
                         }
                     }
                 }
-                Text(
-                    "Comparte este código con tus amigos",
-                    color = Color.Gray,
-                    fontSize = 12.sp
-                )
-
+                Text("Comparte este código con tus amigos", color = Color.Gray, fontSize = 12.sp)
                 if (!state.isLoadingUser && state.currentUser?.gameId.isNullOrEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(

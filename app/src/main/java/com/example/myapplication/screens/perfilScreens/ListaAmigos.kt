@@ -13,11 +13,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.myapplication.data.models.User
 import com.example.myapplication.model.ListaAmigosViewModel
 import com.example.myapplication.screens.SolicitudCard
@@ -45,7 +48,6 @@ fun ListaAmigos(
                 .fillMaxHeight(0.9f)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-
                 // Header
                 Row(
                     modifier = Modifier
@@ -55,17 +57,11 @@ fun ListaAmigos(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        "Amigos",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text("Amigos", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         IconButton(onClick = onBuscarAmigos) {
                             Icon(Icons.Default.Search, null, tint = Color.White, modifier = Modifier.size(20.dp))
                         }
-                        // Badge en solicitudes
                         Box {
                             IconButton(onClick = onVerSolicitudes) {
                                 Icon(Icons.Default.PersonAdd, null, tint = Color.White, modifier = Modifier.size(20.dp))
@@ -93,6 +89,7 @@ fun ListaAmigos(
                     }
                 }
 
+                // Tabs
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -137,19 +134,10 @@ fun ListaAmigos(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Center
                                 ) {
-                                    Icon(
-                                        Icons.Default.PersonOutline,
-                                        null,
-                                        tint = Color.Gray,
-                                        modifier = Modifier.size(64.dp)
-                                    )
+                                    Icon(Icons.Default.PersonOutline, null, tint = Color.Gray, modifier = Modifier.size(64.dp))
                                     Spacer(modifier = Modifier.height(16.dp))
                                     Text("No tienes amigos aún", color = Color.Gray)
-                                    Text(
-                                        "Busca amigos por Game ID",
-                                        color = Color.Gray.copy(alpha = 0.6f),
-                                        fontSize = 12.sp
-                                    )
+                                    Text("Busca amigos por Game ID", color = Color.Gray.copy(alpha = 0.6f), fontSize = 12.sp)
                                     Spacer(modifier = Modifier.height(16.dp))
                                     Button(
                                         onClick = onBuscarAmigos,
@@ -177,7 +165,6 @@ fun ListaAmigos(
                                 }
                             }
                         }
-
                         "solicitudes" -> {
                             if (state.solicitudes.isEmpty()) {
                                 Column(
@@ -185,12 +172,7 @@ fun ListaAmigos(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Center
                                 ) {
-                                    Icon(
-                                        Icons.Default.PersonAdd,
-                                        null,
-                                        tint = Color.Gray,
-                                        modifier = Modifier.size(64.dp)
-                                    )
+                                    Icon(Icons.Default.PersonAdd, null, tint = Color.Gray, modifier = Modifier.size(64.dp))
                                     Spacer(modifier = Modifier.height(16.dp))
                                     Text("No tienes solicitudes pendientes", color = Color.Gray)
                                 }
@@ -235,33 +217,37 @@ fun AmigoItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Avatar con foto real o iniciales
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .background(Color(0xFFFF9800), CircleShape),
+                    .clip(CircleShape)
+                    .background(Color(0xFFFF9800)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    amigo.displayName.take(2).uppercase(),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
+                if (amigo.photoURL.isNotEmpty()) {
+                    AsyncImage(
+                        model = amigo.photoURL,
+                        contentDescription = "Foto de ${amigo.displayName}",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Text(
+                        amigo.displayName.take(2).uppercase(),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                }
             }
+
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    amigo.displayName,
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Text(amigo.displayName, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 Text(amigo.gameId, color = Color.Gray, fontSize = 12.sp)
-                Text(
-                    "${amigo.totalPoints} pts",
-                    color = Color(0xFFFF9800).copy(alpha = 0.8f),
-                    fontSize = 11.sp
-                )
+                Text("${amigo.totalPoints} pts", color = Color(0xFFFF9800).copy(alpha = 0.8f), fontSize = 11.sp)
             }
+
             Box {
                 Box(
                     modifier = Modifier
@@ -270,12 +256,7 @@ fun AmigoItem(
                         .clickable { mostrarMenu = !mostrarMenu },
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        Icons.Default.MoreVert,
-                        null,
-                        tint = Color.White.copy(alpha = 0.6f),
-                        modifier = Modifier.size(16.dp)
-                    )
+                    Icon(Icons.Default.MoreVert, null, tint = Color.White.copy(alpha = 0.6f), modifier = Modifier.size(16.dp))
                 }
                 DropdownMenu(
                     expanded = mostrarMenu,
@@ -284,9 +265,7 @@ fun AmigoItem(
                 ) {
                     DropdownMenuItem(
                         text = { Text("Eliminar amigo", color = Color(0xFFEF4444), fontSize = 13.sp) },
-                        leadingIcon = {
-                            Icon(Icons.Default.PersonRemove, null, tint = Color(0xFFEF4444), modifier = Modifier.size(16.dp))
-                        },
+                        leadingIcon = { Icon(Icons.Default.PersonRemove, null, tint = Color(0xFFEF4444), modifier = Modifier.size(16.dp)) },
                         onClick = {
                             mostrarMenu = false
                             onRemove()
@@ -294,9 +273,7 @@ fun AmigoItem(
                     )
                     DropdownMenuItem(
                         text = { Text("Bloquear", color = Color(0xFFEF4444), fontSize = 13.sp) },
-                        leadingIcon = {
-                            Icon(Icons.Default.Block, null, tint = Color(0xFFEF4444), modifier = Modifier.size(16.dp))
-                        },
+                        leadingIcon = { Icon(Icons.Default.Block, null, tint = Color(0xFFEF4444), modifier = Modifier.size(16.dp)) },
                         onClick = {
                             mostrarMenu = false
                             onBlock()
@@ -304,9 +281,7 @@ fun AmigoItem(
                     )
                     DropdownMenuItem(
                         text = { Text("Reportar", color = Color(0xFFE9C46A), fontSize = 13.sp) },
-                        leadingIcon = {
-                            Icon(Icons.Default.Flag, null, tint = Color(0xFFE9C46A), modifier = Modifier.size(16.dp))
-                        },
+                        leadingIcon = { Icon(Icons.Default.Flag, null, tint = Color(0xFFE9C46A), modifier = Modifier.size(16.dp)) },
                         onClick = { mostrarMenu = false }
                     )
                 }
@@ -326,10 +301,7 @@ fun TabAmigos(
 ) {
     Box(
         modifier = modifier
-            .background(
-                if (activa) color else Color(0xFF252525),
-                RoundedCornerShape(10.dp)
-            )
+            .background(if (activa) color else Color(0xFF252525), RoundedCornerShape(10.dp))
             .clickable { onClick() }
             .padding(vertical = 10.dp),
         contentAlignment = Alignment.Center

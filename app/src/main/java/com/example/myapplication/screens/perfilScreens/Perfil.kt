@@ -1,5 +1,6 @@
 package com.example.myapplication.screens.perfilScreens
 
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,34 +11,43 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.myapplication.auth.BiometricAuthManager
-import com.example.myapplication.data.models.User
-import com.example.myapplication.ui.theme.MyApplicationTheme
-import com.example.myapplication.auth.FirebaseAuthManager
-import com.google.firebase.auth.FirebaseUser
-import kotlinx.coroutines.launch
-import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.example.myapplication.auth.BiometricAuthManager
 import com.example.myapplication.auth.BiometricAuthResult
 import com.example.myapplication.auth.BiometricAvailability
+import com.example.myapplication.auth.FirebaseAuthManager
+import com.example.myapplication.data.models.User
 import com.example.myapplication.model.PerfilViewModel
+import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.launch
 
+/**
+ * Pantalla principal de Perfil
+ * Muestra información del usuario: nombre, email, Game ID y estadísticas
+ * Permite navegar a edición de perfil y lista de amigos
+ * También maneja cierre de sesión y eliminación de cuenta
+ */
 @Composable
 fun Perfil(
     user: FirebaseUser?,
@@ -57,16 +67,22 @@ fun Perfil(
 
     val state by viewModel.perfilState.collectAsState()
 
+    // Datos del usuario priorizando Firebase Auth (más actualizado) sobre Firestore
     val displayName = user?.displayName ?: userData?.displayName ?: "Usuario"
     val email = user?.email ?: "correo@ejemplo.com"
     val userId = user?.uid ?: userData?.uid?.take(8) ?: ""
+    val photoURL = user?.photoUrl?.toString() ?: userData?.photoURL ?: ""
 
+    // Estadísticas desde Firestore
     val totalPlaces = userData?.totalPlacesVisited ?: 0
     val currentStreak = userData?.currentStreak ?: 0
     val bestStreak = userData?.bestStreak ?: 0
     val totalPoints = userData?.totalPoints ?: 0
     val gameId = userData?.gameId ?: "linkup#0000"
 
+    // ============================================================
+    // BLOQUE: Observar resultado de biometría para borrar cuenta
+    // ============================================================
     LaunchedEffect(Unit) {
         biometricManager.authResult.collect { result ->
             when (result) {
@@ -76,6 +92,7 @@ fun Perfil(
                         val deleteResult = authManager.deleteAccount()
                         deleteResult.fold(
                             onSuccess = {
+                                Log.d("Perfil", "Cuenta eliminada con huella")
                                 onAccountDeleted()
                             },
                             onFailure = { e ->
@@ -95,11 +112,13 @@ fun Perfil(
         }
     }
 
+    // UI principal
     PerfilContent(
         displayName = displayName,
         email = email,
         userId = userId,
         gameId = gameId,
+        photoURL = photoURL,
         totalPlaces = totalPlaces,
         currentStreak = currentStreak,
         bestStreak = bestStreak,
@@ -108,6 +127,7 @@ fun Perfil(
         onVerAmigosClick = onVerAmigos,
         onLogoutClick = {
             scope.launch {
+                Log.d("Perfil", "Cerrando sesión")
                 authManager.logout()
                 onLogout()
             }
@@ -115,6 +135,11 @@ fun Perfil(
         onDeleteClick = { viewModel.updateShowDeleteDialog(true) }
     )
 
+    // ============================================================
+    // DIALOGOS: Confirmación para borrar cuenta
+    // ============================================================
+
+    // Diálogo 1: Confirmación inicial
     if (state.showDeleteDialog) {
         Dialog(
             onDismissRequest = { viewModel.updateShowDeleteDialog(false) },
@@ -153,7 +178,7 @@ fun Perfil(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Botón: Usar huella
+                    // Opción 1: Usar huella digital
                     if (biometricManager.isBiometricAvailable() is BiometricAvailability.Available) {
                         Button(
                             onClick = {
@@ -173,6 +198,7 @@ fun Perfil(
                         Spacer(modifier = Modifier.height(12.dp))
                     }
 
+                    // Opción 2: Usar contraseña
                     Button(
                         onClick = {
                             viewModel.updateShowDeleteDialog(false)
@@ -188,9 +214,7 @@ fun Perfil(
                     }
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    TextButton(
-                        onClick = { viewModel.updateShowDeleteDialog(false) }
-                    ) {
+                    TextButton(onClick = { viewModel.updateShowDeleteDialog(false) }) {
                         Text("Cancelar", color = Color.Gray)
                     }
                 }
@@ -198,6 +222,7 @@ fun Perfil(
         }
     }
 
+    // Diálogo 2: Ingresar contraseña para confirmar
     if (state.showPasswordDialog) {
         Dialog(
             onDismissRequest = {
@@ -213,9 +238,7 @@ fun Perfil(
                     .fillMaxWidth()
                     .padding(32.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(24.dp)
-                ) {
+                Column(modifier = Modifier.padding(24.dp)) {
                     Text(
                         text = "Confirmar con contraseña",
                         color = Color.White,
@@ -235,7 +258,7 @@ fun Perfil(
 
                     OutlinedTextField(
                         value = state.deletePassword,
-                        onValueChange = {viewModel.updateDeletePassword(it)},
+                        onValueChange = { viewModel.updateDeletePassword(it) },
                         label = { Text("Contraseña") },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth()
@@ -249,6 +272,7 @@ fun Perfil(
                                 val result = authManager.deleteAccountWithPassword(state.deletePassword)
                                 result.fold(
                                     onSuccess = {
+                                        Log.d("Perfil", "Cuenta eliminada con contraseña")
                                         onAccountDeleted()
                                     },
                                     onFailure = { e ->
@@ -287,12 +311,17 @@ fun Perfil(
     }
 }
 
+/**
+ * Componente UI principal del perfil
+ * Muestra avatar, información del usuario, estadísticas y menú de opciones
+ */
 @Composable
 fun PerfilContent(
     displayName: String,
     email: String,
     userId: String,
     gameId: String,
+    photoURL: String,
     totalPlaces: Int,
     currentStreak: Int,
     bestStreak: Int,
@@ -312,31 +341,45 @@ fun PerfilContent(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
+        // ============================================================
+        // HEADER: Avatar, nombre, email, ID y Game ID
+        // ============================================================
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Avatar con imagen real desde Storage o por defecto
             Box(
                 modifier = Modifier
                     .size(90.dp)
                     .background(accent, shape = CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Imagen de perfil",
-                    tint = Color.White,
-                    modifier = Modifier.size(44.dp)
-                )
+                if (photoURL.isNotEmpty()) {
+                    AsyncImage(
+                        model = photoURL,
+                        contentDescription = "Foto de perfil",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Imagen de perfil por defecto",
+                        tint = Color.White,
+                        modifier = Modifier.size(44.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(14.dp))
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            // Información del usuario
+            Column(modifier = Modifier.weight(1f)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -349,6 +392,7 @@ fun PerfilContent(
                         color = Color.White,
                         modifier = Modifier.weight(1f)
                     )
+                    // Botón de editar perfil
                     IconButton(
                         onClick = onEditClick,
                         modifier = Modifier.size(36.dp)
@@ -370,31 +414,36 @@ fun PerfilContent(
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Column(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "ID: $userId",
+                        text = "ID: ${userId.take(8)}",
                         fontSize = 12.sp,
                         color = accent,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        softWrap = false
                     )
-                    Box(
-                        modifier = Modifier
-                            .size(4.dp)
-                            .background(Color.Gray, CircleShape)
-                    )
+
+                    Spacer(modifier = Modifier.height(2.dp))
+
                     Text(
                         text = gameId,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = Color.Gray,
+                        maxLines = 1,
+                        softWrap = false
                     )
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        // ============================================================
+        // ESTADÍSTICAS: Tarjetas con lugares, racha, mejor racha y XP
+        // ============================================================
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -427,6 +476,9 @@ fun PerfilContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // ============================================================
+        // MENÚ DE OPCIONES
+        // ============================================================
         MenuItem(
             icon = Icons.Default.Settings,
             title = "Configuración",
@@ -477,6 +529,11 @@ fun PerfilContent(
 
         Spacer(modifier = Modifier.weight(1f))
 
+        // ============================================================
+        // BOTONES DE ACCIÓN: Cerrar sesión y Borrar cuenta
+        // ============================================================
+
+        // Botón cerrar sesión
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -508,6 +565,7 @@ fun PerfilContent(
             }
         }
 
+        // Botón borrar cuenta
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -541,6 +599,10 @@ fun PerfilContent(
     }
 }
 
+/**
+ * Tarjeta de estadística individual
+ * Muestra un valor numérico con su respectivo icono y etiqueta
+ */
 @Composable
 fun StatCard(
     value: String,
@@ -571,6 +633,10 @@ fun StatCard(
     }
 }
 
+/**
+ * Ítem del menú lateral
+ * Muestra un icono, título, subtítulo opcional y flecha de navegación
+ */
 @Composable
 fun MenuItem(
     icon: ImageVector,
@@ -610,16 +676,13 @@ fun MenuItem(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
-
                 if (subtitle != null) {
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
@@ -630,11 +693,7 @@ fun MenuItem(
                 }
             }
 
-            Text(
-                text = "›",
-                color = Color(0xFF7A7A7A),
-                fontSize = 22.sp
-            )
+            Text(text = "›", color = Color(0xFF7A7A7A), fontSize = 22.sp)
         }
     }
 }
@@ -648,6 +707,7 @@ fun PerfilPreview() {
             email = "juan.perez@example.com",
             userId = "ABC12345",
             gameId = "linkup#4821",
+            photoURL = "",
             totalPlaces = 12,
             currentStreak = 3,
             bestStreak = 7,
@@ -657,20 +717,5 @@ fun PerfilPreview() {
             onLogoutClick = {},
             onDeleteClick = {}
         )
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF0B0B0B)
-@Composable
-fun StatCardPreview() {
-    MyApplicationTheme {
-        Row(modifier = Modifier.padding(16.dp)) {
-            StatCard(
-                value = "12",
-                label = "Lugares",
-                icon = Icons.Default.Place,
-                modifier = Modifier.weight(1f)
-            )
-        }
     }
 }
