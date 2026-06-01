@@ -1,4 +1,4 @@
-package com.example.myapplication.screens
+package com.example.myapplication.screens.mapaScreens
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.data.models.User
 import com.example.myapplication.model.FriendMapLocation
 import com.example.myapplication.model.MapaViewModel
 import com.example.myapplication.repository.FriendsRepository

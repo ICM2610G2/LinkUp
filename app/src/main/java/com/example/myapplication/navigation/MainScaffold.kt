@@ -2,7 +2,6 @@ package com.example.myapplication.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
@@ -25,12 +24,12 @@ import com.example.myapplication.screens.BuscarAmigos
 import com.example.myapplication.screens.CarreraActivaScreen
 import com.example.myapplication.screens.Carreras
 import com.example.myapplication.screens.Chat
-import com.example.myapplication.screens.CrearCarrera
+import com.example.myapplication.screens.homeScreens.CrearCarrera
 import com.example.myapplication.screens.EditProfileScreen
-import com.example.myapplication.screens.Home
+import com.example.myapplication.screens.homeScreens.Home
 import com.example.myapplication.screens.ListaAmigos
 import com.example.myapplication.screens.LobbyCarreraScreen
-import com.example.myapplication.screens.Mapa
+import com.example.myapplication.screens.mapaScreens.Mapa
 import com.example.myapplication.screens.Perfil
 import com.example.myapplication.screens.Solicitudes
 
@@ -62,7 +61,7 @@ fun MainScaffold(
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 val items = listOf(
-                    NavItem("home", "Home", Icons.Default.Home),
+                    NavItem("home", "Inicio", Icons.Default.Home),
                     NavItem("mapa", "Mapa", Icons.Default.Map),
                     NavItem("carreras", "Carreras", Icons.Default.EmojiEvents),
                     NavItem("chat", "Chat", Icons.AutoMirrored.Filled.Chat),

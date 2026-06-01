@@ -16,14 +16,13 @@ import com.example.myapplication.repository.UserRepository
 import com.example.myapplication.screens.CarreraActivaScreen
 import com.example.myapplication.screens.Carreras
 import com.example.myapplication.screens.Chat
-import com.example.myapplication.screens.CrearCarrera
+import com.example.myapplication.screens.homeScreens.CrearCarrera
 import com.example.myapplication.screens.EditProfileScreen
-import com.example.myapplication.screens.Home
+import com.example.myapplication.screens.homeScreens.Home
 import com.example.myapplication.screens.LobbyCarreraScreen
 import com.example.myapplication.screens.Login
-import com.example.myapplication.screens.Mapa
+import com.example.myapplication.screens.mapaScreens.Mapa
 import com.example.myapplication.screens.Perfil
-import com.example.myapplication.screens.*
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
