@@ -1,10 +1,12 @@
 package com.example.myapplication.screens.homeScreens
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,9 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.model.InvitarNFCViewModel
+import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.utils.InviteUtils
 import com.example.myapplication.utils.QRGenerator
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 @Composable
 fun InvitarNFC(
@@ -40,6 +43,8 @@ fun InvitarNFC(
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val friendsRepository = remember { FriendsRepository() }
     val currentUser = FirebaseAuth.getInstance().currentUser
 
     Box(
@@ -55,44 +60,123 @@ fun InvitarNFC(
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
 
-                HeaderInvitar(onCerrar = {
-                    Log.i("MyApp", "Cerrar invitar NFC clicked")
-                    onCerrar()
-                })
+                HeaderInvitar(onCerrar = onCerrar)
 
                 Column(
                     modifier = Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    // NFC SECTION
                     BotonNFC(
                         escaneando = state.escaneando,
                         onClick = {
                             viewModel.updateEscaneando(true)
-                            Log.i("MyApp", "NFC scan iniciado")
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                viewModel.updateEscaneando(false)
-                                Log.i("MyApp", "NFC scan completado")
-                            }, 2000)
                         }
                     )
 
                     SeparadorO()
 
+                    // SECCIÓN DE CÓDIGO TEMPORAL (Funcionalidad mantenida)
+                    if (state.generatedCode == null) {
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    viewModel.updateIsGenerating(true)
+                                    try {
+                                        val code = friendsRepository.generateFriendInvite()
+                                        viewModel.updateGeneratedCode(code)
+                                    } catch (e: Exception) {
+                                        Log.e("InvitarNFC", "Error generando código", e)
+                                    }
+                                    viewModel.updateIsGenerating(false)
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
+                            shape = RoundedCornerShape(12.dp),
+                            enabled = !state.isGenerating
+                        ) {
+                            if (state.isGenerating) {
+                                CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White)
+                            } else {
+                                Icon(Icons.Default.VpnKey, null)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Generar código de amistad")
+                            }
+                        }
+                    } else {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF252525)),
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            border = BorderStroke(1.dp, Color(0xFFFF9800))
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text("TU CÓDIGO TEMPORAL", color = Color.Gray, fontSize = 10.sp)
+                                Text(
+                                    state.generatedCode!!,
+                                    color = Color(0xFFFF9800),
+                                    fontSize = 32.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    letterSpacing = 2.sp
+                                )
+                                Text("Expira en 15 minutos", color = Color.Gray, fontSize = 11.sp)
+                                
+                                Row(
+                                    modifier = Modifier.padding(top = 12.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                            val clip = ClipData.newPlainText("Friend Code", state.generatedCode)
+                                            clipboard.setPrimaryClip(clip)
+                                            Toast.makeText(context, "Código copiado", Toast.LENGTH_SHORT).show()
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0x33FFFFFF)),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Icon(Icons.Default.ContentCopy, null, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Copiar", fontSize = 12.sp)
+                                    }
+
+                                    Button(
+                                        onClick = {
+                                            val shareIntent = Intent().apply {
+                                                action = Intent.ACTION_SEND
+                                                putExtra(Intent.EXTRA_TEXT, "Mi código de amistad en LinkUp es: ${state.generatedCode}\n\nAbre LinkUp y escribe este código en la sección Agregar Amigo.\n\nEste código expira en 15 minutos.")
+                                                type = "text/plain"
+                                            }
+                                            context.startActivity(Intent.createChooser(shareIntent, "Compartir código"))
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Icon(Icons.Default.Share, null, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Compartir", fontSize = 12.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // RESTAURACIÓN DE SISTEMA QR INDEPENDIENTE
                     BotonOpcion(
-                        emoji = null,
+                        icono = Icons.Default.QrCode,
                         iconoColor = Color(0xFFE9C46A),
                         fondoIcono = Color(0x33E9C46A),
-                        titulo = "Generar código QR",
-                        descripcion = "Escanea para unirte",
-                        icono = Icons.Default.QrCode,
-                        onClick = {
-                            viewModel.updateMostrarQR(!state.mostrarQR)
-                            Log.i("MyApp", "QR toggled: ${!state.mostrarQR}")
-                        }
+                        titulo = "Ver mi QR",
+                        descripcion = "Usa el QR permanente de tu perfil",
+                        onClick = { viewModel.updateMostrarQR(!state.mostrarQR) }
                     )
 
                     if (state.mostrarQR && currentUser != null) {
-                        // El QR usa el Custom URI Scheme (linkup://) para apertura directa e instantánea
+                        // El QR se basa únicamente en el UID permanente, no en códigos temporales.
                         val qrBitmap = remember(currentUser.uid) {
                             QRGenerator.generate(InviteUtils.createQrLink(currentUser.uid))
                         }
@@ -100,67 +184,47 @@ fun InvitarNFC(
                     }
 
                     BotonOpcion(
-                        emoji = null,
+                        icono = Icons.Default.QrCodeScanner,
                         iconoColor = Color(0xFF3B82F6),
                         fondoIcono = Color(0x333B82F6),
-                        titulo = "Escanear código QR",
+                        titulo = "Escanear QR",
                         descripcion = "Escanear el código de un amigo",
-                        icono = Icons.Default.QrCodeScanner,
                         onClick = onEscanearQR
                     )
 
-                    BotonOpcion(
-                        emoji = null,
-                        iconoColor = Color(0xFF22C55E),
-                        fondoIcono = Color(0x3322C55E),
-                        titulo = "Compartir enlace",
-                        descripcion = "WhatsApp, Telegram, etc.",
-                        icono = Icons.Default.Share,
-                        onClick = {
-                            Log.i("MyApp", "Compartir enlace clicked")
-                            currentUser?.uid?.let { uid ->
-                                // Usamos el enlace HTTPS para que apps externas lo reconozcan como clickable
-                                val link = InviteUtils.createShareableLink(uid)
-                                Log.d("INVITE_SHARE", "Link compartido: $link")
-
-                                val sendIntent: Intent = Intent().apply {
-                                    action = Intent.ACTION_SEND
-                                    putExtra(Intent.EXTRA_TEXT, "¡Agrégame en LinkUp para correr juntos! $link")
-                                    type = "text/plain"
-                                }
-                                val shareIntent = Intent.createChooser(sendIntent, null)
-                                context.startActivity(shareIntent)
-                            }
-                        }
-                    )
-
-                    InfoNFC()
+                    InfoSeguridad()
                 }
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Color(0x1AFFFFFF))
-                )
-
-                Button(
-                    onClick = {
-                        Log.i("MyApp", "Cerrar InvitarNFC clicked")
-                        onCerrar()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp)
-                        .padding(bottom = 8.dp)
-                        .height(46.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0x0DFFFFFF)),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Color(0x33FFFFFF))
-                ) {
-                    Text("Cerrar", color = Color.White)
-                }
+                Spacer(modifier = Modifier.height(20.dp))
             }
+        }
+    }
+}
+
+@Composable
+fun CodigoQR(bitmap: Bitmap) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = "Código QR Personal",
+                modifier = Modifier.size(200.dp)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                "SISTEMA QR INDEPENDIENTE\nEscanea este código para agregarme",
+                color = Color.Black,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -175,30 +239,11 @@ fun HeaderInvitar(onCerrar: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            "Invitar amigos",
-            color = Color.White,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .background(Color(0x1AFFFFFF), CircleShape)
-                .clickable { onCerrar() },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(18.dp))
+        Text("Invitar amigos", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        IconButton(onClick = onCerrar) {
+            Icon(Icons.Default.Close, null, tint = Color.White)
         }
     }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(Color(0x1AFFFFFF))
-    )
 }
 
 @Composable
@@ -206,80 +251,25 @@ fun BotonNFC(escaneando: Boolean, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF2A9D8F)),
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { if (!escaneando) onClick() }
+        modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(72.dp)
-                    .background(Color(0x33FFFFFF), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    Icons.Default.Nfc,
-                    null,
-                    tint = Color.White,
-                    modifier = Modifier.size(36.dp)
-                )
-            }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    if (escaneando) "Acercando teléfonos..." else "Acercar teléfonos",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    "Únete a carrera en curso por NFC",
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 12.sp
-                )
+            Icon(Icons.Default.Nfc, null, tint = Color.White, modifier = Modifier.size(32.dp))
+            Column {
+                Text(if (escaneando) "Buscando dispositivos..." else "Compartir por NFC", color = Color.White, fontWeight = FontWeight.Bold)
+                Text("Acerca los teléfonos para sincronizar", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
             }
         }
     }
 }
 
 @Composable
-fun SeparadorO() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(1.dp)
-                .background(Color(0x1AFFFFFF))
-        )
-        Text(
-            "o compartir con",
-            color = Color.White.copy(alpha = 0.6f),
-            fontSize = 12.sp
-        )
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(1.dp)
-                .background(Color(0x1AFFFFFF))
-        )
-    }
-}
-
-@Composable
 fun BotonOpcion(
-    emoji: String?,
-    icono: ImageVector,
+    icono: androidx.compose.ui.graphics.vector.ImageVector,
     iconoColor: Color,
     fondoIcono: Color,
     titulo: String,
@@ -289,10 +279,7 @@ fun BotonOpcion(
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF252525)),
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        border = BorderStroke(1.dp, Color(0x1AFFFFFF))
+        modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -300,84 +287,39 @@ fun BotonOpcion(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .background(fondoIcono, RoundedCornerShape(12.dp)),
+                modifier = Modifier.size(40.dp).background(fondoIcono, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icono, null, tint = iconoColor, modifier = Modifier.size(22.dp))
+                Icon(icono, null, tint = iconoColor, modifier = Modifier.size(20.dp))
             }
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    titulo,
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    descripcion,
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 12.sp
-                )
+            Column {
+                Text(titulo, color = Color.White, fontWeight = FontWeight.SemiBold)
+                Text(descripcion, color = Color.Gray, fontSize = 12.sp)
             }
         }
     }
 }
 
 @Composable
-fun CodigoQR(bitmap: Bitmap) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(192.dp)
-                    .background(Color.White, RoundedCornerShape(12.dp))
-                    .padding(8.dp)
-            ) {
-                Image(
-                    bitmap = bitmap.asImageBitmap(),
-                    contentDescription = "Código QR de invitación",
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                "Escanea este código para unirte a la carrera",
-                color = Color.Black,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
+fun InfoSeguridad() {
+    Text(
+        "💡 Los códigos de amistad son temporales y expiran por seguridad.",
+        color = Color.Gray,
+        fontSize = 11.sp,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+    )
 }
 
 @Composable
-fun InfoNFC() {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0x1A2A9D8F)),
-        shape = RoundedCornerShape(16.dp),
+fun SeparadorO() {
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        border = BorderStroke(1.dp, Color(0x4D2A9D8F))
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            "💡 Quien escanee el QR o enlace se unirá automáticamente a tu carrera activa",
-            color = Color.White.copy(alpha = 0.8f),
-            fontSize = 12.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(12.dp)
-        )
+        Box(modifier = Modifier.weight(1f).height(1.dp).background(Color(0x1AFFFFFF)))
+        Text("o", color = Color.White.copy(alpha = 0.4f), fontSize = 12.sp)
+        Box(modifier = Modifier.weight(1f).height(1.dp).background(Color(0x1AFFFFFF)))
     }
 }

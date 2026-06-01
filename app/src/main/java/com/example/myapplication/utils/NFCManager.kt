@@ -15,10 +15,11 @@ class NFCManager(private val activity: Activity) {
     fun isEnabled(): Boolean = nfcAdapter?.isEnabled == true
 
     /**
-     * Crea un payload NDEF que contiene el enlace de invitación
+     * Crea un payload NDEF que contiene el enlace de invitación.
+     * Utiliza la fuente única de verdad del sistema QR/NFC independiente.
      */
     fun createPayload(uid: String): ByteArray {
-        val link = InviteUtils.createFriendLink(uid)
+        val link = QRGenerator.createQrContent(uid)
         val record = NdefRecord.createUri(link)
         return NdefMessage(arrayOf(record)).toByteArray()
     }
