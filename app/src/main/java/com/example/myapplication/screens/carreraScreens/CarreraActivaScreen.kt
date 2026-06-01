@@ -1,4 +1,4 @@
-package com.example.myapplication.screens
+package com.example.myapplication.screens.carreraScreens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background

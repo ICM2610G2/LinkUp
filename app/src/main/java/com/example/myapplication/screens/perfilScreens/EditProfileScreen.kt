@@ -1,4 +1,4 @@
-package com.example.myapplication.screens
+package com.example.myapplication.screens.perfilScreens
 
 import android.content.ClipData
 import android.content.ClipboardManager

@@ -20,19 +20,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.myapplication.screens.BuscarAmigos
-import com.example.myapplication.screens.CarreraActivaScreen
-import com.example.myapplication.screens.Carreras
-import com.example.myapplication.screens.Chat
+import com.example.myapplication.screens.perfilScreens.BuscarAmigos
+import com.example.myapplication.screens.carreraScreens.CarreraActivaScreen
+import com.example.myapplication.screens.carreraScreens.Carreras
+import com.example.myapplication.screens.grupoScreens.Chat
 import com.example.myapplication.screens.homeScreens.CrearCarrera
-import com.example.myapplication.screens.EditProfileScreen
-import com.example.myapplication.screens.EscanearQR
-import com.example.myapplication.screens.InvitarNFC
+import com.example.myapplication.screens.perfilScreens.EditProfileScreen
+import com.example.myapplication.screens.homeScreens.EscanearQR
+import com.example.myapplication.screens.homeScreens.InvitarNFC
 import com.example.myapplication.screens.homeScreens.Home
-import com.example.myapplication.screens.ListaAmigos
+import com.example.myapplication.screens.perfilScreens.ListaAmigos
 import com.example.myapplication.screens.LobbyCarreraScreen
 import com.example.myapplication.screens.mapaScreens.Mapa
-import com.example.myapplication.screens.Perfil
+import com.example.myapplication.screens.perfilScreens.Perfil
 import com.example.myapplication.screens.Solicitudes
 
 

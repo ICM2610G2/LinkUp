@@ -1,4 +1,4 @@
-package com.example.myapplication.screens
+package com.example.myapplication.screens.perfilScreens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,9 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.models.User
 import com.example.myapplication.model.ListaAmigosViewModel
-import com.example.myapplication.repository.FriendsRepository
-import com.example.myapplication.repository.UserRepository
-import kotlinx.coroutines.launch
+import com.example.myapplication.screens.SolicitudCard
 
 @Composable
 fun ListaAmigos(

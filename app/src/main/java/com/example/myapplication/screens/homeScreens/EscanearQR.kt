@@ -1,4 +1,4 @@
-package com.example.myapplication.screens
+package com.example.myapplication.screens.homeScreens
 
 import android.Manifest
 import android.util.Log

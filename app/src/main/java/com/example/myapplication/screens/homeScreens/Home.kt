@@ -27,8 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.model.HomeViewModel
 import com.example.myapplication.screens.CrearPunto
 import com.example.myapplication.screens.GaleriaLugar
-import com.example.myapplication.screens.InvitarNFC
-import com.example.myapplication.screens.ListaAmigos
+import com.example.myapplication.screens.perfilScreens.ListaAmigos
 import com.example.myapplication.screens.MenuFlotante
 
 @Composable

@@ -1,7 +1,6 @@
-package com.example.myapplication.screens
+package com.example.myapplication.screens.grupoScreens
 
 import android.Manifest
-import android.net.Uri
 import androidx.compose.runtime.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*

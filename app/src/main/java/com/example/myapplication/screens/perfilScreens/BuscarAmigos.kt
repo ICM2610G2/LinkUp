@@ -1,8 +1,9 @@
-package com.example.myapplication.screens
+package com.example.myapplication.screens.perfilScreens
 
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -353,10 +354,10 @@ fun BuscarAmigos(
                                 onClick = {
                                     val clip = ClipData.newPlainText("Game ID", state.currentUser!!.gameId)
                                     clipboardManager.setPrimaryClip(clip)
-                                    android.widget.Toast.makeText(
+                                    Toast.makeText(
                                         context,
                                         "Game ID copiado",
-                                        android.widget.Toast.LENGTH_SHORT
+                                        Toast.LENGTH_SHORT
                                     ).show()
                                 }
                             ) {

@@ -1,5 +1,6 @@
-package com.example.myapplication.screens
+package com.example.myapplication.screens.perfilScreens
 
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,7 +32,10 @@ import com.example.myapplication.auth.FirebaseAuthManager
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.auth.BiometricAuthResult
+import com.example.myapplication.auth.BiometricAvailability
 import com.example.myapplication.model.PerfilViewModel
 
 @Composable
@@ -47,7 +51,7 @@ fun Perfil(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val activity = context as androidx.appcompat.app.AppCompatActivity
+    val activity = context as AppCompatActivity
     val authManager = remember { FirebaseAuthManager(activity) }
     val biometricManager = remember { BiometricAuthManager(activity) }
 
@@ -66,7 +70,7 @@ fun Perfil(
     LaunchedEffect(Unit) {
         biometricManager.authResult.collect { result ->
             when (result) {
-                is com.example.myapplication.auth.BiometricAuthResult.Success -> {
+                is BiometricAuthResult.Success -> {
                     scope.launch {
                         viewModel.updateIsLoading(true)
                         val deleteResult = authManager.deleteAccount()
@@ -82,7 +86,7 @@ fun Perfil(
                         )
                     }
                 }
-                is com.example.myapplication.auth.BiometricAuthResult.Error -> {
+                is BiometricAuthResult.Error -> {
                     viewModel.updateErrorMessage(result.message)
                     viewModel.updateShowBiometricConfirm(false)
                 }
@@ -145,12 +149,12 @@ fun Perfil(
                         text = "Esta acción es irreversible. Se eliminarán todos tus datos.",
                         color = Color.Gray,
                         fontSize = 14.sp,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // Botón: Usar huella
-                    if (biometricManager.isBiometricAvailable() is com.example.myapplication.auth.BiometricAvailability.Available) {
+                    if (biometricManager.isBiometricAvailable() is BiometricAvailability.Available) {
                         Button(
                             onClick = {
                                 viewModel.updateShowDeleteDialog(false)
