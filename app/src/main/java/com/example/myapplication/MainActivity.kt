@@ -1,7 +1,9 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
@@ -16,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.auth.BiometricAuthManager
 import com.example.myapplication.data.models.User
 import com.example.myapplication.repository.UserRepository
@@ -24,15 +27,26 @@ import com.example.myapplication.auth.EncryptedPreferences
 import com.example.myapplication.auth.FirebaseAuthManager
 import com.example.myapplication.auth.AuthState
 import com.example.myapplication.navigation.MainScaffold
+import com.example.myapplication.repository.FriendInviteRepository
 import com.example.myapplication.screens.Login
+import com.example.myapplication.utils.DeepLinkParser
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+    private val inviteRepository by lazy { FriendInviteRepository() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "onCreate llamado")
+        
+        val uri = intent?.data
+        if (uri != null) {
+            Log.d("DEEPLINK", "App abierta vía URI (onCreate): $uri")
+        }
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        handleIntent(intent)
 
         setContent {
             MyApplicationTheme {
@@ -43,6 +57,52 @@ class MainActivity : AppCompatActivity() {
                     LinkUpApp()
                 }
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        
+        val uri = intent?.data
+        if (uri != null) {
+            Log.d("DEEPLINK", "Nuevo Intent recibido (onNewIntent): $uri")
+        }
+        
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        intent?.let {
+            val uid = DeepLinkParser.extractUid(it)
+            if (uid != null) {
+                Log.d("DEEPLINK", "UID extraído: $uid")
+                sendInvite(uid)
+                // Limpiar el intent para no procesarlo de nuevo en recreaciones si fuera necesario
+                // Aunque con singleTop y onNewIntent el manejo suele ser limpio.
+                intent.data = null 
+            }
+
+            if (android.nfc.NfcAdapter.ACTION_NDEF_DISCOVERED == it.action) {
+                Log.i("MainActivity", "NFC recibido")
+            }
+        }
+    }
+
+    private fun sendInvite(uid: String) {
+        lifecycleScope.launch {
+            Log.d("DEEPLINK", "Iniciando envío de solicitud para UID: $uid")
+            val result = inviteRepository.sendInviteByUid(uid)
+            result.fold(
+                onSuccess = {
+                    Log.d("DEEPLINK", "Solicitud enviada exitosamente")
+                    Toast.makeText(this@MainActivity, "Solicitud enviada", Toast.LENGTH_SHORT).show()
+                },
+                onFailure = { e ->
+                    Log.e("DEEPLINK", "Error al enviar solicitud: ${e.message}")
+                    Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            )
         }
     }
 }

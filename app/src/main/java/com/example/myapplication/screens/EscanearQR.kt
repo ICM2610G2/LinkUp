@@ -3,33 +3,39 @@ package com.example.myapplication.screens
 import android.Manifest
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.OptIn
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.myapplication.repository.FriendInviteRepository
 import com.example.myapplication.utils.InviteUtils
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalGetImage::class)
+@kotlin.OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EscanearQR(
     onBack: () -> Unit,
@@ -43,8 +49,17 @@ fun EscanearQR(
     
     var isProcessing by remember { mutableStateOf(false) }
 
+    val scanner = remember {
+        val options = BarcodeScannerOptions.Builder()
+            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+            .build()
+        BarcodeScanning.getClient(options)
+    }
+
     LaunchedEffect(Unit) {
-        cameraPermissionState.launchPermissionRequest()
+        if (!cameraPermissionState.status.isGranted) {
+            cameraPermissionState.launchPermissionRequest()
+        }
     }
 
     Scaffold(
@@ -53,7 +68,7 @@ fun EscanearQR(
                 title = { Text("Escanea un código QR", color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás", tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás", tint = Color.White)
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -66,10 +81,10 @@ fun EscanearQR(
         if (cameraPermissionState.status.isGranted) {
             Box(modifier = Modifier.padding(padding).fillMaxSize()) {
                 AndroidView(
-                    factory = { context ->
-                        val previewView = PreviewView(context)
-                        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-                        val executor = ContextCompat.getMainExecutor(context)
+                    factory = { ctx ->
+                        val previewView = PreviewView(ctx)
+                        val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+                        val executor = ContextCompat.getMainExecutor(ctx)
 
                         cameraProviderFuture.addListener({
                             val cameraProvider = cameraProviderFuture.get()
@@ -77,7 +92,6 @@ fun EscanearQR(
                                 it.setSurfaceProvider(previewView.surfaceProvider)
                             }
 
-                            val scanner = BarcodeScanning.getClient()
                             val analysisUseCase = ImageAnalysis.Builder()
                                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                                 .build()
@@ -88,11 +102,16 @@ fun EscanearQR(
                                     val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
                                     scanner.process(image)
                                         .addOnSuccessListener { barcodes ->
+                                            if (isProcessing) return@addOnSuccessListener
+                                            
                                             for (barcode in barcodes) {
-                                                val rawValue = barcode.rawValue
-                                                if (rawValue != null && rawValue.startsWith("https://linkup.app/addfriend")) {
-                                                    val uid = InviteUtils.extractUidFromLink(rawValue)
-                                                    if (uid != null && !isProcessing) {
+                                                val raw = barcode.rawValue
+                                                if (raw != null) {
+                                                    Log.d("QR_SCAN", "Contenido QR: $raw")
+                                                    val uid = InviteUtils.extractUidFromLink(raw)
+                                                    Log.d("QR_SCAN", "UID extraído: $uid")
+                                                    
+                                                    if (uid != null) {
                                                         isProcessing = true
                                                         scope.launch {
                                                             val result = inviteRepository.sendInviteByUid(uid)
@@ -107,6 +126,7 @@ fun EscanearQR(
                                                                 }
                                                             )
                                                         }
+                                                        break
                                                     }
                                                 }
                                             }
@@ -136,14 +156,15 @@ fun EscanearQR(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Overlay simple para guiar al usuario
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(40.dp),
+                    modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Aquí podrías dibujar un recuadro o visor
+                    Box(
+                        modifier = Modifier
+                            .size(250.dp)
+                            .border(2.dp, Color.White.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                    )
                 }
             }
         } else {
@@ -151,7 +172,13 @@ fun EscanearQR(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Se requiere permiso de cámara para escanear", color = Color.White)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Se requiere permiso de cámara", color = Color.White)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
+                        Text("Conceder permiso")
+                    }
+                }
             }
         }
     }
