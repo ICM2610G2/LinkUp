@@ -6,12 +6,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.*
@@ -24,6 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.example.myapplication.data.models.Race
+import com.example.myapplication.data.models.RaceSession
 import com.example.myapplication.model.HomeViewModel
 import com.example.myapplication.screens.CrearPunto
 import com.example.myapplication.screens.GaleriaLugar
@@ -33,9 +38,14 @@ import com.example.myapplication.screens.MenuFlotante
 @Composable
 fun Home(
     onEscanearQR: () -> Unit,
+    onAbrirLobby: (String) -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
     val state by viewModel.homeState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.cargarRecentSessions()
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -45,11 +55,44 @@ fun Home(
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
             item { HeaderSection() }
-            item { Spacer(modifier = Modifier.height(16.dp)) }
-            item { CarreraEnCursoCard() }
+            
+            // DYNAMIC RECENT LOBBIES SECTION
+            if (state.recentSessions.isNotEmpty()) {
+                item {
+                    Text(
+                        "Tus carreras recientes",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 8.dp)
+                    )
+                }
+                items(state.recentSessions) { item ->
+                    HomeRaceCard(
+                        session = item.session,
+                        race = item.race,
+                        onClick = { onAbrirLobby(item.session.id) }
+                    )
+                }
+                item { Spacer(modifier = Modifier.height(16.dp)) }
+            } else if (state.isLoadingSessions) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = Color(0xFFFF9800))
+                    }
+                }
+            } else {
+                item { Spacer(modifier = Modifier.height(16.dp)) }
+                item { CarreraEnCursoCard() } // Fallback card
+            }
+
             item {
                 RutasHeader({
-                    Log.i("MyApp", "Crear ruta")
                     viewModel.updateMostrarCrearCarrera(true)
                 })
             }
@@ -62,7 +105,6 @@ fun Home(
                     dificultadColor = Color(0xFFFFB300),
                     imageRes = R.drawable.la_candelaria,
                     onClick = {
-                        Log.i("MyApp", "La Candelaria")
                         viewModel.updateLugarSeleccionado("La Candelaria")
                     }
                 )
@@ -76,7 +118,6 @@ fun Home(
                     dificultadColor = Color(0xFFE53935),
                     imageRes = R.drawable.monserrate,
                     onClick = {
-                        Log.i("MyApp", "Monserrate")
                         viewModel.updateLugarSeleccionado("Monserrate")
                     }
                 )
@@ -84,13 +125,13 @@ fun Home(
             item {
                 Spacer(modifier = Modifier.height(24.dp))
                 InvitarAmigosCard(onInvitar = {
-                    Log.i("MyApp", "Invitar Amigos clicked")
                     viewModel.updateMostrarNFC(true)
                 })
             }
             item { Spacer(modifier = Modifier.height(24.dp)) }
         }
 
+        // Floating Action Button
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -98,7 +139,6 @@ fun Home(
                 .size(56.dp)
                 .background(Color(0xFF2A9D8F), CircleShape)
                 .clickable {
-                    Log.i("MyApp", "Menu flotante clicked")
                     viewModel.updateMostrarMenuFlotante(true)
                 },
             contentAlignment = Alignment.Center
@@ -119,18 +159,8 @@ fun Home(
             CrearCarrera(
                 onCerrar = { viewModel.updateMostrarCrearCarrera(false) },
                 onCarreraCreada = {
-                    Log.i("MyApp", "Carrera creada desde Home")
                     viewModel.updateMostrarCrearCarrera(false)
-                }
-            )
-        }
-
-        if (state.mostrarCrearPunto) {
-            CrearPunto(
-                onCerrar = { viewModel.updateMostrarCrearPunto(false) },
-                onPublicar = {
-                    Log.i("MyApp", "Punto publicado desde Home")
-                    viewModel.updateMostrarCrearPunto(false)
+                    viewModel.cargarRecentSessions()
                 }
             )
         }
@@ -155,6 +185,135 @@ fun Home(
                 onCerrar = { viewModel.updateLugarSeleccionado(null) }
             )
         }
+    }
+}
+
+@Composable
+fun HomeRaceCard(
+    session: RaceSession,
+    race: Race?,
+    onClick: () -> Unit
+) {
+    val difficultyColor = when (race?.difficulty) {
+        "facil" -> Color(0xFF22C55E)
+        "media" -> Color(0xFFEAB308)
+        "dificil" -> Color(0xFFEF4444)
+        else -> Color(0xFFFF9800)
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 6.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+        border = BorderStroke(1.dp, Color(0x12FFFFFF))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(Color(0x26FF9800)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (race?.photoUrl?.isNotEmpty() == true) {
+                        AsyncImage(
+                            model = race.photoUrl,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.Route,
+                            null,
+                            tint = Color(0xFFFF9800),
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        race?.name ?: session.raceName,
+                        color = Color.White,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        "Estado: ${session.status.uppercase()}",
+                        color = Color(0xFFFF9800),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                
+                Icon(Icons.Default.ChevronRight, null, tint = Color.Gray)
+            }
+
+            if (race != null) {
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    HomeCardInfoChip(
+                        text = "${"%.1f".format(race.estimatedDistanceKm)} km",
+                        icon = Icons.Default.Place
+                    )
+
+                    HomeCardInfoChip(
+                        text = "${race.checkpointCount} puntos",
+                        icon = Icons.Default.EmojiEvents
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .background(difficultyColor, RoundedCornerShape(50))
+                            .padding(horizontal = 10.dp, vertical = 5.dp)
+                    ) {
+                        Text(
+                            race.difficulty.uppercase(),
+                            color = Color.White,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeCardInfoChip(
+    text: String,
+    icon: ImageVector
+) {
+    Row(
+        modifier = Modifier
+            .background(Color(0xFF252525), RoundedCornerShape(50))
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            icon,
+            null,
+            tint = Color.White.copy(alpha = 0.7f),
+            modifier = Modifier.size(14.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text,
+            color = Color.White.copy(alpha = 0.75f),
+            fontSize = 11.sp
+        )
     }
 }
 
@@ -244,45 +403,39 @@ fun StatBadge(valor: String, label: String, icon: ImageVector, modifier: Modifie
 @Composable
 fun CarreraEnCursoCard() {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFF9800)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .clickable { Log.i("MyApp", "Carrera en curso clicked") }
+            .border(1.dp, Color(0x12FFFFFF), RoundedCornerShape(20.dp))
     ) {
         Row(
             modifier = Modifier.padding(20.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .background(Color(0x1AFF9800), CircleShape),
+                contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .background(Color(0x33FFFFFF), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(Icons.Default.AccessTime, null, tint = Color.White)
-                }
-                Column {
-                    Text(
-                        "Carrera en curso",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        "La Candelaria · 3 de 5 puntos",
-                        color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 12.sp
-                    )
-                }
+                Icon(Icons.Default.Route, null, tint = Color(0xFFFF9800))
             }
-            Icon(Icons.Default.ChevronRight, null, tint = Color.White)
+            Column {
+                Text(
+                    "No hay carreras activas",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+                Text(
+                    "¡Explora rutas y únete a una!",
+                    color = Color.Gray,
+                    fontSize = 12.sp
+                )
+            }
         }
     }
 }
@@ -292,7 +445,7 @@ fun RutasHeader(onCrearRuta: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -330,8 +483,7 @@ fun RutaItem(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { onClick() }
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
     ) {
         Row(
             modifier = Modifier.padding(12.dp),

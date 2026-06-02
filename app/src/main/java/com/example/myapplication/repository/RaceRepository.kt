@@ -75,6 +75,7 @@ class RaceRepository(
 
             Result.success(raceRef.id)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error creating race", e)
             Result.failure(e)
         }
     }
@@ -85,16 +86,25 @@ class RaceRepository(
                 .get()
                 .await()
                 .documents
-                .mapNotNull { doc -> doc.toObject(Race::class.java)?.copy(id = doc.id) }
+                .mapNotNull { doc ->
+                    try {
+                        doc.toObject(Race::class.java)?.apply { id = doc.id }
+                    } catch (e: Exception) {
+                        Log.e("RaceRepository", "Error mapping Race document ${doc.id}", e)
+                        null
+                    }
+                }
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error getting public races", e)
             emptyList()
         }
     }
 
     suspend fun getRaceById(raceId: String): Race? {
         return try {
-            firestore.collection("races").document(raceId).get().await().toObject(Race::class.java)?.copy(id = raceId)
+            firestore.collection("races").document(raceId).get().await().toObject(Race::class.java)?.apply { id = raceId }
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error getting race by id $raceId", e)
             null
         }
     }
@@ -114,23 +124,6 @@ class RaceRepository(
         }
     }
 
-    suspend fun getSessionForRace(raceId: String): RaceSession? {
-        return try {
-            firestore.collection("race_sessions")
-                .whereEqualTo("raceId", raceId)
-                .whereEqualTo("status", "lobby")
-                .limit(1)
-                .get()
-                .await()
-                .documents
-                .firstOrNull()
-                ?.toObject(RaceSession::class.java)
-                ?.let { it.copy(id = it.id) }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
     suspend fun joinRaceSession(sessionId: String): Result<Unit> {
         return try {
             val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
@@ -138,18 +131,19 @@ class RaceRepository(
             firestore.collection("race_sessions")
                 .document(sessionId)
                 .update(
-                    "participants.$uid",
-                    mapOf(
+                    "participants.$uid", mapOf(
                         "joinedAt" to Timestamp.now(),
                         "completedAt" to null,
                         "position" to null,
                         "checkpointsDone" to emptyList<String>()
-                    )
+                    ),
+                    "participantIds", FieldValue.arrayUnion(uid)
                 )
                 .await()
 
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error joining race session $sessionId", e)
             Result.failure(e)
         }
     }
@@ -176,6 +170,7 @@ class RaceRepository(
                 createLobby(race)
             }
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error finding or joining lobby", e)
             Result.failure(e)
         }
     }
@@ -187,11 +182,11 @@ class RaceRepository(
             val sessionRef = firestore.collection("race_sessions").document()
 
             val sessionData = hashMapOf(
-                "id" to sessionRef.id,
                 "raceId" to race.id,
                 "raceName" to race.name,
                 "status" to "lobby",
                 "createdBy" to uid,
+                "participantIds" to listOf(uid),
                 "participants" to mapOf(
                     uid to mapOf(
                         "joinedAt" to Timestamp.now(),
@@ -211,6 +206,7 @@ class RaceRepository(
 
             Result.success(sessionRef.id)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error creating lobby", e)
             Result.failure(e)
         }
     }
@@ -240,6 +236,7 @@ class RaceRepository(
 
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error starting race session", e)
             Result.failure(e)
         }
     }
@@ -255,6 +252,7 @@ class RaceRepository(
                 .mapNotNull { it.toObject(Checkpoint::class.java)?.copy(id = it.id) }
                 .sortedBy { it.order }
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error getting checkpoints", e)
             emptyList()
         }
     }
@@ -273,6 +271,7 @@ class RaceRepository(
 
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error validating checkpoint", e)
             Result.failure(e)
         }
     }
