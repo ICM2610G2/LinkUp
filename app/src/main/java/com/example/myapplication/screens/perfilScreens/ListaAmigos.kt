@@ -60,11 +60,11 @@ fun ListaAmigos(
                     Text("Amigos", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         IconButton(onClick = onBuscarAmigos) {
-                            Icon(Icons.Default.Search, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                            Icon(Icons.Default.PersonAdd, null, tint = Color.White, modifier = Modifier.size(20.dp))
                         }
                         Box {
                             IconButton(onClick = onVerSolicitudes) {
-                                Icon(Icons.Default.PersonAdd, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                                Icon(Icons.Default.Notifications, null, tint = Color.White, modifier = Modifier.size(20.dp))
                             }
                             if (state.solicitudes.isNotEmpty()) {
                                 Box(
@@ -135,18 +135,29 @@ fun ListaAmigos(
                                     verticalArrangement = Arrangement.Center
                                 ) {
                                     Icon(Icons.Default.PersonOutline, null, tint = Color.Gray, modifier = Modifier.size(64.dp))
+                                    Icon(
+                                        Icons.Default.Group,
+                                        null,
+                                        tint = Color.Gray,
+                                        modifier = Modifier.size(64.dp)
+                                    )
                                     Spacer(modifier = Modifier.height(16.dp))
                                     Text("No tienes amigos aún", color = Color.Gray)
                                     Text("Busca amigos por Game ID", color = Color.Gray.copy(alpha = 0.6f), fontSize = 12.sp)
+                                    Text(
+                                        "Añade amigos con un código",
+                                        color = Color.Gray.copy(alpha = 0.6f),
+                                        fontSize = 12.sp
+                                    )
                                     Spacer(modifier = Modifier.height(16.dp))
                                     Button(
                                         onClick = onBuscarAmigos,
                                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
                                         shape = RoundedCornerShape(12.dp)
                                     ) {
-                                        Icon(Icons.Default.Search, null)
+                                        Icon(Icons.Default.Add, null)
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text("Buscar amigos")
+                                        Text("Añadir amigos")
                                     }
                                 }
                             } else {
@@ -243,6 +254,17 @@ fun AmigoItem(
             }
 
             Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    amigo.displayName,
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    "${amigo.totalPoints} pts · ${amigo.gameId}",
+                    color = Color(0xFFFF9800).copy(alpha = 0.8f),
+                    fontSize = 11.sp
+                )
                 Text(amigo.displayName, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 Text(amigo.gameId, color = Color.Gray, fontSize = 12.sp)
                 Text("${amigo.totalPoints} pts", color = Color(0xFFFF9800).copy(alpha = 0.8f), fontSize = 11.sp)

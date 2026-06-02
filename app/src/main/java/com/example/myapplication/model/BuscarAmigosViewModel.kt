@@ -14,7 +14,11 @@ data class BuscarAmigosState(
     val errorMessage: String? = null,
     val friendStatus: String? = null,
     val isSending: Boolean = false,
-    val currentUser: User? = null
+    val currentUser: User? = null,
+    // Nuevos campos para códigos temporales
+    val generatedCode: String? = null,
+    val isGeneratingCode: Boolean = false,
+    val remainingTime: String? = null
 )
 
 class BuscarAmigosViewModel : ViewModel() {
@@ -44,5 +48,11 @@ class BuscarAmigosViewModel : ViewModel() {
     }
     fun updateCurrentUser(newValue: User?) {
         _buscarAmigosState.update { it.copy(currentUser = newValue) }
+    }
+    fun updateGeneratedCode(code: String?, time: String?) {
+        _buscarAmigosState.update { it.copy(generatedCode = code, remainingTime = time) }
+    }
+    fun updateIsGeneratingCode(newValue: Boolean) {
+        _buscarAmigosState.update { it.copy(isGeneratingCode = newValue) }
     }
 }

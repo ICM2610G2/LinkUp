@@ -1,7 +1,10 @@
 package com.example.myapplication
 
+import android.content.Intent
+import android.nfc.NfcAdapter
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
@@ -16,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.auth.BiometricAuthManager
 import com.example.myapplication.data.models.User
 import com.example.myapplication.repository.UserRepository
@@ -25,13 +29,26 @@ import com.example.myapplication.auth.FirebaseAuthManager
 import com.example.myapplication.auth.AuthState
 import com.example.myapplication.navigation.MainScaffold
 import com.example.myapplication.screens.Login
+import com.example.myapplication.utils.NFCManager
+import com.example.myapplication.repository.FriendInviteRepository
 import kotlinx.coroutines.launch
 
+/**
+ * MainActivity (ORQUESTADOR)
+ * Responsable de la gestión del ciclo de vida NFC y recepción de datos mediante ReaderMode.
+ */
 class MainActivity : AppCompatActivity() {
+    private val nfcManager = NFCManager()
+    private lateinit var inviteRepository: FriendInviteRepository
+    
+    // Anti-spam debounce
+    private var lastNfcTime: Long = 0
+    private var lastUid: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("MainActivity", "onCreate llamado")
-
+        inviteRepository = FriendInviteRepository()
+        
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
@@ -40,15 +57,61 @@ class MainActivity : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    LinkUpApp()
+                    LinkUpApp(nfcManager)
                 }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // RECEPTOR REAL: ReaderMode activo para detectar tags NFC (incluyendo otros dispositivos si emularan).
+        if (nfcManager.isAvailable(this) && nfcManager.isEnabled(this)) {
+            nfcManager.enableReaderMode(this) { uid ->
+                handleReceivedUid(uid)
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        nfcManager.disableReaderMode(this)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        // Fallback para procesamiento vía Intent si el sistema no lo capturó por ReaderMode
+        nfcManager.parseFromIntent(intent)?.let { uid ->
+            handleReceivedUid(uid)
+        }
+    }
+
+    private fun handleReceivedUid(uid: String) {
+        val currentTime = System.currentTimeMillis()
+        // Anti-spam: Ignorar mismo UID dentro de 3 segundos
+        if (uid == lastUid && (currentTime - lastNfcTime) < 3000) {
+            return
+        }
+        
+        lastNfcTime = currentTime
+        lastUid = uid
+
+        Log.d("NFC_RECEIVE", "UID válido detectado por NFC: $uid")
+        lifecycleScope.launch {
+            val result = inviteRepository.sendInviteByUid(uid)
+            runOnUiThread {
+                result.fold(
+                    onSuccess = { Toast.makeText(this@MainActivity, "¡Solicitud enviada por NFC!", Toast.LENGTH_SHORT).show() },
+                    onFailure = { e -> Toast.makeText(this@MainActivity, "NFC: ${e.message}", Toast.LENGTH_SHORT).show() }
+                )
             }
         }
     }
 }
 
 @Composable
-fun LinkUpApp() {
+fun LinkUpApp(nfcManager: NFCManager) {
     val context = LocalContext.current
     val activity = context as AppCompatActivity
     val scope = rememberCoroutineScope()
@@ -63,55 +126,20 @@ fun LinkUpApp() {
     var isLoadingUserData by remember { mutableStateOf(false) }
 
     LaunchedEffect(authState) {
-        Log.d("LinkUpApp", "authState cambió: $authState")
-
         if (authState is AuthState.Authenticated) {
             isLoadingUserData = true
             val firebaseUser = (authState as AuthState.Authenticated).user
-            Log.d("LinkUpApp", "Usuario autenticado: ${firebaseUser.uid}")
-
             try {
-                // Intentar cargar desde Firestore
                 var user = userRepository.getUser(firebaseUser.uid)
-                Log.d("LinkUpApp", "Usuario encontrado en Firestore: ${user != null}")
-
-
                 if (user == null) {
-                    Log.d("LinkUpApp", " Usuario no existe en Firestore, creando...")
                     val gameId = authManager.generateUniqueGameId()
-                    Log.d("LinkUpApp", "GameID generado: $gameId")
-
-                    val saveResult = authManager.saveUserToFirestore(firebaseUser, gameId)
-
-                    saveResult.fold(
-                        onSuccess = {
-                            Log.d("LinkUpApp", " Usuario creado en Firestore")
-                            kotlinx.coroutines.delay(500)
-                            user = userRepository.getUser(firebaseUser.uid)
-                            Log.d("LinkUpApp", "Usuario recargado: ${user?.gameId}")
-                        },
-                        onFailure = { e ->
-                            Log.e("LinkUpApp", " Error creando usuario: ${e.message}", e)
-                        }
-                    )
+                    authManager.saveUserToFirestore(firebaseUser, gameId)
+                    user = userRepository.getUser(firebaseUser.uid)
                 }
-
-                // ✅ Asegurar que el user tiene gameId incluso si existe pero está vacío
-                if (user != null && user.gameId.isEmpty()) {
-                    Log.d("LinkUpApp", "⚠ Usuario sin Game ID, actualizando...")
-                    val newGameId = authManager.generateUniqueGameId()
-                    val updatedUser = user.copy(gameId = newGameId)
-                    userRepository.updateUser(updatedUser)
-                    user = updatedUser
-                }
-
                 userData = user
-                Log.d("LinkUpApp", " userData final: ${userData?.gameId}")
-
             } catch (e: Exception) {
-                Log.e("LinkUpApp", "Error en LaunchedEffect: ${e.message}", e)
+                Log.e("LinkUpApp", "Error cargando usuario: ${e.message}")
             }
-
             isLoadingUserData = false
         } else {
             userData = null
@@ -121,38 +149,25 @@ fun LinkUpApp() {
     when (authState) {
         is AuthState.Authenticated -> {
             if (isLoadingUserData) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Color(0xFFFF9800))
                 }
             } else {
                 MainScaffold(
                     user = userData,
-                    onLogout = {
-                        scope.launch { authManager.logout() }
-                    },
-                    onAccountDeleted = {
-                        scope.launch { encryptedPrefs.clearUserCredentials() }
-                    }
+                    onLogout = { scope.launch { authManager.logout() } },
+                    onAccountDeleted = { scope.launch { encryptedPrefs.clearUserCredentials() } }
                 )
             }
         }
-
         AuthState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("Verificando sesión...")
             }
         }
-
         else -> {
-
             Login(
-                onLoginSuccess = { /* authState cambia solo, LaunchedEffect se encarga */ },
+                onLoginSuccess = { },
                 authManager = authManager,
                 biometricManager = biometricManager,
                 encryptedPrefs = encryptedPrefs

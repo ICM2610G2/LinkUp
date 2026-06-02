@@ -2,7 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permisos (cada uno UNA sola vez) -->
+    <!-- Permisos NFC -->
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-feature android:name="android.hardware.nfc" android:required="false" />
+
+    <!-- Permisos existentes -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -15,7 +19,7 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
-    <!-- FORZAR override para librerías con minSdk mayor - DEBE IR AQUÍ, DENTRO DE MANIFEST -->
+    <!-- FORZAR override para librerías con minSdk mayor -->
     <uses-sdk tools:overrideLibrary="androidx.compose.remote.player.core" />
 
     <application
@@ -40,11 +44,19 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:label="@string/app_name"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Intent Filter para NFC -->
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="linkup" />
             </intent-filter>
         </activity>
 

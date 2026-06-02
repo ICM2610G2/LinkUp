@@ -83,8 +83,8 @@ fun Home(
             }
             item {
                 Spacer(modifier = Modifier.height(24.dp))
-                InvitarCard(onNFC = {
-                    Log.i("MyApp", "Compartir NFC")
+                InvitarAmigosCard(onInvitar = {
+                    Log.i("MyApp", "Invitar Amigos clicked")
                     viewModel.updateMostrarNFC(true)
                 })
             }
@@ -395,7 +395,7 @@ fun RutaItem(
 }
 
 @Composable
-fun InvitarCard(onNFC: () -> Unit) {
+fun InvitarAmigosCard(onInvitar: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1C)),
         shape = RoundedCornerShape(20.dp),
@@ -412,20 +412,20 @@ fun InvitarCard(onNFC: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                "Comparte un grupo por NFC y explora juntos",
+                "Código de amistad, QR o NFC",
                 color = Color.Gray,
                 fontSize = 12.sp
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = onNFC,
+                onClick = onInvitar,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Icon(Icons.Default.Nfc, null, tint = Color.White)
+                Icon(Icons.Default.GroupAdd, null, tint = Color.White)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Compartir con NFC")
+                Text("Invitar Amigos")
             }
         }
     }
