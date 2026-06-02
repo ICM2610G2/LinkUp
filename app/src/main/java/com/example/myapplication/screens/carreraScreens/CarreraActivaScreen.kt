@@ -8,11 +8,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,11 +21,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.models.Checkpoint
+import com.example.myapplication.model.WikipediaViewModel
 import com.example.myapplication.repository.RaceRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun CarreraActivaScreen(
@@ -35,6 +39,9 @@ fun CarreraActivaScreen(
     val scope = rememberCoroutineScope()
     val raceRepository = remember { RaceRepository() }
     val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+    val wikipediaViewModel: WikipediaViewModel = viewModel()
+    val wikipediaState by wikipediaViewModel.state.collectAsState()
 
     var raceId by remember { mutableStateOf("") }
     var raceName by remember { mutableStateOf("Carrera activa") }
@@ -55,7 +62,8 @@ fun CarreraActivaScreen(
                     participantsCount = participants?.size ?: 0
 
                     val myData = participants?.get(uid) as? Map<*, *>
-                    myCheckpointsDone = myData?.get("checkpointsDone") as? List<String> ?: emptyList()
+                    myCheckpointsDone =
+                        myData?.get("checkpointsDone") as? List<String> ?: emptyList()
                 }
             }
 
@@ -67,6 +75,7 @@ fun CarreraActivaScreen(
             checkpoints = raceRepository.getCheckpoints(raceId)
         }
     }
+
 
     val completedCount = myCheckpointsDone.size
     val total = checkpoints.size
@@ -121,11 +130,96 @@ fun CarreraActivaScreen(
                     done = done,
                     onValidate = {
                         scope.launch {
-                            raceRepository.validateCheckpoint(sessionId, checkpoint.id)
+                            val result = raceRepository.validateCheckpoint(
+                                sessionId = sessionId,
+                                checkpointId = checkpoint.id
+                            )
+
+                            result.fold(
+                                onSuccess = {
+                                    wikipediaViewModel.buscarLugar(checkpoint.name)
+                                },
+                                onFailure = { error ->
+                                    println("Error validando checkpoint: ${error.message}")
+                                }
+                            )
                         }
                     }
                 )
             }
+        }
+
+        if (wikipediaState.isLoading) {
+            Card(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+                shape = RoundedCornerShape(18.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CircularProgressIndicator(
+                        color = Color(0xFFFF9800),
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 3.dp
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "Consultando Wikipedia...",
+                        color = Color.White
+                    )
+                }
+            }
+        }
+
+        wikipediaState.place?.let { place ->
+            CulturalRewardDialog(
+                title = place.title,
+                extract = place.extract,
+                imageUrl = place.imageUrl,
+                onClose = {
+                    wikipediaViewModel.limpiar()
+                }
+            )
+        }
+
+
+
+
+        wikipediaState.errorMessage?.let { error ->
+            AlertDialog(
+                onDismissRequest = {
+                    wikipediaViewModel.limpiar()
+                },
+                containerColor = Color(0xFF1A1A1A),
+                title = {
+                    Text(
+                        text = "Error consultando Wikipedia",
+                        color = Color.White
+                    )
+                },
+                text = {
+                    Text(
+                        text = error,
+                        color = Color(0xFFBDBDBD)
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            wikipediaViewModel.limpiar()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFF9800)
+                        )
+                    ) {
+                        Text("Cerrar")
+                    }
+                }
+            )
         }
     }
 }
@@ -199,6 +293,95 @@ fun CheckpointCarreraItem(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(if (done) "Listo" else "Validar")
+            }
+        }
+    }
+}
+
+@Composable
+fun CulturalRewardDialog(
+    title: String,
+    extract: String,
+    imageUrl: String?,
+    onClose: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xCC000000)),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFF1A1A1A)
+            ),
+            border = BorderStroke(1.dp, Color(0x33FF9800))
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Lugar descubierto",
+                    color = Color(0xFFFF9800),
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                if (!imageUrl.isNullOrBlank()) {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = title,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .background(Color(0xFF252525), RoundedCornerShape(20.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                Text(
+                    text = title,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = extract,
+                    color = Color(0xFFBDBDBD),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                Text(
+                    text = "+100 XP",
+                    color = Color(0xFFFF9800),
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                Button(
+                    onClick = onClose,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFF9800)
+                    ),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Text("Continuar carrera")
+                }
             }
         }
     }

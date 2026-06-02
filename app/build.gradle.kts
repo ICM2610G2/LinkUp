@@ -54,6 +54,13 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
 
+    //api de wikipedia
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+// Logging HTTP
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Huella digital
     implementation("androidx.biometric:biometric:1.1.0")
