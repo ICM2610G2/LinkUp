@@ -238,12 +238,38 @@ class RaceRepository(
                 )
             ).await()
 
+            //notificar a todos los participantes
+            val raceName = snap.getString("raceName") ?: "la carrera"
+            //notifyParticipants(participants, raceName)
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
+//    private suspend fun notifyParticipants(participants: Map<*, *>?, raceName: String) {
+//        if (participants == null) return
+//        for (participantId in participants.keys) {
+//            try {
+//                val userDoc = firestore.collection("users")
+//                    .document(participantId.toString())
+//                    .get()
+//                    .await()
+//                val token = userDoc.getString("fcmToken") ?: continue
+//                firestore.collection("notifications").add(
+//                    mapOf(
+//                        "token" to token,
+//                        "title" to "¡Arrancó la carrera!",
+//                        "body" to "La carrera \"$raceName\" ha comenzado. ¡Corre!",
+//                        "createdAt" to Timestamp.now()
+//                    )
+//                ).await()
+//            } catch (e: Exception) {
+//                Log.e("FCM", "Error notificando a $participantId: ${e.message}")
+//            }
+//        }
+//    }
     suspend fun getCheckpoints(raceId: String): List<Checkpoint> {
         return try {
             firestore.collection("races")

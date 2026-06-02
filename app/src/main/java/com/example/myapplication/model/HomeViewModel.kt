@@ -34,15 +34,15 @@ class HomeViewModel : ViewModel() {
             try {
                 // Cargar carreras públicas
                 val races = raceRepository.getPublicRaces()
-                
+
                 // Cargar sesiones activas del usuario
                 val activeSessions = raceRepository.getUserActiveSessions()
                 val activeSession = activeSessions.firstOrNull()
-                
+
                 Log.d("HomeViewModel", "Datos cargados: ${races.size} rutas, sesión activa: ${activeSession?.id}")
 
                 _homeState.update { it.copy(
-                    publicRaces = races, 
+                    publicRaces = races,
                     activeSession = activeSession,
                     isLoadingRaces = false
                 ) }

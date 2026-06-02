@@ -58,9 +58,9 @@ fun Home(
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
             item { HeaderSection() }
-            
+
             item { Spacer(modifier = Modifier.height(20.dp)) }
-            
+
             if (state.activeSession != null) {
                 item {
                     CarreraEnCursoCard(
@@ -70,7 +70,7 @@ fun Home(
                 }
                 item { Spacer(modifier = Modifier.height(20.dp)) }
             }
-            
+
             item {
                 RutasHeader({
                     Log.i("MyApp", "Crear ruta")
@@ -295,9 +295,9 @@ fun CarreraEnCursoCard(
                     modifier = Modifier.size(26.dp)
                 )
             }
-            
+
             Spacer(modifier = Modifier.width(16.dp))
-            
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     session.raceName,
@@ -311,7 +311,7 @@ fun CarreraEnCursoCard(
                     fontSize = 13.sp
                 )
             }
-            
+
             Icon(Icons.Default.PlayArrow, null, tint = Color.White)
         }
     }
@@ -400,9 +400,9 @@ fun HomeCarreraCard(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
-                
+
                 Spacer(modifier = Modifier.height(4.dp))
-                
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -425,7 +425,7 @@ fun HomeCarreraCard(
                     }
                 }
             }
-            
+
             Icon(Icons.Default.ChevronRight, null, tint = Color.White.copy(alpha = 0.3f))
         }
     }
