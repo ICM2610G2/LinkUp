@@ -102,14 +102,28 @@ class RaceRepository(
     suspend fun getUserActiveSessions(): List<RaceSession> {
         return try {
             val uid = auth.currentUser?.uid ?: return emptyList()
-            firestore.collection("race_sessions")
-                .whereNotEqualTo("status", "finished")
+
+            val lobbySnap = firestore.collection("race_sessions")
+                .whereEqualTo("status", "lobby")
                 .get()
                 .await()
-                .documents
-                .mapNotNull { it.toObject(RaceSession::class.java)?.copy(id = it.id) }
-                .filter { it.participants.containsKey(uid) }
+
+            val activeSnap = firestore.collection("race_sessions")
+                .whereEqualTo("status", "active")
+                .get()
+                .await()
+
+            val allSessions = (lobbySnap.documents + activeSnap.documents)
+                .mapNotNull { doc ->
+                    doc.toObject(RaceSession::class.java)?.copy(id = doc.id)
+                }
+            
+            allSessions.filter { session ->
+                session.participants.containsKey(uid)
+            }
+
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error getUserActiveSessions: ${e.message}")
             emptyList()
         }
     }
