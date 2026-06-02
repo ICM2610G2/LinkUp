@@ -20,6 +20,7 @@ import com.google.firebase.Timestamp
 import android.util.Log
 import com.example.myapplication.R
 import com.example.myapplication.data.models.User
+import com.google.firebase.messaging.FirebaseMessaging
 
 
 class FirebaseAuthManager(private val activity: Activity) {
@@ -67,6 +68,10 @@ class FirebaseAuthManager(private val activity: Activity) {
         return try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
             result.user?.let {
+                val db = FirebaseFirestore.getInstance()
+                FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                    db.collection("users").document(it.uid).update("fcmToken", token)
+                }
                 Result.success(it)
             } ?: Result.failure(Exception("Usuario no encontrado"))
         } catch (e: Exception) {
@@ -91,6 +96,11 @@ class FirebaseAuthManager(private val activity: Activity) {
                     .setDisplayName(account.displayName)
                     .build()
                 user.updateProfile(profileUpdates).await()
+            }
+
+            val db = FirebaseFirestore.getInstance()
+            FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                db.collection("users").document(user.uid).update("fcmToken", token)
             }
 
             Result.success(user)
@@ -169,6 +179,13 @@ class FirebaseAuthManager(private val activity: Activity) {
             val savedDoc = db.collection("users").document(user.uid).get().await()
             val savedGameId = savedDoc.getString("gameId")
             Log.d("FIRESTORE", "Verificación - GameID en Firestore: $savedGameId")
+
+
+            //guarda el token del FCM
+            FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                db.collection("users").document(user.uid).update("fcmToken", token)
+                Log.d("FCM", "Token guardado al registrar usuario: $token")
+            }
 
             Result.success(Unit)
         } catch (e: Exception) {
