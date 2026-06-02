@@ -179,44 +179,69 @@ fun HeaderCarreras(
     onCrearCarrera: () -> Unit,
     onRefresh: () -> Unit
 ) {
-    Column {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            "Carreras",
+            color = Color.White,
+            fontSize = 26.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            "Explora rutas públicas o crea una nueva",
+            color = Color.Gray,
+            fontSize = 13.sp
+        )
+
+        Spacer(modifier = Modifier.height(14.dp))
+
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text(
-                    "Carreras",
-                    color = Color.White,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold
+            Button(
+                onClick = onCrearCarrera,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFFF9800)
+                ),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(18.dp)
                 )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
-                    "Explora rutas públicas o crea una nueva",
-                    color = Color.Gray,
-                    fontSize = 13.sp
+                    "Crear carrera",
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1
                 )
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                IconButton(onClick = onRefresh) {
-                    Icon(
-                        Icons.Default.Refresh,
-                        contentDescription = "Actualizar",
-                        tint = Color.White
-                    )
-                }
-
-                Button(
-                    onClick = onCrearCarrera,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
-                    shape = RoundedCornerShape(14.dp)
-                ) {
-                    Icon(Icons.Default.Add, null, tint = Color.White, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Crear", color = Color.White)
-                }
+            IconButton(
+                onClick = onRefresh,
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(Color(0xFF1A1A1A), RoundedCornerShape(14.dp))
+            ) {
+                Icon(
+                    Icons.Default.Refresh,
+                    contentDescription = "Actualizar",
+                    tint = Color.White
+                )
             }
         }
 

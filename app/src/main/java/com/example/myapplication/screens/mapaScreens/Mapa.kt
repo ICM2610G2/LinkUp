@@ -200,7 +200,7 @@ fun MapaConUbicacion(
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = true),
             uiSettings = MapUiSettings(
-                zoomControlsEnabled = false,
+                zoomControlsEnabled = true,
                 myLocationButtonEnabled = true
             )
         ) {
