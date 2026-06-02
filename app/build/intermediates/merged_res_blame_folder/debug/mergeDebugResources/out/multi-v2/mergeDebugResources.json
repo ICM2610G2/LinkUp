@@ -7681,23 +7681,6 @@
                     }
                 },
                 {
-                    "source": "C:\\dev\\movil\\Proyecto_Movil\\app\\build\\generated\\res\\processDebugGoogleServices\\values\\values.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8",
-                        "startColumns": "4,4,4,4,4,4,4",
-                        "startOffsets": "55,199,281,385,494,614,718",
-                        "endColumns": "143,81,103,108,119,103,72",
-                        "endOffsets": "194,276,380,489,609,713,786"
-                    },
-                    "to": {
-                        "startLines": "542,567,571,572,573,574,685",
-                        "startColumns": "4,4,4,4,4,4,4",
-                        "startOffsets": "32605,34454,34832,34936,35045,35165,43376",
-                        "endColumns": "143,81,103,108,119,103,72",
-                        "endOffsets": "32744,34531,34931,35040,35160,35264,43444"
-                    }
-                },
-                {
                     "source": "C:\\Users\\Gaming pc\\.gradle\\caches\\9.2.1\\transforms\\fd8dea509cbab990112b2cef65a536d3\\workspace\\transformed\\activity-1.12.4\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2,3",
@@ -7712,6 +7695,23 @@
                         "startOffsets": "23239,25065",
                         "endColumns": "41,59",
                         "endOffsets": "23276,25120"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Gaming pc\\Desktop\\LinkUp-main\\app\\build\\generated\\res\\processDebugGoogleServices\\values\\values.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "55,199,281,385,494,614,718",
+                        "endColumns": "143,81,103,108,119,103,72",
+                        "endOffsets": "194,276,380,489,609,713,786"
+                    },
+                    "to": {
+                        "startLines": "542,567,571,572,573,574,685",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "32605,34454,34832,34936,35045,35165,43376",
+                        "endColumns": "143,81,103,108,119,103,72",
+                        "endOffsets": "32744,34531,34931,35040,35160,35264,43444"
                     }
                 },
                 {
@@ -7859,6 +7859,23 @@
                     }
                 },
                 {
+                    "source": "C:\\Users\\Gaming pc\\Desktop\\LinkUp-main\\app\\src\\main\\res\\values\\colors.xml",
+                    "from": {
+                        "startLines": "7,2,3,4,5,6,8",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "286,55,102,149,196,241,328",
+                        "endColumns": "41,46,46,46,44,44,41",
+                        "endOffsets": "323,97,144,191,236,281,365"
+                    },
+                    "to": {
+                        "startLines": "139,200,201,202,213,214,217",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "5300,9545,9592,9639,10383,10428,10594",
+                        "endColumns": "41,46,46,46,44,44,41",
+                        "endOffsets": "5337,9587,9634,9681,10423,10468,10631"
+                    }
+                },
+                {
                     "source": "C:\\Users\\Gaming pc\\.gradle\\caches\\9.2.1\\transforms\\d973f37353d9782e19bfda97b527f5f1\\workspace\\transformed\\core-common-2.0.3\\res\\values\\values.xml",
                     "from": {
                         "startLines": "4",
@@ -7897,37 +7914,20 @@
                     }
                 },
                 {
-                    "source": "C:\\dev\\movil\\Proyecto_Movil\\app\\src\\main\\res\\values\\strings.xml",
+                    "source": "C:\\Users\\Gaming pc\\Desktop\\LinkUp-main\\app\\src\\main\\res\\values\\themes.xml",
                     "from": {
-                        "startLines": "1",
+                        "startLines": "3",
                         "startColumns": "4",
-                        "startOffsets": "16",
-                        "endColumns": "51",
-                        "endOffsets": "63"
+                        "startOffsets": "56",
+                        "endColumns": "90",
+                        "endOffsets": "142"
                     },
                     "to": {
-                        "startLines": "494",
+                        "startLines": "2142",
                         "startColumns": "4",
-                        "startOffsets": "28195",
-                        "endColumns": "51",
-                        "endOffsets": "28242"
-                    }
-                },
-                {
-                    "source": "C:\\dev\\movil\\Proyecto_Movil\\app\\src\\main\\res\\values\\colors.xml",
-                    "from": {
-                        "startLines": "7,2,3,4,5,6,8",
-                        "startColumns": "4,4,4,4,4,4,4",
-                        "startOffsets": "286,55,102,149,196,241,328",
-                        "endColumns": "41,46,46,46,44,44,41",
-                        "endOffsets": "323,97,144,191,236,281,365"
-                    },
-                    "to": {
-                        "startLines": "139,200,201,202,213,214,217",
-                        "startColumns": "4,4,4,4,4,4,4",
-                        "startOffsets": "5300,9545,9592,9639,10383,10428,10594",
-                        "endColumns": "41,46,46,46,44,44,41",
-                        "endOffsets": "5337,9587,9634,9681,10423,10468,10631"
+                        "startOffsets": "139989",
+                        "endColumns": "89",
+                        "endOffsets": "140074"
                     }
                 },
                 {
@@ -7945,6 +7945,23 @@
                         "startOffsets": "27806,27888",
                         "endColumns": "81,83",
                         "endOffsets": "27883,27967"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Gaming pc\\Desktop\\LinkUp-main\\app\\src\\main\\res\\values\\strings.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "16",
+                        "endColumns": "51",
+                        "endOffsets": "63"
+                    },
+                    "to": {
+                        "startLines": "494",
+                        "startColumns": "4",
+                        "startOffsets": "28195",
+                        "endColumns": "51",
+                        "endOffsets": "28242"
                     }
                 },
                 {
@@ -8193,23 +8210,6 @@
                         "endLines": "408,2376,3451,3454",
                         "endColumns": "52,24,24,24",
                         "endOffsets": "23028,153304,189111,189226"
-                    }
-                },
-                {
-                    "source": "C:\\dev\\movil\\Proyecto_Movil\\app\\src\\main\\res\\values\\themes.xml",
-                    "from": {
-                        "startLines": "3",
-                        "startColumns": "4",
-                        "startOffsets": "56",
-                        "endColumns": "90",
-                        "endOffsets": "142"
-                    },
-                    "to": {
-                        "startLines": "2142",
-                        "startColumns": "4",
-                        "startOffsets": "139989",
-                        "endColumns": "89",
-                        "endOffsets": "140074"
                     }
                 },
                 {

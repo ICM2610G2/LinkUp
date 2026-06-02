@@ -37,8 +37,7 @@ import com.example.myapplication.screens.Solicitudes
 import com.example.myapplication.screens.carreraScreens.CarreraScreen
 import com.example.myapplication.screens.grupoScreens.ListaChatsScreen
 import com.example.myapplication.screens.grupoScreens.ChatDetailScreen
-
-
+import com.example.myapplication.screens.carreraScreens.CarreraScreen
 
 @Composable
 fun MainScaffold(
@@ -71,7 +70,6 @@ fun MainScaffold(
                     NavItem("mapa", "Mapa", Icons.Default.Map),
                     NavItem("carreras", "Carreras", Icons.Default.EmojiEvents),
                     NavItem("lista_chats", "Chat", Icons.AutoMirrored.Filled.Chat),
-
                     NavItem("perfil", "Perfil", Icons.Default.Person)
                 )
 
@@ -113,8 +111,12 @@ fun MainScaffold(
         ) {
             composable("home") {
                 Home(
-                    onAbrirLobby = { navController.navigate("lobby_carrera/$it") },
-                    onEscanearQR = { navController.navigate(Screen.EscanearQR.route) })
+                    onVerCarrera = { raceId -> navController.navigate("carrera_detail/$raceId") },
+                    onEscanearQR = { navController.navigate("escanear_qr") },
+                    onAbrirLobby = { sessionId ->
+                        navController.navigate("lobby_carrera/$sessionId")
+                    }
+                )
             }
 
             composable("mapa") {
@@ -132,7 +134,6 @@ fun MainScaffold(
                     onVerCarrera = { raceId ->
                         navController.navigate("carrera_detail/$raceId")
                     },
-
                 )
             }
 
@@ -212,7 +213,6 @@ fun MainScaffold(
                 )
             }
 
-
             composable("perfil") {
                 Perfil(
                     user = firebaseUser,
@@ -225,8 +225,6 @@ fun MainScaffold(
                     onVerAmigos = {
                         navController.navigate("lista_amigos")
                     },
-
-
                     onRefresh = {
                         scope.launch {
                             firebaseUser?.uid?.let { uid ->
@@ -285,7 +283,6 @@ fun MainScaffold(
                 )
             }
 
-
             composable("buscar_amigos") {
                 BuscarAmigos(onBack = { navController.popBackStack() })
             }
@@ -293,8 +290,6 @@ fun MainScaffold(
             composable("solicitudes") {
                 Solicitudes(onBack = { navController.popBackStack() })
             }
-
-
         }
     }
 }

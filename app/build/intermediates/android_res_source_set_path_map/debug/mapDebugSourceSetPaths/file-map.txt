@@ -69,11 +69,11 @@ com.example.myapplication.app-ads-adservices-java-1.0.0-beta05-67 C:\Users\Gamin
 com.example.myapplication.app-material-icons-core-release-68 C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fa8cebf1ba413075e9585019bb4b3c9d\workspace\transformed\material-icons-core-release\res
 com.example.myapplication.app-activity-1.12.4-69 C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fd8dea509cbab990112b2cef65a536d3\workspace\transformed\activity-1.12.4\res
 com.example.myapplication.app-core-runtime-2.2.0-70 C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fe19dc443c4354bba5d61e3725304d93\workspace\transformed\core-runtime-2.2.0\res
-com.example.myapplication.app-pngs-71 C:\dev\movil\Proyecto_Movil\app\build\generated\res\pngs\debug
-com.example.myapplication.app-res-72 C:\dev\movil\Proyecto_Movil\app\build\generated\res\processDebugGoogleServices
-com.example.myapplication.app-updated_navigation_xml-73 C:\dev\movil\Proyecto_Movil\app\build\generated\updated_navigation_xml\debug
-com.example.myapplication.app-packageDebugResources-74 C:\dev\movil\Proyecto_Movil\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
-com.example.myapplication.app-packageDebugResources-75 C:\dev\movil\Proyecto_Movil\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
-com.example.myapplication.app-debug-76 C:\dev\movil\Proyecto_Movil\app\build\intermediates\merged_res\debug\mergeDebugResources
-com.example.myapplication.app-debug-77 C:\dev\movil\Proyecto_Movil\app\src\debug\res
-com.example.myapplication.app-main-78 C:\dev\movil\Proyecto_Movil\app\src\main\res
+com.example.myapplication.app-pngs-71 C:\Users\Gaming pc\Desktop\LinkUp-main\app\build\generated\res\pngs\debug
+com.example.myapplication.app-res-72 C:\Users\Gaming pc\Desktop\LinkUp-main\app\build\generated\res\processDebugGoogleServices
+com.example.myapplication.app-updated_navigation_xml-73 C:\Users\Gaming pc\Desktop\LinkUp-main\app\build\generated\updated_navigation_xml\debug
+com.example.myapplication.app-packageDebugResources-74 C:\Users\Gaming pc\Desktop\LinkUp-main\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.example.myapplication.app-packageDebugResources-75 C:\Users\Gaming pc\Desktop\LinkUp-main\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.example.myapplication.app-debug-76 C:\Users\Gaming pc\Desktop\LinkUp-main\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.example.myapplication.app-debug-77 C:\Users\Gaming pc\Desktop\LinkUp-main\app\src\debug\res
+com.example.myapplication.app-main-78 C:\Users\Gaming pc\Desktop\LinkUp-main\app\src\main\res

@@ -95,8 +95,14 @@ fun AppNavGraph(
 
         composable(Screen.Home.route) {
             Home(
-                onAbrirLobby = { navController.navigate("lobby_carrera/$it") },
-                onEscanearQR = { navController.navigate(Screen.EscanearQR.route) })
+                onEscanearQR = { navController.navigate(Screen.EscanearQR.route) },
+                onVerCarrera = { raceId ->
+                    navController.navigate("carrera_detail/$raceId")
+                },
+                onAbrirLobby = { sessionId ->
+                    navController.navigate("lobby_carrera/$sessionId")
+                }
+            )
         }
 
         composable(Screen.Mapa.route) {
