@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -15,15 +16,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.myapplication.model.BuscarAmigosViewModel
 import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.repository.UserRepository
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -104,6 +109,7 @@ fun BuscarAmigos(
             .fillMaxSize()
             .background(Color(0xFF0A0A0A))
     ) {
+        // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -254,7 +260,6 @@ fun BuscarAmigos(
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true
                     )
-
                     Button(
                         onClick = { searchUser() },
                         enabled = !state.isSearching && state.searchQuery.length == 8,
@@ -271,6 +276,7 @@ fun BuscarAmigos(
             }
         }
 
+        // Mensaje de error
         if (state.errorMessage != null) {
             Text(
                 state.errorMessage!!,
@@ -280,49 +286,86 @@ fun BuscarAmigos(
             )
         }
 
+        // Resultado de búsqueda
         state.searchResult?.let { user ->
             Card(
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                border = BorderStroke(1.dp, Color(0x33FFFFFF))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    // Avatar con foto real o iniciales
                     Box(
                         modifier = Modifier
-                            .size(48.dp)
-                            .background(Color(0xFFFF9800), CircleShape),
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFFF9800)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            user.displayName.take(2).uppercase(),
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
+                        if (user.photoURL.isNotEmpty()) {
+                            AsyncImage(
+                                model = user.photoURL,
+                                contentDescription = "Foto de ${user.displayName}",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Text(
+                                user.displayName.take(2).uppercase(),
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            )
+                        }
                     }
 
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(user.displayName, color = Color.White, fontWeight = FontWeight.SemiBold)
+                        Text(user.displayName, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                         Text(user.gameId, color = Color.Gray, fontSize = 12.sp)
                     }
 
                     when (state.friendStatus) {
-                        "accepted" -> Text("Amigos", color = Color(0xFF22C55E), fontSize = 13.sp)
-                        "pending" -> Text("Pendiente", color = Color(0xFFE9C46A), fontSize = 13.sp)
+                        "accepted" -> {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Check, null, tint = Color(0xFF22C55E), modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Amigos", color = Color(0xFF22C55E), fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            }
+                        }
+                        "pending" -> {
+                            Text(
+                                "Solicitud\nenviada",
+                                color = Color(0xFFE9C46A),
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 12.sp,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        }
+                        "blocked" -> {
+                            Text("Bloqueado", color = Color(0xFFEF4444), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        }
                         else -> {
                             Button(
                                 onClick = {
                                     scope.launch {
                                         viewModel.updateIsSending(true)
-                                        friendsRepository.sendFriendRequest(user.uid).onSuccess {
-                                            viewModel.updateFriendStatus("pending")
-                                            Toast.makeText(context, "Solicitud enviada", Toast.LENGTH_SHORT).show()
-                                        }
+                                        viewModel.updateErrorMessage(null)
+                                        friendsRepository.sendFriendRequest(user.uid).fold(
+                                            onSuccess = {
+                                                viewModel.updateFriendStatus("pending")
+                                                Toast.makeText(context, "Solicitud enviada", Toast.LENGTH_SHORT).show()
+                                            },
+                                            onFailure = { e ->
+                                                viewModel.updateErrorMessage(e.message)
+                                            }
+                                        )
                                         viewModel.updateIsSending(false)
                                     }
                                 },
@@ -334,6 +377,91 @@ fun BuscarAmigos(
                             }
                         }
                     }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Tu Game ID
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Tu Game ID", color = Color.Gray, fontSize = 12.sp)
+                    TextButton(
+                        onClick = {
+                            scope.launch {
+                                viewModel.updateIsLoadingUser(true)
+                                viewModel.updateCurrentUser(userRepository.getCurrentUser())
+                                viewModel.updateIsLoadingUser(false)
+                                if (state.currentUser?.gameId.isNullOrEmpty()) {
+                                    viewModel.updateErrorMessage("⚠️ Game ID no encontrado. Reintentando...")
+                                    val firebaseUser = FirebaseAuth.getInstance().currentUser
+                                    if (firebaseUser != null && state.currentUser != null) {
+                                        val newGameId = "linkup#${(1000..9999).random()}"
+                                        val updatedUser = state.currentUser!!.copy(gameId = newGameId)
+                                        userRepository.updateUser(updatedUser)
+                                        viewModel.updateCurrentUser(updatedUser)
+                                    }
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Default.Refresh, null, tint = Color(0xFFFF9800), modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Recargar", color = Color(0xFFFF9800), fontSize = 12.sp)
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                if (state.isLoadingUser) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = Color(0xFFFF9800),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            state.currentUser?.gameId?.takeIf { it.isNotEmpty() } ?: "No disponible",
+                            color = if (state.currentUser?.gameId.isNullOrEmpty()) Color.Red else Color(0xFFFF9800),
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (!state.currentUser?.gameId.isNullOrEmpty()) {
+                            val clipboardManager = LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                            IconButton(
+                                onClick = {
+                                    val clip = ClipData.newPlainText("Game ID", state.currentUser!!.gameId)
+                                    clipboardManager.setPrimaryClip(clip)
+                                    Toast.makeText(context, "Game ID copiado", Toast.LENGTH_SHORT).show()
+                                }
+                            ) {
+                                Icon(Icons.Default.ContentCopy, null, tint = Color(0xFFFF9800), modifier = Modifier.size(20.dp))
+                            }
+                        }
+                    }
+                }
+                Text("Comparte este código con tus amigos", color = Color.Gray, fontSize = 12.sp)
+                if (!state.isLoadingUser && state.currentUser?.gameId.isNullOrEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        "⚠️ Error: No se encontró tu Game ID. Toca 'Recargar' para generarlo.",
+                        color = Color(0xFFFF6B6B),
+                        fontSize = 11.sp
+                    )
                 }
             }
         }

@@ -66,17 +66,27 @@ fun InvitarNFC(
                     modifier = Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // NFC SECTION
+                    // NFC SECTION (READER MODE STATUS)
                     BotonNFC(
                         escaneando = state.escaneando,
                         onClick = {
-                            viewModel.updateEscaneando(true)
+                            viewModel.updateEscaneando(!state.escaneando)
                         }
                     )
 
+                    if (state.escaneando) {
+                        Text(
+                            "📲 NFC Receptor activo. Acerca un tag u otro teléfono.",
+                            color = Color(0xFF2A9D8F),
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
                     SeparadorO()
 
-                    // SECCIÓN DE CÓDIGO TEMPORAL (Funcionalidad mantenida)
+                    // SECCIÓN DE CÓDIGO TEMPORAL
                     if (state.generatedCode == null) {
                         Button(
                             onClick = {
@@ -176,10 +186,8 @@ fun InvitarNFC(
                     )
 
                     if (state.mostrarQR && currentUser != null) {
-                        // El QR se basa únicamente en el UID permanente, no en códigos temporales.
-                        val qrBitmap = remember(currentUser.uid) {
-                            QRGenerator.generate(InviteUtils.createQrLink(currentUser.uid))
-                        }
+                        val qrContent = remember(currentUser.uid) { QRGenerator.createQrContent(currentUser.uid) }
+                        val qrBitmap = remember(qrContent) { QRGenerator.generate(qrContent) }
                         CodigoQR(qrBitmap)
                     }
 
@@ -249,9 +257,10 @@ fun HeaderInvitar(onCerrar: () -> Unit) {
 @Composable
 fun BotonNFC(escaneando: Boolean, onClick: () -> Unit) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF2A9D8F)),
+        colors = CardDefaults.cardColors(containerColor = Color(if (escaneando) 0xFF2A9D8F else 0xFF252525)),
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().clickable { onClick() }
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
+        border = if (escaneando) BorderStroke(2.dp, Color.White) else null
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -260,8 +269,8 @@ fun BotonNFC(escaneando: Boolean, onClick: () -> Unit) {
         ) {
             Icon(Icons.Default.Nfc, null, tint = Color.White, modifier = Modifier.size(32.dp))
             Column {
-                Text(if (escaneando) "Buscando dispositivos..." else "Compartir por NFC", color = Color.White, fontWeight = FontWeight.Bold)
-                Text("Acerca los teléfonos para sincronizar", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                Text(if (escaneando) "Buscando dispositivos..." else "Activar Receptor NFC", color = Color.White, fontWeight = FontWeight.Bold)
+                Text("Listo para recibir invitaciones", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
             }
         }
     }
