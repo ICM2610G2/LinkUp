@@ -240,7 +240,7 @@ class RaceRepository(
 
             //notificar a todos los participantes
             val raceName = snap.getString("raceName") ?: "la carrera"
-            notifyParticipants(participants, raceName)
+            //notifyParticipants(participants, raceName)
 
             Result.success(Unit)
         } catch (e: Exception) {

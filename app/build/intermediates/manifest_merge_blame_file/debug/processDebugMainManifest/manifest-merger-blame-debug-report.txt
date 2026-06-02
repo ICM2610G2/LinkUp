@@ -4,788 +4,788 @@
 4    android:versionCode="1"
 5    android:versionName="1.0" > <!-- FORZAR override para librerías con minSdk mayor -->
 6    <uses-sdk
-6-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:25:5-77
+6-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:25:5-77
 7        android:minSdkVersion="28"
 8        android:targetSdkVersion="36" />
 9
 10    <!-- Permisos NFC -->
 11    <uses-permission android:name="android.permission.NFC" />
-11-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:6:5-62
-11-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:6:22-59
+11-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:6:5-62
+11-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:6:22-59
 12
 13    <uses-feature
-13-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:7:5-82
+13-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:7:5-82
 14        android:name="android.hardware.nfc"
-14-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:7:19-54
+14-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:7:19-54
 15        android:required="false" />
-15-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:7:55-79
+15-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:7:55-79
 16
 17    <!-- Permisos existentes -->
 18    <uses-permission android:name="android.permission.INTERNET" />
-18-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:10:5-67
-18-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:10:22-64
+18-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:10:5-67
+18-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:10:22-64
 19    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-19-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:11:5-79
-19-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:11:22-76
+19-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:11:5-79
+19-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:11:22-76
 20    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-20-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:12:5-81
-20-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:12:22-78
+20-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:12:5-81
+20-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:12:22-78
 21    <uses-permission android:name="android.permission.CAMERA" />
-21-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:13:5-65
-21-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:13:22-62
+21-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:13:5-65
+21-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:13:22-62
 22    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
-22-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:14:5-79
-22-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:14:22-76
+22-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:14:5-79
+22-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:14:22-76
 23    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
-23-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:15:5-72
-23-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:15:22-69
+23-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:15:5-72
+23-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:15:22-69
 24    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-24-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:16:5-74
-24-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:16:22-71
+24-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:16:5-74
+24-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:16:22-71
 25    <!-- Para FCM -->
 26    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-26-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:18:5-77
-26-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:18:22-74
+26-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:18:5-77
+26-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:18:22-74
 27
 28    <uses-feature
-28-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:20:5-22:36
+28-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:20:5-22:36
 29        android:name="android.hardware.camera"
-29-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:21:9-47
+29-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:21:9-47
 30        android:required="false" />
-30-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:22:9-33
+30-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:22:9-33
 31
 32    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-32-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:26:5-79
-32-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:26:22-76
+32-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:26:5-79
+32-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:26:22-76
 33
 34    <uses-feature
-34-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:26:5-28:35
+34-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:26:5-28:35
 35        android:glEsVersion="0x00020000"
-35-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:27:9-41
+35-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:27:9-41
 36        android:required="true" />
-36-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:28:9-32
+36-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:28:9-32
 37
 38    <queries>
-38-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:30:5-34:15
+38-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:30:5-34:15
 39
 40        <!-- Needs to be explicitly declared on Android R+ -->
 41        <package android:name="com.google.android.apps.maps" />
-41-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:33:9-64
-41-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:33:18-61
+41-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:33:9-64
+41-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:33:18-61
 42    </queries>
 43
 44    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- Required by older versions of Google Play services to create IID tokens -->
-44-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:24:5-68
-44-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:24:22-65
+44-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:24:5-68
+44-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:24:22-65
 45    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-45-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:26:5-82
-45-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:26:22-79
+45-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:26:5-82
+45-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:26:22-79
 46    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE" />
-46-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:26:5-110
-46-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:26:22-107
+46-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:26:5-110
+46-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:26:22-107
 47    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
-47-->[com.google.android.gms:play-services-measurement-impl:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\8e70b55ac0da888e5067793558692d1d\workspace\transformed\play-services-measurement-impl-22.1.2\AndroidManifest.xml:27:5-79
-47-->[com.google.android.gms:play-services-measurement-impl:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\8e70b55ac0da888e5067793558692d1d\workspace\transformed\play-services-measurement-impl-22.1.2\AndroidManifest.xml:27:22-76
+47-->[com.google.android.gms:play-services-measurement-impl:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8e70b55ac0da888e5067793558692d1d\workspace\transformed\play-services-measurement-impl-22.1.2\AndroidManifest.xml:27:5-79
+47-->[com.google.android.gms:play-services-measurement-impl:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8e70b55ac0da888e5067793558692d1d\workspace\transformed\play-services-measurement-impl-22.1.2\AndroidManifest.xml:27:22-76
 48    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" />
-48-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:26:5-88
-48-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:26:22-85
+48-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:26:5-88
+48-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:26:22-85
 49    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" />
-49-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:27:5-82
-49-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:27:22-79
+49-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:27:5-82
+49-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:27:22-79
 50    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-50-->[com.google.android.recaptcha:recaptcha:18.5.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\fe76073bd40c669769e50956c522ba06\workspace\transformed\recaptcha-18.5.1\AndroidManifest.xml:9:5-98
-50-->[com.google.android.recaptcha:recaptcha:18.5.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\fe76073bd40c669769e50956c522ba06\workspace\transformed\recaptcha-18.5.1\AndroidManifest.xml:9:22-95
+50-->[com.google.android.recaptcha:recaptcha:18.5.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fe76073bd40c669769e50956c522ba06\workspace\transformed\recaptcha-18.5.1\AndroidManifest.xml:9:5-98
+50-->[com.google.android.recaptcha:recaptcha:18.5.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fe76073bd40c669769e50956c522ba06\workspace\transformed\recaptcha-18.5.1\AndroidManifest.xml:9:22-95
 51
 52    <permission
-52-->[androidx.core:core:1.17.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\9c5d90a0dd0ee428f8600642b42d8e09\workspace\transformed\core-1.17.0\AndroidManifest.xml:22:5-24:47
+52-->[androidx.core:core:1.17.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9c5d90a0dd0ee428f8600642b42d8e09\workspace\transformed\core-1.17.0\AndroidManifest.xml:22:5-24:47
 53        android:name="com.example.myapplication.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-53-->[androidx.core:core:1.17.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\9c5d90a0dd0ee428f8600642b42d8e09\workspace\transformed\core-1.17.0\AndroidManifest.xml:23:9-81
+53-->[androidx.core:core:1.17.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9c5d90a0dd0ee428f8600642b42d8e09\workspace\transformed\core-1.17.0\AndroidManifest.xml:23:9-81
 54        android:protectionLevel="signature" />
-54-->[androidx.core:core:1.17.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\9c5d90a0dd0ee428f8600642b42d8e09\workspace\transformed\core-1.17.0\AndroidManifest.xml:24:9-44
+54-->[androidx.core:core:1.17.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9c5d90a0dd0ee428f8600642b42d8e09\workspace\transformed\core-1.17.0\AndroidManifest.xml:24:9-44
 55
 56    <uses-permission android:name="com.example.myapplication.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-56-->[androidx.core:core:1.17.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\9c5d90a0dd0ee428f8600642b42d8e09\workspace\transformed\core-1.17.0\AndroidManifest.xml:26:5-97
-56-->[androidx.core:core:1.17.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\9c5d90a0dd0ee428f8600642b42d8e09\workspace\transformed\core-1.17.0\AndroidManifest.xml:26:22-94
+56-->[androidx.core:core:1.17.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9c5d90a0dd0ee428f8600642b42d8e09\workspace\transformed\core-1.17.0\AndroidManifest.xml:26:5-97
+56-->[androidx.core:core:1.17.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9c5d90a0dd0ee428f8600642b42d8e09\workspace\transformed\core-1.17.0\AndroidManifest.xml:26:22-94
 57
 58    <supports-screens
-58-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:9:5-12:40
+58-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:9:5-12:40
 59        android:anyDensity="true"
-59-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:10:9-34
+59-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:10:9-34
 60        android:largeScreens="true"
-60-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:11:9-36
+60-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:11:9-36
 61        android:normalScreens="true" />
-61-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:12:9-37
+61-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:12:9-37
 62
 63    <uses-feature
-63-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:14:5-16:36
+63-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:14:5-16:36
 64        android:name="android.hardware.location.network"
-64-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:15:9-57
+64-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:15:9-57
 65        android:required="false" />
-65-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:16:9-33
+65-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:16:9-33
 66    <uses-feature
-66-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:17:5-19:36
+66-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:17:5-19:36
 67        android:name="android.hardware.location.gps"
-67-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:18:9-53
+67-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:18:9-53
 68        android:required="false" />
-68-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:19:9-33
+68-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:19:9-33
 69    <uses-feature
-69-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:20:5-22:36
+69-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:20:5-22:36
 70        android:name="android.hardware.telephony"
-70-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:21:9-50
+70-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:21:9-50
 71        android:required="false" />
-71-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:22:9-33
+71-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:22:9-33
 72    <uses-feature
-72-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:23:5-25:36
+72-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:23:5-25:36
 73        android:name="android.hardware.wifi"
-73-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:24:9-45
+73-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:24:9-45
 74        android:required="false" />
-74-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\camil\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:25:9-33
+74-->[org.osmdroid:osmdroid-android:6.1.20] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\7fd20c553ba8b890e2b4906870757f2a\workspace\transformed\osmdroid-android-6.1.20\AndroidManifest.xml:25:9-33
 75
 76    <application
-76-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:27:5-82:19
+76-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:27:5-82:19
 77        android:allowBackup="true"
-77-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:28:9-35
+77-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:28:9-35
 78        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-78-->[androidx.core:core:1.17.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\9c5d90a0dd0ee428f8600642b42d8e09\workspace\transformed\core-1.17.0\AndroidManifest.xml:28:18-86
+78-->[androidx.core:core:1.17.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9c5d90a0dd0ee428f8600642b42d8e09\workspace\transformed\core-1.17.0\AndroidManifest.xml:28:18-86
 79        android:dataExtractionRules="@xml/data_extraction_rules"
-79-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:29:9-65
+79-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:29:9-65
 80        android:debuggable="true"
 81        android:extractNativeLibs="false"
 82        android:fullBackupContent="@xml/backup_rules"
-82-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:30:9-54
+82-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:30:9-54
 83        android:icon="@mipmap/ic_launcher"
-83-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:31:9-43
+83-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:31:9-43
 84        android:label="@string/app_name"
-84-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:32:9-41
+84-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:32:9-41
 85        android:roundIcon="@mipmap/ic_launcher_round"
-85-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:33:9-54
+85-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:33:9-54
 86        android:supportsRtl="true"
-86-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:34:9-35
+86-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:34:9-35
 87        android:testOnly="true"
 88        android:theme="@style/Theme.MyApplication" >
-88-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:35:9-51
+88-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:35:9-51
 89        <meta-data
-89-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:37:9-39:71
+89-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:37:9-39:71
 90            android:name="com.google.android.geo.API_KEY"
-90-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:38:13-58
+90-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:38:13-58
 91            android:value="AIzaSyB60y55WfRS-T06rpBSpKgrjqGVEZPZZgw" />
-91-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:39:13-68
+91-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:39:13-68
 92
 93        <activity
-93-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:41:9-44:40
+93-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:41:9-44:40
 94            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-94-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:42:13-79
+94-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:42:13-79
 95            android:exported="false"
-95-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:44:13-37
+95-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:44:13-37
 96            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-96-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:43:13-72
+96-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:43:13-72
 97        <activity
-97-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:46:9-63:20
+97-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:46:9-63:20
 98            android:name="com.example.myapplication.MainActivity"
-98-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:47:13-41
+98-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:47:13-41
 99            android:exported="true"
-99-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:48:13-36
+99-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:48:13-36
 100            android:label="@string/app_name"
-100-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:50:13-45
+100-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:50:13-45
 101            android:launchMode="singleTop"
-101-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:49:13-43
+101-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:49:13-43
 102            android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
-102-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:51:13-69
+102-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:51:13-69
 103            <intent-filter>
-103-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:52:13-55:29
+103-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:52:13-55:29
 104                <action android:name="android.intent.action.MAIN" />
-104-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:53:17-69
-104-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:53:25-66
+104-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:53:17-69
+104-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:53:25-66
 105
 106                <category android:name="android.intent.category.LAUNCHER" />
-106-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:54:17-77
-106-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:54:27-74
+106-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:54:17-77
+106-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:54:27-74
 107            </intent-filter>
 108
 109            <!-- Intent Filter para NFC -->
 110            <intent-filter>
-110-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:58:13-62:29
+110-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:58:13-62:29
 111                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-111-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:59:17-77
-111-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:59:25-74
+111-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:59:17-77
+111-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:59:25-74
 112
 113                <category android:name="android.intent.category.DEFAULT" />
-113-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:60:17-76
-113-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:60:27-73
+113-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:60:17-76
+113-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:60:27-73
 114
 115                <data android:scheme="linkup" />
-115-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:61:17-49
-115-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:61:23-46
+115-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:61:17-49
+115-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:61:23-46
 116            </intent-filter>
 117        </activity>
 118
 119        <provider
 120            android:name="androidx.core.content.FileProvider"
-120-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:66:13-62
+120-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:66:13-62
 121            android:authorities="com.example.myapplication.fileprovider"
-121-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:67:13-64
+121-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:67:13-64
 122            android:exported="false"
-122-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:68:13-37
+122-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:68:13-37
 123            android:grantUriPermissions="true" >
-123-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:69:13-47
+123-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:69:13-47
 124            <meta-data
-124-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:70:13-72:54
+124-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:70:13-72:54
 125                android:name="android.support.FILE_PROVIDER_PATHS"
-125-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:71:17-67
+125-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:71:17-67
 126                android:resource="@xml/file_paths" />
-126-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:72:17-51
+126-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:72:17-51
 127        </provider>
 128        <!-- Para FCM -->
 129        <service
-129-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:75:9-81:19
+129-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:75:9-81:19
 130            android:name="com.example.myapplication.service.LinkUpFirebaseMessagingService"
-130-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:76:13-67
+130-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:76:13-67
 131            android:exported="false" >
-131-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:77:13-37
+131-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:77:13-37
 132            <intent-filter>
-132-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:78:13-80:29
+132-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:78:13-80:29
 133                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-133-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:79:17-78
-133-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:79:25-75
+133-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:79:17-78
+133-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:79:25-75
 134            </intent-filter>
 135        </service>
 136        <service
-136-->[androidx.camera:camera-camera2:1.3.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:24:9-33:19
+136-->[androidx.camera:camera-camera2:1.3.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:24:9-33:19
 137            android:name="androidx.camera.core.impl.MetadataHolderService"
-137-->[androidx.camera:camera-camera2:1.3.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:25:13-75
+137-->[androidx.camera:camera-camera2:1.3.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:25:13-75
 138            android:enabled="false"
-138-->[androidx.camera:camera-camera2:1.3.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:26:13-36
+138-->[androidx.camera:camera-camera2:1.3.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:26:13-36
 139            android:exported="false" >
-139-->[androidx.camera:camera-camera2:1.3.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:27:13-37
+139-->[androidx.camera:camera-camera2:1.3.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:27:13-37
 140            <meta-data
-140-->[androidx.camera:camera-camera2:1.3.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:30:13-32:89
+140-->[androidx.camera:camera-camera2:1.3.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:30:13-32:89
 141                android:name="androidx.camera.core.impl.MetadataHolderService.DEFAULT_CONFIG_PROVIDER"
-141-->[androidx.camera:camera-camera2:1.3.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:31:17-103
+141-->[androidx.camera:camera-camera2:1.3.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:31:17-103
 142                android:value="androidx.camera.camera2.Camera2Config$DefaultProvider" />
-142-->[androidx.camera:camera-camera2:1.3.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:32:17-86
+142-->[androidx.camera:camera-camera2:1.3.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8848135e5c69be671cdaa59f71606388\workspace\transformed\camera-camera2-1.3.0\AndroidManifest.xml:32:17-86
 143        </service>
 144        <service
-144-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\5054909a33c23262bae07a862bd9e4dd\workspace\transformed\play-services-mlkit-barcode-scanning-18.3.1\AndroidManifest.xml:9:9-15:19
+144-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\5054909a33c23262bae07a862bd9e4dd\workspace\transformed\play-services-mlkit-barcode-scanning-18.3.1\AndroidManifest.xml:9:9-15:19
 145            android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService"
-145-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\5054909a33c23262bae07a862bd9e4dd\workspace\transformed\play-services-mlkit-barcode-scanning-18.3.1\AndroidManifest.xml:10:13-91
+145-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\5054909a33c23262bae07a862bd9e4dd\workspace\transformed\play-services-mlkit-barcode-scanning-18.3.1\AndroidManifest.xml:10:13-91
 146            android:directBootAware="true"
-146-->[com.google.mlkit:common:18.11.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:17:13-43
+146-->[com.google.mlkit:common:18.11.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:17:13-43
 147            android:exported="false" >
-147-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\5054909a33c23262bae07a862bd9e4dd\workspace\transformed\play-services-mlkit-barcode-scanning-18.3.1\AndroidManifest.xml:11:13-37
+147-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\5054909a33c23262bae07a862bd9e4dd\workspace\transformed\play-services-mlkit-barcode-scanning-18.3.1\AndroidManifest.xml:11:13-37
 148            <meta-data
-148-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\5054909a33c23262bae07a862bd9e4dd\workspace\transformed\play-services-mlkit-barcode-scanning-18.3.1\AndroidManifest.xml:12:13-14:85
+148-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\5054909a33c23262bae07a862bd9e4dd\workspace\transformed\play-services-mlkit-barcode-scanning-18.3.1\AndroidManifest.xml:12:13-14:85
 149                android:name="com.google.firebase.components:com.google.mlkit.vision.barcode.internal.BarcodeRegistrar"
-149-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\5054909a33c23262bae07a862bd9e4dd\workspace\transformed\play-services-mlkit-barcode-scanning-18.3.1\AndroidManifest.xml:13:17-120
+149-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\5054909a33c23262bae07a862bd9e4dd\workspace\transformed\play-services-mlkit-barcode-scanning-18.3.1\AndroidManifest.xml:13:17-120
 150                android:value="com.google.firebase.components.ComponentRegistrar" />
-150-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\5054909a33c23262bae07a862bd9e4dd\workspace\transformed\play-services-mlkit-barcode-scanning-18.3.1\AndroidManifest.xml:14:17-82
+150-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\5054909a33c23262bae07a862bd9e4dd\workspace\transformed\play-services-mlkit-barcode-scanning-18.3.1\AndroidManifest.xml:14:17-82
 151            <meta-data
-151-->[com.google.mlkit:vision-common:17.3.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\34c501e33ee19ac0a4c34776294a3dab\workspace\transformed\vision-common-17.3.0\AndroidManifest.xml:12:13-14:85
+151-->[com.google.mlkit:vision-common:17.3.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\34c501e33ee19ac0a4c34776294a3dab\workspace\transformed\vision-common-17.3.0\AndroidManifest.xml:12:13-14:85
 152                android:name="com.google.firebase.components:com.google.mlkit.vision.common.internal.VisionCommonRegistrar"
-152-->[com.google.mlkit:vision-common:17.3.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\34c501e33ee19ac0a4c34776294a3dab\workspace\transformed\vision-common-17.3.0\AndroidManifest.xml:13:17-124
+152-->[com.google.mlkit:vision-common:17.3.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\34c501e33ee19ac0a4c34776294a3dab\workspace\transformed\vision-common-17.3.0\AndroidManifest.xml:13:17-124
 153                android:value="com.google.firebase.components.ComponentRegistrar" />
-153-->[com.google.mlkit:vision-common:17.3.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\34c501e33ee19ac0a4c34776294a3dab\workspace\transformed\vision-common-17.3.0\AndroidManifest.xml:14:17-82
+153-->[com.google.mlkit:vision-common:17.3.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\34c501e33ee19ac0a4c34776294a3dab\workspace\transformed\vision-common-17.3.0\AndroidManifest.xml:14:17-82
 154            <meta-data
-154-->[com.google.mlkit:common:18.11.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:20:13-22:85
+154-->[com.google.mlkit:common:18.11.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:20:13-22:85
 155                android:name="com.google.firebase.components:com.google.mlkit.common.internal.CommonComponentRegistrar"
-155-->[com.google.mlkit:common:18.11.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:21:17-120
+155-->[com.google.mlkit:common:18.11.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:21:17-120
 156                android:value="com.google.firebase.components.ComponentRegistrar" />
-156-->[com.google.mlkit:common:18.11.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:22:17-82
+156-->[com.google.mlkit:common:18.11.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:22:17-82
 157        </service>
 158
 159        <provider
-159-->[com.google.mlkit:common:18.11.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:9:9-13:38
+159-->[com.google.mlkit:common:18.11.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:9:9-13:38
 160            android:name="com.google.mlkit.common.internal.MlKitInitProvider"
-160-->[com.google.mlkit:common:18.11.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:10:13-78
+160-->[com.google.mlkit:common:18.11.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:10:13-78
 161            android:authorities="com.example.myapplication.mlkitinitprovider"
-161-->[com.google.mlkit:common:18.11.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:11:13-69
+161-->[com.google.mlkit:common:18.11.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:11:13-69
 162            android:exported="false"
-162-->[com.google.mlkit:common:18.11.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:12:13-37
+162-->[com.google.mlkit:common:18.11.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:12:13-37
 163            android:initOrder="99" />
-163-->[com.google.mlkit:common:18.11.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:13:13-35
+163-->[com.google.mlkit:common:18.11.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\fbf7dce4e3bc3bf4224029ea0cecee06\workspace\transformed\common-18.11.0\AndroidManifest.xml:13:13-35
 164
 165        <activity
-165-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:29:9-46:20
+165-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:29:9-46:20
 166            android:name="com.google.firebase.auth.internal.GenericIdpActivity"
-166-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:30:13-80
+166-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:30:13-80
 167            android:excludeFromRecents="true"
-167-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:31:13-46
+167-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:31:13-46
 168            android:exported="true"
-168-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:32:13-36
+168-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:32:13-36
 169            android:launchMode="singleTask"
-169-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:33:13-44
+169-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:33:13-44
 170            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-170-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:34:13-72
+170-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:34:13-72
 171            <intent-filter>
-171-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:35:13-45:29
+171-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:35:13-45:29
 172                <action android:name="android.intent.action.VIEW" />
-172-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:36:17-69
-172-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:36:25-66
+172-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:36:17-69
+172-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:36:25-66
 173
 174                <category android:name="android.intent.category.DEFAULT" />
-174-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:60:17-76
-174-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:60:27-73
+174-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:60:17-76
+174-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:60:27-73
 175                <category android:name="android.intent.category.BROWSABLE" />
-175-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:39:17-78
-175-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:39:27-75
+175-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:39:17-78
+175-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:39:27-75
 176
 177                <data
-177-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:61:17-49
+177-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:61:17-49
 178                    android:host="firebase.auth"
 179                    android:path="/"
 180                    android:scheme="genericidp" />
-180-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:61:23-46
+180-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:61:23-46
 181            </intent-filter>
 182        </activity>
 183        <activity
-183-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:47:9-64:20
+183-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:47:9-64:20
 184            android:name="com.google.firebase.auth.internal.RecaptchaActivity"
-184-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:48:13-79
+184-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:48:13-79
 185            android:excludeFromRecents="true"
-185-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:49:13-46
+185-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:49:13-46
 186            android:exported="true"
-186-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:50:13-36
+186-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:50:13-36
 187            android:launchMode="singleTask"
-187-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:51:13-44
+187-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:51:13-44
 188            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-188-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:52:13-72
+188-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:52:13-72
 189            <intent-filter>
-189-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:53:13-63:29
+189-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:53:13-63:29
 190                <action android:name="android.intent.action.VIEW" />
-190-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:36:17-69
-190-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:36:25-66
+190-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:36:17-69
+190-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:36:25-66
 191
 192                <category android:name="android.intent.category.DEFAULT" />
-192-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:60:17-76
-192-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:60:27-73
+192-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:60:17-76
+192-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:60:27-73
 193                <category android:name="android.intent.category.BROWSABLE" />
-193-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:39:17-78
-193-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:39:27-75
+193-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:39:17-78
+193-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:39:27-75
 194
 195                <data
-195-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:61:17-49
+195-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:61:17-49
 196                    android:host="firebase.auth"
 197                    android:path="/"
 198                    android:scheme="recaptcha" />
-198-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:61:23-46
+198-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:61:23-46
 199            </intent-filter>
 200        </activity>
 201
 202        <service
-202-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:66:9-72:19
+202-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:66:9-72:19
 203            android:name="com.google.firebase.components.ComponentDiscoveryService"
-203-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:67:13-84
+203-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:67:13-84
 204            android:directBootAware="true"
-204-->[com.google.firebase:firebase-common:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:32:13-43
+204-->[com.google.firebase:firebase-common:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:32:13-43
 205            android:exported="false" >
-205-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:68:13-37
+205-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:68:13-37
 206            <meta-data
-206-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:69:13-71:85
+206-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:69:13-71:85
 207                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
-207-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:70:17-109
+207-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:70:17-109
 208                android:value="com.google.firebase.components.ComponentRegistrar" />
-208-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:71:17-82
+208-->[com.google.firebase:firebase-auth:23.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\a00c538420885c6c539a004268aa192f\workspace\transformed\firebase-auth-23.1.0\AndroidManifest.xml:71:17-82
 209            <meta-data
-209-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:17:13-19:85
+209-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:17:13-19:85
 210                android:name="com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar"
-210-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:18:17-122
+210-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:18:17-122
 211                android:value="com.google.firebase.components.ComponentRegistrar" />
-211-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:19:17-82
+211-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:19:17-82
 212            <meta-data
-212-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:20:13-22:85
+212-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:20:13-22:85
 213                android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
-213-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:21:17-111
+213-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:21:17-111
 214                android:value="com.google.firebase.components.ComponentRegistrar" />
-214-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:22:17-82
+214-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9c21fcddb5ad005a1bcd7d74b83fd308\workspace\transformed\firebase-firestore-25.1.1\AndroidManifest.xml:22:17-82
 215            <meta-data
-215-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:57:13-59:85
+215-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:57:13-59:85
 216                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingKtxRegistrar"
-216-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:58:17-122
+216-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:58:17-122
 217                android:value="com.google.firebase.components.ComponentRegistrar" />
-217-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:59:17-82
+217-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:59:17-82
 218            <meta-data
-218-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:60:13-62:85
+218-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:60:13-62:85
 219                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
-219-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:61:17-119
+219-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:61:17-119
 220                android:value="com.google.firebase.components.ComponentRegistrar" />
-220-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:62:17-82
+220-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:62:17-82
 221            <meta-data
-221-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:30:13-32:85
+221-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:30:13-32:85
 222                android:name="com.google.firebase.components:com.google.firebase.storage.FirebaseStorageKtxRegistrar"
-222-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:31:17-118
+222-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:31:17-118
 223                android:value="com.google.firebase.components.ComponentRegistrar" />
-223-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:32:17-82
+223-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:32:17-82
 224            <meta-data
-224-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:33:13-35:85
+224-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:33:13-35:85
 225                android:name="com.google.firebase.components:com.google.firebase.storage.StorageRegistrar"
-225-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:34:17-107
+225-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:34:17-107
 226                android:value="com.google.firebase.components.ComponentRegistrar" />
-226-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\camil\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:35:17-82
+226-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8fcc0b6fd4bee8b7ce5cfd90be18a781\workspace\transformed\firebase-storage-21.0.1\AndroidManifest.xml:35:17-82
 227            <meta-data
-227-->[com.google.firebase:firebase-database-ktx:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\0664c556f77b47c5542f34b1a806d8ff\workspace\transformed\firebase-database-ktx-21.0.0\AndroidManifest.xml:12:13-14:85
+227-->[com.google.firebase:firebase-database-ktx:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\0664c556f77b47c5542f34b1a806d8ff\workspace\transformed\firebase-database-ktx-21.0.0\AndroidManifest.xml:12:13-14:85
 228                android:name="com.google.firebase.components:com.google.firebase.database.ktx.FirebaseDatabaseLegacyRegistrar"
-228-->[com.google.firebase:firebase-database-ktx:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\0664c556f77b47c5542f34b1a806d8ff\workspace\transformed\firebase-database-ktx-21.0.0\AndroidManifest.xml:13:17-127
+228-->[com.google.firebase:firebase-database-ktx:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\0664c556f77b47c5542f34b1a806d8ff\workspace\transformed\firebase-database-ktx-21.0.0\AndroidManifest.xml:13:17-127
 229                android:value="com.google.firebase.components.ComponentRegistrar" />
-229-->[com.google.firebase:firebase-database-ktx:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\0664c556f77b47c5542f34b1a806d8ff\workspace\transformed\firebase-database-ktx-21.0.0\AndroidManifest.xml:14:17-82
+229-->[com.google.firebase:firebase-database-ktx:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\0664c556f77b47c5542f34b1a806d8ff\workspace\transformed\firebase-database-ktx-21.0.0\AndroidManifest.xml:14:17-82
 230            <meta-data
-230-->[com.google.firebase:firebase-database:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\6e5799d9299f4e508164bd466799f81c\workspace\transformed\firebase-database-21.0.0\AndroidManifest.xml:29:13-31:85
+230-->[com.google.firebase:firebase-database:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\6e5799d9299f4e508164bd466799f81c\workspace\transformed\firebase-database-21.0.0\AndroidManifest.xml:29:13-31:85
 231                android:name="com.google.firebase.components:com.google.firebase.database.FirebaseDatabaseKtxRegistrar"
-231-->[com.google.firebase:firebase-database:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\6e5799d9299f4e508164bd466799f81c\workspace\transformed\firebase-database-21.0.0\AndroidManifest.xml:30:17-120
+231-->[com.google.firebase:firebase-database:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\6e5799d9299f4e508164bd466799f81c\workspace\transformed\firebase-database-21.0.0\AndroidManifest.xml:30:17-120
 232                android:value="com.google.firebase.components.ComponentRegistrar" />
-232-->[com.google.firebase:firebase-database:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\6e5799d9299f4e508164bd466799f81c\workspace\transformed\firebase-database-21.0.0\AndroidManifest.xml:31:17-82
+232-->[com.google.firebase:firebase-database:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\6e5799d9299f4e508164bd466799f81c\workspace\transformed\firebase-database-21.0.0\AndroidManifest.xml:31:17-82
 233            <meta-data
-233-->[com.google.firebase:firebase-database:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\6e5799d9299f4e508164bd466799f81c\workspace\transformed\firebase-database-21.0.0\AndroidManifest.xml:32:13-34:85
+233-->[com.google.firebase:firebase-database:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\6e5799d9299f4e508164bd466799f81c\workspace\transformed\firebase-database-21.0.0\AndroidManifest.xml:32:13-34:85
 234                android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar"
-234-->[com.google.firebase:firebase-database:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\6e5799d9299f4e508164bd466799f81c\workspace\transformed\firebase-database-21.0.0\AndroidManifest.xml:33:17-109
+234-->[com.google.firebase:firebase-database:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\6e5799d9299f4e508164bd466799f81c\workspace\transformed\firebase-database-21.0.0\AndroidManifest.xml:33:17-109
 235                android:value="com.google.firebase.components.ComponentRegistrar" />
-235-->[com.google.firebase:firebase-database:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\6e5799d9299f4e508164bd466799f81c\workspace\transformed\firebase-database-21.0.0\AndroidManifest.xml:34:17-82
+235-->[com.google.firebase:firebase-database:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\6e5799d9299f4e508164bd466799f81c\workspace\transformed\firebase-database-21.0.0\AndroidManifest.xml:34:17-82
 236            <meta-data
-236-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:25:13-27:85
+236-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:25:13-27:85
 237                android:name="com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckKtxRegistrar"
-237-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:26:17-120
+237-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:26:17-120
 238                android:value="com.google.firebase.components.ComponentRegistrar" />
-238-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:27:17-82
+238-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:27:17-82
 239            <meta-data
-239-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:28:13-30:85
+239-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:28:13-30:85
 240                android:name="com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckRegistrar"
-240-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:29:17-117
+240-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:29:17-117
 241                android:value="com.google.firebase.components.ComponentRegistrar" />
-241-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:30:17-82
+241-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\8f9c8be48d36d01fcdcc654c021727ac\workspace\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:30:17-82
 242            <meta-data
-242-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:37:13-39:85
+242-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:37:13-39:85
 243                android:name="com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar"
-243-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:38:17-139
+243-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:38:17-139
 244                android:value="com.google.firebase.components.ComponentRegistrar" />
-244-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:39:17-82
+244-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:39:17-82
 245            <meta-data
-245-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:15:13-17:85
+245-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:15:13-17:85
 246                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsKtxRegistrar"
-246-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:16:17-130
+246-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:16:17-130
 247                android:value="com.google.firebase.components.ComponentRegistrar" />
-247-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:17:17-82
+247-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:17:17-82
 248            <meta-data
-248-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:18:13-20:85
+248-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:18:13-20:85
 249                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
-249-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:19:17-127
+249-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:19:17-127
 250                android:value="com.google.firebase.components.ComponentRegistrar" />
-250-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:20:17-82
+250-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\77b2a90e4f3e3e7cfe58ecb40635b371\workspace\transformed\firebase-installations-18.0.0\AndroidManifest.xml:20:17-82
 251            <meta-data
-251-->[com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\e1969500876655e01e84f8788b5f4a94\workspace\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:12:13-14:85
+251-->[com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\e1969500876655e01e84f8788b5f4a94\workspace\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:12:13-14:85
 252                android:name="com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonLegacyRegistrar"
-252-->[com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\e1969500876655e01e84f8788b5f4a94\workspace\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:13:17-116
+252-->[com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\e1969500876655e01e84f8788b5f4a94\workspace\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:13:17-116
 253                android:value="com.google.firebase.components.ComponentRegistrar" />
-253-->[com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\e1969500876655e01e84f8788b5f4a94\workspace\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:14:17-82
+253-->[com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\e1969500876655e01e84f8788b5f4a94\workspace\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:14:17-82
 254            <meta-data
-254-->[com.google.firebase:firebase-common:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:35:13-37:85
+254-->[com.google.firebase:firebase-common:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:35:13-37:85
 255                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
-255-->[com.google.firebase:firebase-common:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:36:17-109
+255-->[com.google.firebase:firebase-common:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:36:17-109
 256                android:value="com.google.firebase.components.ComponentRegistrar" />
-256-->[com.google.firebase:firebase-common:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:37:17-82
+256-->[com.google.firebase:firebase-common:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:37:17-82
 257            <meta-data
-257-->[com.google.firebase:firebase-datatransport:18.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\2b526a28eaf731b86cef39a40dba2464\workspace\transformed\firebase-datatransport-18.2.0\AndroidManifest.xml:25:13-27:85
+257-->[com.google.firebase:firebase-datatransport:18.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\2b526a28eaf731b86cef39a40dba2464\workspace\transformed\firebase-datatransport-18.2.0\AndroidManifest.xml:25:13-27:85
 258                android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar"
-258-->[com.google.firebase:firebase-datatransport:18.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\2b526a28eaf731b86cef39a40dba2464\workspace\transformed\firebase-datatransport-18.2.0\AndroidManifest.xml:26:17-115
+258-->[com.google.firebase:firebase-datatransport:18.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\2b526a28eaf731b86cef39a40dba2464\workspace\transformed\firebase-datatransport-18.2.0\AndroidManifest.xml:26:17-115
 259                android:value="com.google.firebase.components.ComponentRegistrar" />
-259-->[com.google.firebase:firebase-datatransport:18.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\2b526a28eaf731b86cef39a40dba2464\workspace\transformed\firebase-datatransport-18.2.0\AndroidManifest.xml:27:17-82
+259-->[com.google.firebase:firebase-datatransport:18.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\2b526a28eaf731b86cef39a40dba2464\workspace\transformed\firebase-datatransport-18.2.0\AndroidManifest.xml:27:17-82
 260        </service>
 261        <service
-261-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:24:9-32:19
+261-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:24:9-32:19
 262            android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
-262-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:25:13-94
+262-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:25:13-94
 263            android:enabled="true"
-263-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:26:13-35
+263-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:26:13-35
 264            android:exported="false" >
-264-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:27:13-37
+264-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:27:13-37
 265            <meta-data
-265-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:29:13-31:104
+265-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:29:13-31:104
 266                android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY"
-266-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:30:17-76
+266-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:30:17-76
 267                android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl" />
-267-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:31:17-101
+267-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:31:17-101
 268        </service>
 269
 270        <activity
-270-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:34:9-41:20
+270-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:34:9-41:20
 271            android:name="androidx.credentials.playservices.HiddenActivity"
-271-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:35:13-76
+271-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:35:13-76
 272            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
-272-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:36:13-87
+272-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:36:13-87
 273            android:enabled="true"
-273-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:37:13-35
+273-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:37:13-35
 274            android:exported="false"
-274-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:38:13-37
+274-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:38:13-37
 275            android:fitsSystemWindows="true"
-275-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:39:13-45
+275-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:39:13-45
 276            android:theme="@style/Theme.Hidden" >
-276-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\camil\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:40:13-48
+276-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\31e47b7848289a19ff444538f83d39b5\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:40:13-48
 277        </activity>
 278        <activity
-278-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:23:9-27:75
+278-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:23:9-27:75
 279            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
-279-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:24:13-93
+279-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:24:13-93
 280            android:excludeFromRecents="true"
-280-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:25:13-46
+280-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:25:13-46
 281            android:exported="false"
-281-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:26:13-37
+281-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:26:13-37
 282            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-282-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:27:13-72
+282-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:27:13-72
 283        <!--
 284            Service handling Google Sign-In user revocation. For apps that do not integrate with
 285            Google Sign-In, this service will never be started.
 286        -->
 287        <service
-287-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:33:9-37:51
+287-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:33:9-37:51
 288            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
-288-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:34:13-89
+288-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:34:13-89
 289            android:exported="true"
-289-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:35:13-36
+289-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:35:13-36
 290            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
-290-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:36:13-107
+290-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:36:13-107
 291            android:visibleToInstantApps="true" /> <!-- Needs to be explicitly declared on P+ -->
-291-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:37:13-48
+291-->[com.google.android.gms:play-services-auth:21.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\66d16eea03bae7daa10f25fda1d4496d\workspace\transformed\play-services-auth-21.2.0\AndroidManifest.xml:37:13-48
 292        <uses-library
-292-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:39:9-41:40
+292-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:39:9-41:40
 293            android:name="org.apache.http.legacy"
-293-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:40:13-50
+293-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:40:13-50
 294            android:required="false" />
-294-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:41:13-37
+294-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\98b712b55e6c6a08ce43f20225b0a285\workspace\transformed\play-services-maps-18.2.0\AndroidManifest.xml:41:13-37
 295
 296        <receiver
-296-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:29:9-40:20
+296-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:29:9-40:20
 297            android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
-297-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:30:13-78
+297-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:30:13-78
 298            android:exported="true"
-298-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:31:13-36
+298-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:31:13-36
 299            android:permission="com.google.android.c2dm.permission.SEND" >
-299-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:32:13-73
+299-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:32:13-73
 300            <intent-filter>
-300-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:33:13-35:29
+300-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:33:13-35:29
 301                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-301-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:34:17-81
-301-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:34:25-78
+301-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:34:17-81
+301-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:34:25-78
 302            </intent-filter>
 303
 304            <meta-data
-304-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:37:13-39:40
+304-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:37:13-39:40
 305                android:name="com.google.android.gms.cloudmessaging.FINISHED_AFTER_HANDLED"
-305-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:38:17-92
+305-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:38:17-92
 306                android:value="true" />
-306-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:39:17-37
+306-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:39:17-37
 307        </receiver>
 308        <!--
 309             FirebaseMessagingService performs security checks at runtime,
 310             but set to not exported to explicitly avoid allowing another app to call it.
 311        -->
 312        <service
-312-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:46:9-53:19
+312-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:46:9-53:19
 313            android:name="com.google.firebase.messaging.FirebaseMessagingService"
-313-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:47:13-82
+313-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:47:13-82
 314            android:directBootAware="true"
-314-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:48:13-43
+314-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:48:13-43
 315            android:exported="false" >
-315-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:49:13-37
+315-->[com.google.firebase:firebase-messaging:24.1.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\75d8c7cbf63e1f1c018b120491019c00\workspace\transformed\firebase-messaging-24.1.0\AndroidManifest.xml:49:13-37
 316            <intent-filter android:priority="-500" >
-316-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:78:13-80:29
+316-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:78:13-80:29
 317                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-317-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:79:17-78
-317-->C:\Users\camil\Documents\GitHub\LinkUp\app\src\main\AndroidManifest.xml:79:25-75
+317-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:79:17-78
+317-->C:\dev\movil\Proyecto_Movil\app\src\main\AndroidManifest.xml:79:25-75
 318            </intent-filter>
 319        </service>
 320
 321        <receiver
-321-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:29:9-33:20
+321-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:29:9-33:20
 322            android:name="com.google.android.gms.measurement.AppMeasurementReceiver"
-322-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:30:13-85
+322-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:30:13-85
 323            android:enabled="true"
-323-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:31:13-35
+323-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:31:13-35
 324            android:exported="false" >
-324-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:32:13-37
+324-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:32:13-37
 325        </receiver>
 326
 327        <service
-327-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:35:9-38:40
+327-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:35:9-38:40
 328            android:name="com.google.android.gms.measurement.AppMeasurementService"
-328-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:36:13-84
+328-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:36:13-84
 329            android:enabled="true"
-329-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:37:13-35
+329-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:37:13-35
 330            android:exported="false" />
-330-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:38:13-37
+330-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:38:13-37
 331        <service
-331-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:39:9-43:72
+331-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:39:9-43:72
 332            android:name="com.google.android.gms.measurement.AppMeasurementJobService"
-332-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:40:13-87
+332-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:40:13-87
 333            android:enabled="true"
-333-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:41:13-35
+333-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:41:13-35
 334            android:exported="false"
-334-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:42:13-37
+334-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:42:13-37
 335            android:permission="android.permission.BIND_JOB_SERVICE" />
-335-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:43:13-69
+335-->[com.google.android.gms:play-services-measurement:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\88d4ad41c774c594d2c659aec0a8f47c\workspace\transformed\play-services-measurement-22.1.2\AndroidManifest.xml:43:13-69
 336
 337        <property
-337-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:30:9-32:61
+337-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:30:9-32:61
 338            android:name="android.adservices.AD_SERVICES_CONFIG"
-338-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:31:13-65
+338-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:31:13-65
 339            android:resource="@xml/ga_ad_services_config" />
-339-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\camil\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:32:13-58
+339-->[com.google.android.gms:play-services-measurement-api:22.1.2] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\68d5c9df755d767ab48936eb02ffe835\workspace\transformed\play-services-measurement-api-22.1.2\AndroidManifest.xml:32:13-58
 340
 341        <provider
-341-->[com.google.firebase:firebase-common:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:23:9-28:39
+341-->[com.google.firebase:firebase-common:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:23:9-28:39
 342            android:name="com.google.firebase.provider.FirebaseInitProvider"
-342-->[com.google.firebase:firebase-common:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:24:13-77
+342-->[com.google.firebase:firebase-common:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:24:13-77
 343            android:authorities="com.example.myapplication.firebaseinitprovider"
-343-->[com.google.firebase:firebase-common:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:25:13-72
+343-->[com.google.firebase:firebase-common:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:25:13-72
 344            android:directBootAware="true"
-344-->[com.google.firebase:firebase-common:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:26:13-43
+344-->[com.google.firebase:firebase-common:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:26:13-43
 345            android:exported="false"
-345-->[com.google.firebase:firebase-common:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:27:13-37
+345-->[com.google.firebase:firebase-common:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:27:13-37
 346            android:initOrder="100" />
-346-->[com.google.firebase:firebase-common:21.0.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:28:13-36
+346-->[com.google.firebase:firebase-common:21.0.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\87ebd0185bfe8a5e84597b2a7577f539\workspace\transformed\firebase-common-21.0.0\AndroidManifest.xml:28:13-36
 347
 348        <activity
-348-->[androidx.compose.ui:ui-tooling-android:1.10.6] C:\Users\camil\.gradle\caches\9.2.1\transforms\2d0c3137b8f065c7392c3c60c5b5466c\workspace\transformed\ui-tooling\AndroidManifest.xml:23:9-25:39
+348-->[androidx.compose.ui:ui-tooling-android:1.10.6] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\2d0c3137b8f065c7392c3c60c5b5466c\workspace\transformed\ui-tooling\AndroidManifest.xml:23:9-25:39
 349            android:name="androidx.compose.ui.tooling.PreviewActivity"
-349-->[androidx.compose.ui:ui-tooling-android:1.10.6] C:\Users\camil\.gradle\caches\9.2.1\transforms\2d0c3137b8f065c7392c3c60c5b5466c\workspace\transformed\ui-tooling\AndroidManifest.xml:24:13-71
+349-->[androidx.compose.ui:ui-tooling-android:1.10.6] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\2d0c3137b8f065c7392c3c60c5b5466c\workspace\transformed\ui-tooling\AndroidManifest.xml:24:13-71
 350            android:exported="true" />
-350-->[androidx.compose.ui:ui-tooling-android:1.10.6] C:\Users\camil\.gradle\caches\9.2.1\transforms\2d0c3137b8f065c7392c3c60c5b5466c\workspace\transformed\ui-tooling\AndroidManifest.xml:25:13-36
+350-->[androidx.compose.ui:ui-tooling-android:1.10.6] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\2d0c3137b8f065c7392c3c60c5b5466c\workspace\transformed\ui-tooling\AndroidManifest.xml:25:13-36
 351        <activity
-351-->[androidx.compose.ui:ui-test-manifest:1.10.6] C:\Users\camil\.gradle\caches\9.2.1\transforms\f16a7de46283be4881c30430af1f1baa\workspace\transformed\ui-test-manifest-1.10.6\AndroidManifest.xml:23:9-26:79
+351-->[androidx.compose.ui:ui-test-manifest:1.10.6] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\f16a7de46283be4881c30430af1f1baa\workspace\transformed\ui-test-manifest-1.10.6\AndroidManifest.xml:23:9-26:79
 352            android:name="androidx.activity.ComponentActivity"
-352-->[androidx.compose.ui:ui-test-manifest:1.10.6] C:\Users\camil\.gradle\caches\9.2.1\transforms\f16a7de46283be4881c30430af1f1baa\workspace\transformed\ui-test-manifest-1.10.6\AndroidManifest.xml:24:13-63
+352-->[androidx.compose.ui:ui-test-manifest:1.10.6] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\f16a7de46283be4881c30430af1f1baa\workspace\transformed\ui-test-manifest-1.10.6\AndroidManifest.xml:24:13-63
 353            android:exported="true"
-353-->[androidx.compose.ui:ui-test-manifest:1.10.6] C:\Users\camil\.gradle\caches\9.2.1\transforms\f16a7de46283be4881c30430af1f1baa\workspace\transformed\ui-test-manifest-1.10.6\AndroidManifest.xml:25:13-36
+353-->[androidx.compose.ui:ui-test-manifest:1.10.6] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\f16a7de46283be4881c30430af1f1baa\workspace\transformed\ui-test-manifest-1.10.6\AndroidManifest.xml:25:13-36
 354            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
-354-->[androidx.compose.ui:ui-test-manifest:1.10.6] C:\Users\camil\.gradle\caches\9.2.1\transforms\f16a7de46283be4881c30430af1f1baa\workspace\transformed\ui-test-manifest-1.10.6\AndroidManifest.xml:26:13-76
+354-->[androidx.compose.ui:ui-test-manifest:1.10.6] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\f16a7de46283be4881c30430af1f1baa\workspace\transformed\ui-test-manifest-1.10.6\AndroidManifest.xml:26:13-76
 355
 356        <uses-library
-356-->[androidx.window:window:1.5.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\d0ba3a906d02ded7f23e9a4cd1373921\workspace\transformed\window-1.5.0\AndroidManifest.xml:23:9-25:40
+356-->[androidx.window:window:1.5.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d0ba3a906d02ded7f23e9a4cd1373921\workspace\transformed\window-1.5.0\AndroidManifest.xml:23:9-25:40
 357            android:name="androidx.window.extensions"
-357-->[androidx.window:window:1.5.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\d0ba3a906d02ded7f23e9a4cd1373921\workspace\transformed\window-1.5.0\AndroidManifest.xml:24:13-54
+357-->[androidx.window:window:1.5.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d0ba3a906d02ded7f23e9a4cd1373921\workspace\transformed\window-1.5.0\AndroidManifest.xml:24:13-54
 358            android:required="false" />
-358-->[androidx.window:window:1.5.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\d0ba3a906d02ded7f23e9a4cd1373921\workspace\transformed\window-1.5.0\AndroidManifest.xml:25:13-37
+358-->[androidx.window:window:1.5.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d0ba3a906d02ded7f23e9a4cd1373921\workspace\transformed\window-1.5.0\AndroidManifest.xml:25:13-37
 359        <uses-library
-359-->[androidx.window:window:1.5.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\d0ba3a906d02ded7f23e9a4cd1373921\workspace\transformed\window-1.5.0\AndroidManifest.xml:26:9-28:40
+359-->[androidx.window:window:1.5.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d0ba3a906d02ded7f23e9a4cd1373921\workspace\transformed\window-1.5.0\AndroidManifest.xml:26:9-28:40
 360            android:name="androidx.window.sidecar"
-360-->[androidx.window:window:1.5.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\d0ba3a906d02ded7f23e9a4cd1373921\workspace\transformed\window-1.5.0\AndroidManifest.xml:27:13-51
+360-->[androidx.window:window:1.5.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d0ba3a906d02ded7f23e9a4cd1373921\workspace\transformed\window-1.5.0\AndroidManifest.xml:27:13-51
 361            android:required="false" />
-361-->[androidx.window:window:1.5.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\d0ba3a906d02ded7f23e9a4cd1373921\workspace\transformed\window-1.5.0\AndroidManifest.xml:28:13-37
+361-->[androidx.window:window:1.5.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d0ba3a906d02ded7f23e9a4cd1373921\workspace\transformed\window-1.5.0\AndroidManifest.xml:28:13-37
 362
 363        <provider
-363-->[androidx.emoji2:emoji2:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:24:9-32:20
+363-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:24:9-32:20
 364            android:name="androidx.startup.InitializationProvider"
-364-->[androidx.emoji2:emoji2:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:25:13-67
+364-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:25:13-67
 365            android:authorities="com.example.myapplication.androidx-startup"
-365-->[androidx.emoji2:emoji2:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:26:13-68
+365-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:26:13-68
 366            android:exported="false" >
-366-->[androidx.emoji2:emoji2:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:27:13-37
+366-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:27:13-37
 367            <meta-data
-367-->[androidx.emoji2:emoji2:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:29:13-31:52
+367-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:29:13-31:52
 368                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-368-->[androidx.emoji2:emoji2:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:30:17-75
+368-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:30:17-75
 369                android:value="androidx.startup" />
-369-->[androidx.emoji2:emoji2:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:31:17-49
+369-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\67073196c204543b6ec87bd3c9d71935\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:31:17-49
 370            <meta-data
-370-->[androidx.lifecycle:lifecycle-process:2.10.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\29a3ff0191bf489e1ff499109b30bdb6\workspace\transformed\lifecycle-process-2.10.0\AndroidManifest.xml:29:13-31:52
+370-->[androidx.lifecycle:lifecycle-process:2.10.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\29a3ff0191bf489e1ff499109b30bdb6\workspace\transformed\lifecycle-process-2.10.0\AndroidManifest.xml:29:13-31:52
 371                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-371-->[androidx.lifecycle:lifecycle-process:2.10.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\29a3ff0191bf489e1ff499109b30bdb6\workspace\transformed\lifecycle-process-2.10.0\AndroidManifest.xml:30:17-78
+371-->[androidx.lifecycle:lifecycle-process:2.10.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\29a3ff0191bf489e1ff499109b30bdb6\workspace\transformed\lifecycle-process-2.10.0\AndroidManifest.xml:30:17-78
 372                android:value="androidx.startup" />
-372-->[androidx.lifecycle:lifecycle-process:2.10.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\29a3ff0191bf489e1ff499109b30bdb6\workspace\transformed\lifecycle-process-2.10.0\AndroidManifest.xml:31:17-49
+372-->[androidx.lifecycle:lifecycle-process:2.10.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\29a3ff0191bf489e1ff499109b30bdb6\workspace\transformed\lifecycle-process-2.10.0\AndroidManifest.xml:31:17-49
 373            <meta-data
-373-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+373-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
 374                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-374-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+374-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
 375                android:value="androidx.startup" />
-375-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+375-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
 376        </provider>
 377
 378        <uses-library
-378-->[androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\camil\.gradle\caches\9.2.1\transforms\9fab01700a6dc8360bcce098ee4f2607\workspace\transformed\ads-adservices-1.0.0-beta05\AndroidManifest.xml:23:9-25:40
+378-->[androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9fab01700a6dc8360bcce098ee4f2607\workspace\transformed\ads-adservices-1.0.0-beta05\AndroidManifest.xml:23:9-25:40
 379            android:name="android.ext.adservices"
-379-->[androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\camil\.gradle\caches\9.2.1\transforms\9fab01700a6dc8360bcce098ee4f2607\workspace\transformed\ads-adservices-1.0.0-beta05\AndroidManifest.xml:24:13-50
+379-->[androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9fab01700a6dc8360bcce098ee4f2607\workspace\transformed\ads-adservices-1.0.0-beta05\AndroidManifest.xml:24:13-50
 380            android:required="false" />
-380-->[androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\camil\.gradle\caches\9.2.1\transforms\9fab01700a6dc8360bcce098ee4f2607\workspace\transformed\ads-adservices-1.0.0-beta05\AndroidManifest.xml:25:13-37
+380-->[androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\9fab01700a6dc8360bcce098ee4f2607\workspace\transformed\ads-adservices-1.0.0-beta05\AndroidManifest.xml:25:13-37
 381
 382        <meta-data
-382-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\b5133268635d4649a1ab9fa6082b919a\workspace\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
+382-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\b5133268635d4649a1ab9fa6082b919a\workspace\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
 383            android:name="com.google.android.gms.version"
-383-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\b5133268635d4649a1ab9fa6082b919a\workspace\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
+383-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\b5133268635d4649a1ab9fa6082b919a\workspace\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
 384            android:value="@integer/google_play_services_version" />
-384-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\b5133268635d4649a1ab9fa6082b919a\workspace\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
+384-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\b5133268635d4649a1ab9fa6082b919a\workspace\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
 385
 386        <service
-386-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\e8213537e9ec1066459513a5600dde0d\workspace\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:28:9-34:19
+386-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\e8213537e9ec1066459513a5600dde0d\workspace\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:28:9-34:19
 387            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
-387-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\e8213537e9ec1066459513a5600dde0d\workspace\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:29:13-103
+387-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\e8213537e9ec1066459513a5600dde0d\workspace\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:29:13-103
 388            android:exported="false" >
-388-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\e8213537e9ec1066459513a5600dde0d\workspace\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:30:13-37
+388-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\e8213537e9ec1066459513a5600dde0d\workspace\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:30:13-37
 389            <meta-data
-389-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\e8213537e9ec1066459513a5600dde0d\workspace\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:31:13-33:39
+389-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\e8213537e9ec1066459513a5600dde0d\workspace\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:31:13-33:39
 390                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
-390-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\e8213537e9ec1066459513a5600dde0d\workspace\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:32:17-94
+390-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\e8213537e9ec1066459513a5600dde0d\workspace\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:32:17-94
 391                android:value="cct" />
-391-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\e8213537e9ec1066459513a5600dde0d\workspace\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:33:17-36
+391-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\e8213537e9ec1066459513a5600dde0d\workspace\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:33:17-36
 392        </service>
 393        <service
-393-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:26:9-30:19
+393-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:26:9-30:19
 394            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
-394-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:27:13-117
+394-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:27:13-117
 395            android:exported="false"
-395-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:28:13-37
+395-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:28:13-37
 396            android:permission="android.permission.BIND_JOB_SERVICE" >
-396-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:29:13-69
+396-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:29:13-69
 397        </service>
 398
 399        <receiver
-399-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:32:9-34:40
+399-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:32:9-34:40
 400            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
-400-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:33:13-132
+400-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:33:13-132
 401            android:exported="false" />
-401-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\camil\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:34:13-37
+401-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d3bb9a6707b0ce197b254d968840e54a\workspace\transformed\transport-runtime-3.1.9\AndroidManifest.xml:34:13-37
 402        <receiver
-402-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+402-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
 403            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-403-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+403-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
 404            android:directBootAware="false"
-404-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+404-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
 405            android:enabled="true"
-405-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+405-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
 406            android:exported="true"
-406-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+406-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
 407            android:permission="android.permission.DUMP" >
-407-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+407-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
 408            <intent-filter>
-408-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+408-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
 409                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-409-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
-409-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+409-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+409-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
 410            </intent-filter>
 411            <intent-filter>
-411-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+411-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
 412                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-412-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
-412-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+412-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+412-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
 413            </intent-filter>
 414            <intent-filter>
-414-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+414-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
 415                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-415-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
-415-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+415-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+415-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
 416            </intent-filter>
 417            <intent-filter>
-417-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+417-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
 418                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-418-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
-418-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\camil\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
+418-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+418-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\4a51ee9ee610d05e57790415145a17fd\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
 419            </intent-filter>
 420        </receiver> <!-- The activities will be merged into the manifest of the hosting app. -->
 421        <activity
-421-->[com.google.android.play:core-common:2.0.3] C:\Users\camil\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:14:9-18:65
+421-->[com.google.android.play:core-common:2.0.3] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:14:9-18:65
 422            android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
-422-->[com.google.android.play:core-common:2.0.3] C:\Users\camil\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:15:13-93
+422-->[com.google.android.play:core-common:2.0.3] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:15:13-93
 423            android:exported="false"
-423-->[com.google.android.play:core-common:2.0.3] C:\Users\camil\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:16:13-37
+423-->[com.google.android.play:core-common:2.0.3] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:16:13-37
 424            android:stateNotNeeded="true"
-424-->[com.google.android.play:core-common:2.0.3] C:\Users\camil\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:17:13-42
+424-->[com.google.android.play:core-common:2.0.3] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:17:13-42
 425            android:theme="@style/Theme.PlayCore.Transparent" />
-425-->[com.google.android.play:core-common:2.0.3] C:\Users\camil\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:18:13-62
+425-->[com.google.android.play:core-common:2.0.3] C:\Users\Gaming pc\.gradle\caches\9.2.1\transforms\d973f37353d9782e19bfda97b527f5f1\workspace\transformed\core-common-2.0.3\AndroidManifest.xml:18:13-62
 426    </application>
 427
 428</manifest>

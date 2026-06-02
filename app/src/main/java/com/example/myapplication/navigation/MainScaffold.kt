@@ -112,7 +112,15 @@ fun MainScaffold(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") {
-                Home(onEscanearQR = { navController.navigate(Screen.EscanearQR.route) })
+                Home(
+                    onEscanearQR = { navController.navigate(Screen.EscanearQR.route) },
+                    onVerCarrera = { raceId ->
+                        navController.navigate("carrera_detail/$raceId")
+                    },
+                    onAbrirLobby = { sessionId ->
+                        navController.navigate("lobby_carrera/$sessionId")
+                    }
+                )
             }
 
             composable("mapa") {
