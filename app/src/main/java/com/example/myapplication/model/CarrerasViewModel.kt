@@ -26,16 +26,18 @@ class CarrerasViewModel : ViewModel() {
         viewModelScope.launch {
             _carrerasState.update { it.copy(isLoading = true) }
             val repo = _carrerasState.value.raceRepository
-            
+
             val activeSessions = repo.getUserActiveSessions()
             Log.d("CarrerasViewModel", "Active sessions: $activeSessions")
             val allPublicRaces = repo.getPublicRaces()
+                .filter { it.isPublic }
             Log.d("CarrerasViewModel", "All public races: $allPublicRaces")
 
             val activeRaceIds = activeSessions.map { it.raceId }.toSet()
             val otherRaces = allPublicRaces.filter { it.id !in activeRaceIds }
+                .filter { it.isPublic }
 
-            _carrerasState.update { 
+            _carrerasState.update {
                 it.copy(
                     activeSessions = activeSessions,
                     otherRaces = otherRaces,

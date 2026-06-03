@@ -83,6 +83,7 @@ class RaceRepository(
     suspend fun getPublicRaces(): List<Race> {
         return try {
             val snapshot = firestore.collection("races")
+                .whereEqualTo("public", true)
                 .get()
                 .await()
 
