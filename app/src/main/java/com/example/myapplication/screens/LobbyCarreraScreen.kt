@@ -1,5 +1,13 @@
 package com.example.myapplication.screens
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,9 +21,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationCompat
 import com.example.myapplication.repository.RaceRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -39,6 +49,12 @@ fun LobbyCarreraScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { _ -> }
+
+    val context = LocalContext.current
+
     DisposableEffect(sessionId) {
         val listener = FirebaseFirestore.getInstance()
             .collection("race_sessions")
@@ -52,9 +68,14 @@ fun LobbyCarreraScreen(
                     val participants = snapshot.get("participants") as? Map<*, *>
                     participantsCount = participants?.size ?: 0
                     isParticipant = participants?.containsKey(currentUid) == true
-
+                    Log.d("NOTIF_TEST", "Entró al if — status=$status, isParticipant=$isParticipant")
                     if (status == "active" && isParticipant) {
-                        onRaceStarted(sessionId)
+                        Log.d("NOTIF_TEST", "Entró al if — status=$status, isParticipant=$isParticipant")
+                        scope.launch {
+                            showRaceStartNotification(context, raceName)
+                            kotlinx.coroutines.delay(500)
+                            onRaceStarted(sessionId)
+                        }
                     }
                 }
             }
@@ -146,6 +167,9 @@ fun LobbyCarreraScreen(
             if (!isParticipant && status == "lobby") {
                 Button(
                     onClick = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
                         scope.launch {
                             isLoading = true
                             errorMessage = null
@@ -204,4 +228,25 @@ fun LobbyCarreraScreen(
             }
         }
     }
+}
+
+fun showRaceStartNotification(context: Context, raceName: String) {
+    val channelId = "linkup_channel"
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val channel = NotificationChannel(
+        channelId,
+        "Notificaciones LinkUp",
+        NotificationManager.IMPORTANCE_HIGH
+    )
+    notificationManager.createNotificationChannel(channel)
+
+    val notification = NotificationCompat.Builder(context, channelId)
+        .setSmallIcon(android.R.drawable.ic_dialog_info)
+        .setContentTitle("¡La carrera comenzó!")
+        .setContentText("\"$raceName\" está en marcha. ¡Corre!")
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setAutoCancel(true)
+        .build()
+    notificationManager.notify(1001, notification)
 }

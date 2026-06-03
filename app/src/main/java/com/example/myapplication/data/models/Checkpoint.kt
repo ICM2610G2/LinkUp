@@ -4,7 +4,7 @@ import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.GeoPoint
 
 data class Checkpoint(
-    @DocumentId
+
     val id: String = "",
     val name: String = "",
     val description: String = "",

@@ -117,10 +117,25 @@ class RaceRepository(
                 .get()
                 .await()
 
+<<<<<<< HEAD
             snapshot.documents.mapNotNull { doc ->
                 doc.toObject(RaceSession::class.java)?.copy(id = doc.id)
             }.filter { session ->
                 session.participants.containsKey(uid) && (session.status == "lobby" || session.status == "active")
+=======
+            val activeSnap = firestore.collection("race_sessions")
+                .whereEqualTo("status", "active")
+                .get()
+                .await()
+
+            val allSessions = (lobbySnap.documents + activeSnap.documents)
+                .mapNotNull { doc ->
+                    doc.toObject(RaceSession::class.java)?.copy(id = doc.id)
+                }
+
+            allSessions.filter { session ->
+                session.participants.containsKey(uid)
+>>>>>>> CloudFunction
             }
 
         } catch (e: Exception) {
