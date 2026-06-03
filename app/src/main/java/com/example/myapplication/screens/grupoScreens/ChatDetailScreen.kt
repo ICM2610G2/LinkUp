@@ -135,7 +135,12 @@ fun ChatDetailScreen(
             ) {
                 when {
                     isGroup -> {
-                        Icon(Icons.Default.Group, null, tint = Color.White, modifier = Modifier.size(22.dp))
+                        Icon(
+                            Icons.Default.Group,
+                            null,
+                            tint = Color.White,
+                            modifier = Modifier.size(22.dp)
+                        )
                     }
                     otherUserPhotoURL.isNotEmpty() && !isLoadingOtherUser -> {
                         AsyncImage(
@@ -269,11 +274,13 @@ fun MessageBubble(
     onAbrirCarrera: (raceId: String) -> Unit = {}
 ) {
     val esInvitacion = text != null &&
-            text.startsWith("🏃 Te han invitado a una carrera") &&
-            text.contains("ID: ")
+            text.contains("Nombre: ") &&
+            text.contains("ID: ") &&
+            text.contains("carrera")
 
     val raceId = if (esInvitacion) {
         text!!.lines()
+            .map { it.trim() }
             .firstOrNull { it.startsWith("ID: ") }
             ?.removePrefix("ID: ")
             ?.trim() ?: ""
@@ -281,10 +288,14 @@ fun MessageBubble(
 
     val raceName = if (esInvitacion) {
         text!!.lines()
+            .map { it.trim() }
             .firstOrNull { it.startsWith("Nombre: ") }
             ?.removePrefix("Nombre: ")
             ?.trim() ?: ""
     } else ""
+
+// LOG TEMPORAL
+    android.util.Log.d("INVITACION_DEBUG", "text='$text' | esInvitacion=$esInvitacion | raceId='$raceId' | raceName='$raceName'")
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -349,7 +360,11 @@ fun MessageBubble(
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Ver carrera", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text(
+                                "Ver carrera",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }

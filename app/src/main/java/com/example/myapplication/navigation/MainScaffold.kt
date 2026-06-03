@@ -1,46 +1,43 @@
 package com.example.myapplication.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.compose.*
 import com.example.myapplication.data.models.User
 import com.example.myapplication.repository.UserRepository
+import com.example.myapplication.screens.LobbyCarreraScreen
+import com.example.myapplication.screens.Solicitudes
+import com.example.myapplication.screens.carreraScreens.CarreraActivaScreen
+import com.example.myapplication.screens.carreraScreens.CarreraScreen
+import com.example.myapplication.screens.carreraScreens.Carreras
+import com.example.myapplication.screens.grupoScreens.ChatDetailScreen
+import com.example.myapplication.screens.grupoScreens.ListaChatsScreen
+import com.example.myapplication.screens.homeScreens.CrearCarrera
+import com.example.myapplication.screens.homeScreens.EscanearQR
+import com.example.myapplication.screens.homeScreens.Home
+import com.example.myapplication.screens.homeScreens.InvitarNFC
+import com.example.myapplication.screens.mapaScreens.Mapa
+import com.example.myapplication.screens.perfilScreens.BuscarAmigos
+import com.example.myapplication.screens.perfilScreens.ConfiguracionScreen
+import com.example.myapplication.screens.perfilScreens.EditProfileScreen
+import com.example.myapplication.screens.perfilScreens.HistorialCarrerasScreen
+import com.example.myapplication.screens.perfilScreens.ListaAmigos
+import com.example.myapplication.screens.perfilScreens.Perfil
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.myapplication.screens.perfilScreens.BuscarAmigos
-import com.example.myapplication.screens.carreraScreens.CarreraActivaScreen
-import com.example.myapplication.screens.carreraScreens.Carreras
-import com.example.myapplication.screens.grupoScreens.Chat
-import com.example.myapplication.screens.homeScreens.CrearCarrera
-import com.example.myapplication.screens.perfilScreens.EditProfileScreen
-import com.example.myapplication.screens.homeScreens.EscanearQR
-import com.example.myapplication.screens.homeScreens.InvitarNFC
-import com.example.myapplication.screens.homeScreens.Home
-import com.example.myapplication.screens.perfilScreens.ListaAmigos
-import com.example.myapplication.screens.LobbyCarreraScreen
-import com.example.myapplication.screens.mapaScreens.Mapa
-import com.example.myapplication.screens.perfilScreens.Perfil
-import com.example.myapplication.screens.perfilScreens.ConfiguracionScreen
-import com.example.myapplication.screens.perfilScreens.HistorialCarrerasScreen
-import com.example.myapplication.screens.Solicitudes
-import com.example.myapplication.screens.carreraScreens.CarreraScreen
-import com.example.myapplication.screens.grupoScreens.ListaChatsScreen
-import com.example.myapplication.screens.grupoScreens.ChatDetailScreen
-
-
 
 @Composable
 fun MainScaffold(
@@ -114,7 +111,7 @@ fun MainScaffold(
         ) {
             composable("home") {
                 Home(
-                    onEscanearQR = { navController.navigate(Screen.EscanearQR.route) },
+                    onEscanearQR = { navController.navigate("escanear_qr") },
                     onVerCarrera = { raceId ->
                         navController.navigate("carrera_detail/$raceId")
                     },
@@ -138,7 +135,7 @@ fun MainScaffold(
                     },
                     onVerCarrera = { raceId ->
                         navController.navigate("carrera_detail/$raceId")
-                    },
+                    }
                 )
             }
 
@@ -201,7 +198,10 @@ fun MainScaffold(
                     chatName = chatName,
                     isGroup = isGroup,
                     isReadOnly = isReadOnly,
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    onAbrirCarrera = { raceId ->
+                        navController.navigate("carrera_detail/$raceId")
+                    }
                 )
             }
 
@@ -258,8 +258,14 @@ fun MainScaffold(
                         onCancel = { navController.popBackStack() }
                     )
                 } else {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No se encontraron datos del perfil en Firestore", color = Color.White)
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "No se encontraron datos del perfil en Firestore",
+                            color = Color.White
+                        )
                     }
                 }
             }
