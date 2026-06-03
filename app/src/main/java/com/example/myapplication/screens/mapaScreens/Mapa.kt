@@ -31,11 +31,8 @@ import com.example.myapplication.data.models.Checkpoint
 import com.example.myapplication.data.models.RaceSession
 import com.example.myapplication.model.FriendMapLocation
 import com.example.myapplication.model.MapaViewModel
-<<<<<<< Updated upstream
-=======
 import com.example.myapplication.model.ParticipantMapLocation
 import com.example.myapplication.repository.FriendsRepository
->>>>>>> Stashed changes
 import com.example.myapplication.repository.LocationRepository
 import com.example.myapplication.repository.RaceRepository
 import com.google.android.gms.location.*
@@ -45,6 +42,7 @@ import com.google.firebase.database.*
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.myapplication.repository.UserRepository
 
 @Composable
 fun Mapa(
@@ -73,7 +71,6 @@ fun Mapa(
         if (!granted) {
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         } else {
-            // Cargamos tanto la carrera como los amigos según el estado
             viewModel.cargarDatos()
         }
     }
@@ -198,7 +195,7 @@ fun MapaConUbicacion(
     }
 
     // ============================================================
-    // UBICACIÓN EN TIEMPO REAL - ACTUALIZA live_positions Y user_live
+    // UBICACIÓN EN TIEMPO REAL
     // ============================================================
     DisposableEffect(Unit) {
         val locationRequest = LocationRequest.Builder(
@@ -223,7 +220,7 @@ fun MapaConUbicacion(
 
                 if (compartirUbicacion) {
                     if (activeSessionId != null) {
-                        Log.d("MAP_LOCATION", " Escribiendo en live_positions/$activeSessionId/$uid")
+                        Log.d("MAP_LOCATION", "🏁 Escribiendo en live_positions/$activeSessionId/$uid")
                         locationRepository.updateRaceLocation(
                             sessionId = activeSessionId,
                             lat = location.latitude,
@@ -270,45 +267,17 @@ fun MapaConUbicacion(
         }
     }
 
-<<<<<<< Updated upstream
-    // Lógica de amigos (Realtime DB) - Se activa solo si hay amigos aceptados en el estado
-    DisposableEffect(state.acceptedFriends) {
-        val listeners = mutableListOf<Pair<DatabaseReference, ValueEventListener>>()
-        state.acceptedFriends.forEach { friend ->
-            val ref = realtimeDb.child("user_live").child(friend.uid).child("location")
-            val listener = object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val visible = snapshot.child("visible").getValue(Boolean::class.java) ?: false
-                    val lat = snapshot.child("lat").getValue(Double::class.java)
-                    val lng = snapshot.child("lng").getValue(Double::class.java)
-                    
-                    val updatedList = if (visible && lat != null && lng != null) {
-                        state.friendLocations.filterNot { it.user.uid == friend.uid } + FriendMapLocation(friend, LatLng(lat, lng))
-                    } else {
-                        state.friendLocations.filterNot { it.user.uid == friend.uid }
-                    }
-                    viewModel.updateFriendLocations(updatedList)
-                }
-                override fun onCancelled(error: DatabaseError) {}
-            }
-            ref.addValueEventListener(listener)
-            listeners.add(ref to listener)
-        }
-        onDispose { listeners.forEach { (ref, l) -> ref.removeEventListener(l) } }
-    }
-
-=======
     // ============================================================
-    // FORZAR ESCRITURA INICIAL CUANDO SE DETECTA SESIÓN ACTIVA
+    // FORZAR ESCRITURA INICIAL
     // ============================================================
     LaunchedEffect(state.activeSession, state.userLocation) {
         val session = state.activeSession
         val userLocation = state.userLocation
 
-        Log.d("MAP_SESSION_CHECK", " Verificando: session=$session, userLocation=$userLocation, compartir=$compartirUbicacion")
+        Log.d("MAP_SESSION_CHECK", "🔄 Verificando: session=$session, userLocation=$userLocation, compartir=$compartirUbicacion")
 
         if (session != null && userLocation != null && compartirUbicacion) {
-            Log.d("MAP_SESSION_CHECK", " Forzando escritura inicial en live_positions")
+            Log.d("MAP_SESSION_CHECK", "🏁 Forzando escritura inicial en live_positions")
             locationRepository.updateRaceLocation(
                 sessionId = session.id,
                 lat = userLocation.latitude,
@@ -320,10 +289,9 @@ fun MapaConUbicacion(
     // ============================================================
     // ESCUCHAR PARTICIPANTES EN live_positions
     // ============================================================
-
     DisposableEffect(state.activeSession?.id) {
         val sessionId = state.activeSession?.id
-        Log.d("MAP_PARTICIPANTS", " Escuchando participantes para sesión: $sessionId")
+        Log.d("MAP_PARTICIPANTS", "🎯 Escuchando participantes para sesión: $sessionId")
 
         if (sessionId == null) {
             viewModel.updateParticipantLocations(emptyList())
@@ -332,52 +300,43 @@ fun MapaConUbicacion(
             val ref = realtimeDb.child("live_positions").child(sessionId)
             Log.d("MAP_PARTICIPANTS", "📡 Ruta: $ref")
 
-            // Mapa para almacenar información de los participantes (nombre y gameId)
-            val participantsInfo = mutableMapOf<String, Triple<String, String, Boolean>>()
+            val participantsCache = mutableMapOf<String, Pair<String, String>>()
 
-            // Cargar información de los participantes desde Firestore
             scope.launch {
                 val session = state.activeSession
                 session?.participantIds?.forEach { uid ->
-                    val user = userRepository.getUser(uid)
-                    if (user != null) {
-                        participantsInfo[uid] = Triple(user.displayName, user.gameId, false)
-                        Log.d("MAP_PARTICIPANTS", " Cargado: $uid -> ${user.displayName}, ${user.gameId}")
+                    if (uid != auth.currentUser?.uid) {
+                        val user = userRepository.getUser(uid)
+                        if (user != null) {
+                            participantsCache[uid] = Pair(user.displayName, user.gameId)
+                            Log.d("MAP_PARTICIPANTS", "📝 Cargado: $uid -> ${user.displayName}, ${user.gameId}")
+                        }
                     }
-                }
-
-                // Marcar como cargados
-                participantsInfo.keys.forEach { uid ->
-                    participantsInfo[uid] = participantsInfo[uid]?.copy(third = true) ?: Triple("", "", true)
                 }
             }
 
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    Log.d("MAP_PARTICIPANTS", " DataSnapshot recibido. Children: ${snapshot.childrenCount}")
+                    Log.d("MAP_PARTICIPANTS", "📥 DataSnapshot recibido. Children: ${snapshot.childrenCount}")
 
                     val updatedList = snapshot.children.mapNotNull { child ->
                         val uid = child.key ?: return@mapNotNull null
                         val lat = child.child("lat").getValue(Double::class.java)
                         val lng = child.child("lng").getValue(Double::class.java)
 
-                        Log.d("MAP_PARTICIPANTS", "   - Procesando uid: $uid, lat=$lat, lng=$lng")
-
                         if (lat != null && lng != null) {
-                            val userInfo = participantsInfo[uid]
+                            val isCurrentUser = uid == auth.currentUser?.uid
 
-                            // Para el usuario actual, obtener datos directamente
-                            val displayName = if (uid == auth.currentUser?.uid) {
+                            val displayName = if (isCurrentUser) {
                                 "Tú"
                             } else {
-                                userInfo?.first ?: "Participante"
+                                participantsCache[uid]?.first ?: "Participante"
                             }
 
-
-                            val gameId = if (uid == auth.currentUser?.uid) {
+                            val gameId = if (isCurrentUser) {
                                 "Tú"
                             } else {
-                                userInfo?.second ?: ""
+                                participantsCache[uid]?.second ?: ""
                             }
 
                             Log.d("MAP_PARTICIPANTS", "   - Participante: $uid, nombre=$displayName, gameId=$gameId")
@@ -393,12 +352,12 @@ fun MapaConUbicacion(
                         }
                     }
 
-                    Log.d("MAP_PARTICIPANTS", " Participantes encontrados: ${updatedList.size}")
+                    Log.d("MAP_PARTICIPANTS", "✅ Participantes encontrados: ${updatedList.size}")
                     viewModel.updateParticipantLocations(updatedList)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("MAP_PARTICIPANTS", " Error: ${error.message}")
+                    Log.e("MAP_PARTICIPANTS", "❌ Error: ${error.message}")
                 }
             }
 
@@ -457,7 +416,6 @@ fun MapaConUbicacion(
     // ============================================================
     // UI DEL MAPA
     // ============================================================
->>>>>>> Stashed changes
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.matchParentSize(),
@@ -465,13 +423,7 @@ fun MapaConUbicacion(
             properties = MapProperties(isMyLocationEnabled = true),
             uiSettings = MapUiSettings(zoomControlsEnabled = true, myLocationButtonEnabled = true)
         ) {
-<<<<<<< Updated upstream
-            // Checkpoints (Solo aparecen si la carrera está iniciada)
-=======
-            // ============================================================
             // CHECKPOINTS
-            // ============================================================
->>>>>>> Stashed changes
             state.checkpoints.forEach { checkpoint ->
                 val pos = LatLng(checkpoint.coordinates.latitude, checkpoint.coordinates.longitude)
                 val isCompleted = state.activeSession
@@ -502,22 +454,7 @@ fun MapaConUbicacion(
                 )
             }
 
-<<<<<<< Updated upstream
-            // Amigos (Solo aparecen si no hay carrera activa según el ViewModel)
-            state.friendLocations.forEach { friendLocation ->
-                Marker(
-                    state = MarkerState(position = friendLocation.location),
-                    title = friendLocation.user.displayName,
-                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
-                )
-            }
-        }
-
-        // --- PANEL SUPERIOR: Nombre de Carrera, Lobby o Aviso ---
-=======
-            // ============================================================
-            // AMIGOS (fuera de carrera) - Color NARANJA
-            // ============================================================
+            // AMIGOS (fuera de carrera)
             if (state.activeSession == null) {
                 state.friendLocations.forEach { friendLocation ->
                     Marker(
@@ -528,9 +465,7 @@ fun MapaConUbicacion(
                     )
                 }
             } else {
-                // ============================================================
-                // PARTICIPANTES (dentro de carrera) - Color ROSADO con NOMBRE y GAME ID
-                // ============================================================
+                // PARTICIPANTES (dentro de carrera)
                 state.participantLocations.forEach { participantLocation ->
                     Marker(
                         state = MarkerState(position = participantLocation.location),
@@ -546,10 +481,7 @@ fun MapaConUbicacion(
             }
         }
 
-        // ============================================================
         // INDICADOR DE CARRERA ACTIVA
-        // ============================================================
->>>>>>> Stashed changes
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -557,11 +489,10 @@ fun MapaConUbicacion(
         ) {
             val session = state.activeSession
             val cardColor = when {
-                session?.status == "active" -> Color(0xEEFF9800) // Naranja para carrera
-                session?.status == "lobby" -> Color(0xEE2A9D8F)  // Teal para lobby
-                else -> Color(0xEE333333)                        // Gris para aviso
+                session?.status == "active" -> Color(0xEEFF9800)
+                session?.status == "lobby" -> Color(0xEE2A9D8F)
+                else -> Color(0xEE333333)
             }
-            
             val textColor = if (session != null) Color.Black else Color.White
 
             Card(
@@ -580,19 +511,12 @@ fun MapaConUbicacion(
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
-<<<<<<< Updated upstream
                         text = when {
-                            session?.status == "active" -> "Carrera: ${session.raceName}"
+                            session?.status == "active" -> "Carrera: ${session.raceName} · Participantes: ${state.participantLocations.size}"
                             session?.status == "lobby" -> "Lobby: ${session.raceName} (Esperando inicio...)"
-                            else -> "No estás inscrito a ninguna carrera. ¡Inscríbete a una!"
+                            else -> "No estás inscrito a ninguna carrera"
                         },
                         color = textColor,
-=======
-                        text = state.activeSession?.let {
-                            "Carrera: ${it.raceName} · Participantes: ${state.participantLocations.size}"
-                        } ?: "No estás inscrito a ninguna carrera",
-                        color = if (state.activeSession != null) Color.Black else Color.White,
->>>>>>> Stashed changes
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
@@ -600,9 +524,7 @@ fun MapaConUbicacion(
             }
         }
 
-        // ============================================================
         // BOTÓN TOGGLE DE UBICACIÓN
-        // ============================================================
         FloatingActionButton(
             onClick = { compartirUbicacion = !compartirUbicacion },
             modifier = Modifier
@@ -617,9 +539,7 @@ fun MapaConUbicacion(
             )
         }
 
-        // ============================================================
         // PANEL DE VALIDACIÓN DE CHECKPOINT
-        // ============================================================
         AnimatedVisibility(
             visible = selectedCheckpoint != null,
             modifier = Modifier
