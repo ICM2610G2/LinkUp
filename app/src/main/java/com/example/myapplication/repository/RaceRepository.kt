@@ -315,7 +315,10 @@ class RaceRepository(
 
             firestore.collection("race_sessions")
                 .document(sessionId)
-                .update("participants.$uid.checkpointsDone", FieldValue.arrayUnion(checkpointId))
+                .update(
+                    "participants.$uid.checkpointsDone", FieldValue.arrayUnion(checkpointId),
+                    "participants.$uid.lastCheckpointAt", FieldValue.serverTimestamp()
+                )
                 .await()
 
             Result.success(Unit)
@@ -340,7 +343,10 @@ class RaceRepository(
 
             firestore.collection("race_sessions")
                 .document(sessionId)
-                .update("participants.$uid.checkpointsDone", FieldValue.arrayUnion(checkpointId))
+                .update(
+                    "participants.$uid.checkpointsDone", FieldValue.arrayUnion(checkpointId),
+                    "participants.$uid.lastCheckpointAt", FieldValue.serverTimestamp()
+                )
                 .await()
 
             Result.success(downloadUrl)

@@ -6,6 +6,7 @@ import com.google.firebase.firestore.IgnoreExtraProperties
 
 @IgnoreExtraProperties
 data class RaceSession(
+    @DocumentId
     var id: String = "",
     var raceId: String = "",
     var raceName: String = "",
@@ -24,6 +25,7 @@ data class RaceSession(
 data class ParticipantInfo(
     var joinedAt: Timestamp? = null,
     var completedAt: Timestamp? = null,
+    var lastCheckpointAt: Timestamp? = null, // Para el desempate de posición
     var position: Int? = null,
     var checkpointsDone: List<String> = emptyList()
 )
