@@ -4,7 +4,6 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 
 data class RaceSession(
-    @DocumentId
     val id: String = "",
     val raceId: String = "",
     val raceName: String = "",

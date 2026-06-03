@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -67,8 +68,9 @@ fun LobbyCarreraScreen(
                     val participants = snapshot.get("participants") as? Map<*, *>
                     participantsCount = participants?.size ?: 0
                     isParticipant = participants?.containsKey(currentUid) == true
-
+                    Log.d("NOTIF_TEST", "Entró al if — status=$status, isParticipant=$isParticipant")
                     if (status == "active" && isParticipant) {
+                        Log.d("NOTIF_TEST", "Entró al if — status=$status, isParticipant=$isParticipant")
                         scope.launch {
                             showRaceStartNotification(context, raceName)
                             kotlinx.coroutines.delay(500)
