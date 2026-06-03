@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +20,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +33,9 @@ import com.example.myapplication.model.FriendMapLocation
 import com.example.myapplication.model.MapaViewModel
 import com.example.myapplication.repository.LocationRepository
 import com.example.myapplication.repository.RaceRepository
+import com.example.myapplication.sensors.LightSensorManager
+import com.example.myapplication.sensors.NIGHT_MAP_STYLE
+import com.example.myapplication.sensors.StepSensorManager
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
@@ -45,23 +50,33 @@ fun Mapa(
     val context = LocalContext.current
     val state by viewModel.mapaState.collectAsState()
 
+    // ── Pedir ubicación + actividad en un solo launcher ────────────
     val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        viewModel.updateHasLocationPermission(granted)
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val locationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+        viewModel.updateHasLocationPermission(locationGranted)
     }
 
     LaunchedEffect(Unit) {
-        val granted = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
+        val locationGranted = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-        viewModel.updateHasLocationPermission(granted)
 
-        if (!granted) {
-            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        val activityGranted = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACTIVITY_RECOGNITION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        viewModel.updateHasLocationPermission(locationGranted)
+
+        val toRequest = buildList {
+            if (!locationGranted) add(Manifest.permission.ACCESS_FINE_LOCATION)
+            if (!activityGranted) add(Manifest.permission.ACTIVITY_RECOGNITION)
+        }
+
+        if (toRequest.isNotEmpty()) {
+            permissionLauncher.launch(toRequest.toTypedArray())
         } else {
-            // Cargamos tanto la carrera como los amigos según el estado
             viewModel.cargarDatos()
         }
     }
@@ -71,7 +86,12 @@ fun Mapa(
     } else {
         MapaSinPermiso(
             onRequestPermission = {
-                permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                permissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACTIVITY_RECOGNITION
+                    )
+                )
             }
         )
     }
@@ -86,6 +106,26 @@ fun MapaConUbicacion(
     val state by viewModel.mapaState.collectAsState()
     val scope = rememberCoroutineScope()
     val raceRepository = remember { RaceRepository() }
+
+    // ── Sensor de luz ──────────────────────────────────────────────
+    val lightSensorManager = remember { LightSensorManager(context) }
+    val isDark by lightSensorManager.isDark.collectAsState()
+
+    DisposableEffect(Unit) {
+        lightSensorManager.start()
+        onDispose { lightSensorManager.stop() }
+    }
+
+    // ── Sensor de pasos ────────────────────────────────────────────
+    val stepSensorManager = remember { StepSensorManager(context) }
+    val steps by stepSensorManager.steps.collectAsState()
+    val isMoving by stepSensorManager.isMoving.collectAsState()
+
+    DisposableEffect(Unit) {
+        stepSensorManager.start()
+        onDispose { stepSensorManager.stop() }
+    }
+    // ───────────────────────────────────────────────────────────────
 
     var selectedCheckpoint by remember { mutableStateOf<Checkpoint?>(null) }
     var isUploading by remember { mutableStateOf(false) }
@@ -134,8 +174,11 @@ fun MapaConUbicacion(
             }
         }
         fusedLocationClient.requestLocationUpdates(
-            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L).setMinUpdateIntervalMillis(3000L).build(),
-            callback, Looper.getMainLooper()
+            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L)
+                .setMinUpdateIntervalMillis(3000L)
+                .build(),
+            callback,
+            Looper.getMainLooper()
         )
         onDispose {
             locationRepository.removeLocation()
@@ -143,7 +186,6 @@ fun MapaConUbicacion(
         }
     }
 
-    // Lógica de amigos (Realtime DB) - Se activa solo si hay amigos aceptados en el estado
     DisposableEffect(state.acceptedFriends) {
         val listeners = mutableListOf<Pair<DatabaseReference, ValueEventListener>>()
         state.acceptedFriends.forEach { friend ->
@@ -153,9 +195,10 @@ fun MapaConUbicacion(
                     val visible = snapshot.child("visible").getValue(Boolean::class.java) ?: false
                     val lat = snapshot.child("lat").getValue(Double::class.java)
                     val lng = snapshot.child("lng").getValue(Double::class.java)
-                    
+
                     val updatedList = if (visible && lat != null && lng != null) {
-                        state.friendLocations.filterNot { it.user.uid == friend.uid } + FriendMapLocation(friend, LatLng(lat, lng))
+                        state.friendLocations.filterNot { it.user.uid == friend.uid } +
+                                FriendMapLocation(friend, LatLng(lat, lng))
                     } else {
                         state.friendLocations.filterNot { it.user.uid == friend.uid }
                     }
@@ -170,13 +213,19 @@ fun MapaConUbicacion(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+
         GoogleMap(
             modifier = Modifier.matchParentSize(),
             cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = true),
-            uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = true)
+            properties = MapProperties(
+                isMyLocationEnabled = true,
+                mapStyleOptions = if (isDark) MapStyleOptions(NIGHT_MAP_STYLE) else null
+            ),
+            uiSettings = MapUiSettings(
+                zoomControlsEnabled = false,
+                myLocationButtonEnabled = true
+            )
         ) {
-            // Checkpoints (Solo aparecen si la carrera está iniciada)
             state.checkpoints.forEach { checkpoint ->
                 val pos = LatLng(checkpoint.coordinates.latitude, checkpoint.coordinates.longitude)
                 val isCompleted = state.activeSession?.participants?.get(auth.currentUser?.uid)
@@ -203,7 +252,6 @@ fun MapaConUbicacion(
                 )
             }
 
-            // Amigos (Solo aparecen si no hay carrera activa según el ViewModel)
             state.friendLocations.forEach { friendLocation ->
                 Marker(
                     state = MarkerState(position = friendLocation.location),
@@ -213,7 +261,7 @@ fun MapaConUbicacion(
             }
         }
 
-        // --- PANEL SUPERIOR: Nombre de Carrera, Lobby o Aviso ---
+        // ── Panel superior: estado de carrera ──────────────────────
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -221,11 +269,10 @@ fun MapaConUbicacion(
         ) {
             val session = state.activeSession
             val cardColor = when {
-                session?.status == "active" -> Color(0xEEFF9800) // Naranja para carrera
-                session?.status == "lobby" -> Color(0xEE2A9D8F)  // Teal para lobby
-                else -> Color(0xEE333333)                        // Gris para aviso
+                session?.status == "active" -> Color(0xEEFF9800)
+                session?.status == "lobby"  -> Color(0xEE2A9D8F)
+                else                        -> Color(0xEE333333)
             }
-            
             val textColor = if (session != null) Color.Black else Color.White
 
             Card(
@@ -246,7 +293,7 @@ fun MapaConUbicacion(
                     Text(
                         text = when {
                             session?.status == "active" -> "Carrera: ${session.raceName}"
-                            session?.status == "lobby" -> "Lobby: ${session.raceName} (Esperando inicio...)"
+                            session?.status == "lobby"  -> "Lobby: ${session.raceName} (Esperando inicio...)"
                             else -> "No estás inscrito a ninguna carrera. ¡Inscríbete a una!"
                         },
                         color = textColor,
@@ -257,16 +304,31 @@ fun MapaConUbicacion(
             }
         }
 
-        // --- PANEL INFERIOR: Validación de Checkpoint ---
+        // ── Widget podómetro (esquina inferior izquierda) ──────────
+        StepWidget(
+            steps = steps,
+            isMoving = isMoving,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 16.dp, bottom = 120.dp)
+        )
+
+        // ── Panel inferior: validación de checkpoint ───────────────
         AnimatedVisibility(
             visible = selectedCheckpoint != null,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 110.dp, start = 16.dp, end = 16.dp)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 110.dp, start = 16.dp, end = 16.dp)
         ) {
             selectedCheckpoint?.let { cp ->
                 val userLoc = state.userLocation
                 val results = FloatArray(1)
                 if (userLoc != null) {
-                    Location.distanceBetween(userLoc.latitude, userLoc.longitude, cp.coordinates.latitude, cp.coordinates.longitude, results)
+                    Location.distanceBetween(
+                        userLoc.latitude, userLoc.longitude,
+                        cp.coordinates.latitude, cp.coordinates.longitude,
+                        results
+                    )
                 }
                 val distance = if (userLoc != null) results[0] else Float.MAX_VALUE
                 val isWithinRange = distance <= 50f
@@ -282,7 +344,12 @@ fun MapaConUbicacion(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Place, null, tint = Color(0xFFFF9800))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(cp.name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            Text(
+                                cp.name,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            )
                             Spacer(modifier = Modifier.weight(1f))
                             IconButton(onClick = { selectedCheckpoint = null }) {
                                 Icon(Icons.Default.Close, null, tint = Color.Gray)
@@ -305,11 +372,18 @@ fun MapaConUbicacion(
                                 shape = RoundedCornerShape(12.dp)
                             ) {
                                 if (isUploading) {
-                                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                                    CircularProgressIndicator(
+                                        color = Color.White,
+                                        modifier = Modifier.size(20.dp),
+                                        strokeWidth = 2.dp
+                                    )
                                 } else {
                                     Icon(Icons.Default.PhotoCamera, null)
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(if (isWithinRange) "Tomar Foto del Checkpoint" else "Acércate a 50m para validar")
+                                    Text(
+                                        if (isWithinRange) "Tomar Foto del Checkpoint"
+                                        else "Acércate a 50m para validar"
+                                    )
                                 }
                             }
                         }
@@ -320,18 +394,102 @@ fun MapaConUbicacion(
     }
 }
 
+// ── Widget podómetro ───────────────────────────────────────────────
+@Composable
+fun StepWidget(
+    steps: Int,
+    isMoving: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val pulse by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.18f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulse_scale"
+    )
+
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xCC1A1A1A)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = if (isMoving) Icons.Default.DirectionsWalk else Icons.Default.Accessibility,
+                contentDescription = null,
+                tint = if (isMoving) Color(0xFFFF9800) else Color(0xFF757575),
+                modifier = Modifier
+                    .size(20.dp)
+                    .scale(if (isMoving) pulse else 1f)
+            )
+            Column {
+                Text(
+                    text = "$steps",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 16.sp
+                )
+                Text(
+                    text = if (isMoving) "en marcha" else "pasos",
+                    color = if (isMoving) Color(0xFFFF9800) else Color(0xFF757575),
+                    fontSize = 9.sp,
+                    lineHeight = 9.sp
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun MapaSinPermiso(onRequestPermission: () -> Unit) {
-    Box(modifier = Modifier.fillMaxSize().background(Color(0xFF0B0B0B)), contentAlignment = Alignment.Center) {
-        Card(modifier = Modifier.padding(24.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))) {
-            Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Default.LocationOff, null, tint = Color(0xFFFF9800), modifier = Modifier.size(48.dp))
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0B0B0B)),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier.padding(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    Icons.Default.LocationOff,
+                    null,
+                    tint = Color(0xFFFF9800),
+                    modifier = Modifier.size(48.dp)
+                )
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Ubicación requerida", color = Color.White, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    "Ubicación requerida",
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium
+                )
                 Spacer(modifier = Modifier.height(12.dp))
-                Text("Para participar en carreras y ver amigos, activa los permisos.", color = Color.Gray, fontSize = 14.sp)
+                Text(
+                    "Para participar en carreras y ver amigos, activa los permisos.",
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
                 Spacer(modifier = Modifier.height(24.dp))
-                Button(onClick = onRequestPermission, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)), shape = RoundedCornerShape(12.dp)) {
+                Button(
+                    onClick = onRequestPermission,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
                     Text("Dar permiso de ubicación")
                 }
             }

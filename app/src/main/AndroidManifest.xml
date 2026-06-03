@@ -17,6 +17,8 @@
     <!-- Para FCM -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />

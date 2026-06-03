@@ -11,58 +11,46 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import org.osmdroid.events.MapEventsReceiver
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.MapEventsOverlay
-import org.osmdroid.views.overlay.Marker
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.*
 
 @Composable
 fun SeleccionMapa(
     onPuntoSeleccionado: (Double, Double) -> Unit,
     onCerrar: () -> Unit
 ) {
-    var puntoSeleccionado by remember { mutableStateOf<GeoPoint?>(null) }
-    val context = LocalContext.current
+    var puntoSeleccionado by remember { mutableStateOf<LatLng?>(null) }
+
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(LatLng(4.6097, -74.0817), 15f)
+    }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        AndroidView(
+        GoogleMap(
             modifier = Modifier.fillMaxSize(),
-            factory = { ctx ->
-                MapView(ctx).apply {
-                    setTileSource(TileSourceFactory.MAPNIK)
-                    setMultiTouchControls(true)
-                    controller.setZoom(15.0)
-                    controller.setCenter(GeoPoint(4.6097, -74.0817)) // Bogotá center
-
-                    val marker = Marker(this)
-
-                    val overlayEvents = MapEventsOverlay(object : MapEventsReceiver {
-                        override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-                            p?.let {
-                                puntoSeleccionado = it
-                                marker.position = it
-                                if (!overlays.contains(marker)) {
-                                    overlays.add(marker)
-                                }
-                                invalidate()
-                            }
-                            return true
-                        }
-
-                        override fun longPressHelper(p: GeoPoint?): Boolean = false
-                    })
-                    overlays.add(overlayEvents)
-                }
+            cameraPositionState = cameraPositionState,
+            uiSettings = MapUiSettings(
+                zoomControlsEnabled = false,
+                myLocationButtonEnabled = false
+            ),
+            onMapClick = { latLng ->
+                puntoSeleccionado = latLng
             }
-        )
+        ) {
+            puntoSeleccionado?.let { punto ->
+                Marker(
+                    state = MarkerState(position = punto),
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
+                )
+            }
+        }
 
+        // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -83,17 +71,22 @@ fun SeleccionMapa(
                 color = Color.White,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.background(Color(0xCC1A1A1A), RoundedCornerShape(12.dp)).padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier
+                    .background(Color(0xCC1A1A1A), RoundedCornerShape(12.dp))
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
             Spacer(modifier = Modifier.width(48.dp))
         }
 
-        // FAB to confirm
+        // FAB de confirmación
         if (puntoSeleccionado != null) {
             ExtendedFloatingActionButton(
                 onClick = {
-                    onPuntoSeleccionado(puntoSeleccionado!!.latitude, puntoSeleccionado!!.longitude)
+                    onPuntoSeleccionado(
+                        puntoSeleccionado!!.latitude,
+                        puntoSeleccionado!!.longitude
+                    )
                 },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
