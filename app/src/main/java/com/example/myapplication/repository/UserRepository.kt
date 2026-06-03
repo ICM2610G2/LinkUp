@@ -45,12 +45,21 @@ class UserRepository(
         }
     }
 
-
-
     suspend fun updatePhotoURL(uid: String, photoURL: String): Result<Unit> {
         return try {
             firestore.collection("users").document(uid)
                 .update("photoURL", photoURL)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateShareLocationMode(uid: String, mode: String): Result<Unit> {
+        return try {
+            firestore.collection("users").document(uid)
+                .update("shareLocationMode", mode)
                 .await()
             Result.success(Unit)
         } catch (e: Exception) {

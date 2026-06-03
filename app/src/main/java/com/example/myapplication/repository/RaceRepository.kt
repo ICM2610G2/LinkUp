@@ -138,11 +138,37 @@ class RaceRepository(
         }
     }
 
+    /**
+     * Devuelve TODAS las sesiones del usuario (activas, lobby y finalizadas).
+     * Usado por HistorialCarrerasScreen.
+     */
+    suspend fun getAllUserSessions(): List<RaceSession> {
+        return try {
+            val uid = auth.currentUser?.uid ?: return emptyList()
+
+            val snapshot = firestore.collection("race_sessions")
+                .whereArrayContains("participantIds", uid)
+                .get()
+                .await()
+
+            snapshot.documents.mapNotNull { doc ->
+                try {
+                    doc.toObject(RaceSession::class.java)?.also { it.id = doc.id }
+                } catch (e: Exception) {
+                    Log.e("RaceRepository", "Error mapping RaceSession ${doc.id}", e)
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("RaceRepository", "Error getting all user sessions", e)
+            emptyList()
+        }
+    }
+
     suspend fun joinRaceSession(sessionId: String): Result<Unit> {
         return try {
             val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
 
-            // VALIDACIÓN: Solo una carrera a la vez
             val activeSessions = getUserActiveSessions()
             if (activeSessions.any { it.id != sessionId }) {
                 return Result.failure(Exception("No puedes unirte. Ya participas en otra carrera activa."))
@@ -199,7 +225,6 @@ class RaceRepository(
         return try {
             val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
 
-            // VALIDACIÓN: No crear si ya tiene una carrera activa
             val activeSessions = getUserActiveSessions()
             if (activeSessions.isNotEmpty()) {
                 return Result.failure(Exception("No puedes crear una sesión si ya participas en otra carrera activa."))

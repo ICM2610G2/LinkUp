@@ -33,6 +33,8 @@ import com.example.myapplication.screens.perfilScreens.ListaAmigos
 import com.example.myapplication.screens.LobbyCarreraScreen
 import com.example.myapplication.screens.mapaScreens.Mapa
 import com.example.myapplication.screens.perfilScreens.Perfil
+import com.example.myapplication.screens.perfilScreens.ConfiguracionScreen
+import com.example.myapplication.screens.perfilScreens.HistorialCarrerasScreen
 import com.example.myapplication.screens.Solicitudes
 import com.example.myapplication.screens.carreraScreens.CarreraScreen
 import com.example.myapplication.screens.grupoScreens.ListaChatsScreen
@@ -71,7 +73,6 @@ fun MainScaffold(
                     NavItem("mapa", "Mapa", Icons.Default.Map),
                     NavItem("carreras", "Carreras", Icons.Default.EmojiEvents),
                     NavItem("lista_chats", "Chat", Icons.AutoMirrored.Filled.Chat),
-
                     NavItem("perfil", "Perfil", Icons.Default.Person)
                 )
 
@@ -138,23 +139,17 @@ fun MainScaffold(
                     onVerCarrera = { raceId ->
                         navController.navigate("carrera_detail/$raceId")
                     },
-
                 )
             }
 
             composable("lobby_carrera/{sessionId}") { backStackEntry ->
                 val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
-
                 LobbyCarreraScreen(
                     sessionId = sessionId,
-                    onBack = {
-                        navController.popBackStack()
-                    },
+                    onBack = { navController.popBackStack() },
                     onRaceStarted = { id ->
                         navController.navigate("carrera_activa/$id") {
-                            popUpTo("lobby_carrera/$id") {
-                                inclusive = true
-                            }
+                            popUpTo("lobby_carrera/$id") { inclusive = true }
                         }
                     }
                 )
@@ -175,23 +170,16 @@ fun MainScaffold(
 
             composable("carrera_activa/{sessionId}") { backStackEntry ->
                 val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
-
                 CarreraActivaScreen(
                     sessionId = sessionId,
-                    onBack = {
-                        navController.popBackStack()
-                    }
+                    onBack = { navController.popBackStack() }
                 )
             }
 
             composable("crear_carrera") {
                 CrearCarrera(
-                    onCerrar = {
-                        navController.popBackStack()
-                    },
-                    onCarreraCreada = {
-                        navController.popBackStack()
-                    }
+                    onCerrar = { navController.popBackStack() },
+                    onCarreraCreada = { navController.popBackStack() }
                 )
             }
 
@@ -208,7 +196,6 @@ fun MainScaffold(
                 val chatName = backStackEntry.arguments?.getString("chatName") ?: ""
                 val isGroup = backStackEntry.arguments?.getString("isGroup")?.toBoolean() ?: false
                 val isReadOnly = backStackEntry.arguments?.getString("isReadOnly")?.toBoolean() ?: false
-
                 ChatDetailScreen(
                     chatId = chatId,
                     chatName = chatName,
@@ -218,21 +205,16 @@ fun MainScaffold(
                 )
             }
 
-
             composable("perfil") {
                 Perfil(
                     user = firebaseUser,
                     userData = userData,
                     onLogout = onLogout,
                     onAccountDeleted = onAccountDeleted,
-                    onEditProfile = {
-                        navController.navigate("edit_profile")
-                    },
-                    onVerAmigos = {
-                        navController.navigate("lista_amigos")
-                    },
-
-
+                    onEditProfile = { navController.navigate("edit_profile") },
+                    onVerAmigos = { navController.navigate("lista_amigos") },
+                    onConfiguracion = { navController.navigate("configuracion") },
+                    onHistorialCarreras = { navController.navigate("historial_carreras") },
                     onRefresh = {
                         scope.launch {
                             firebaseUser?.uid?.let { uid ->
@@ -242,6 +224,20 @@ fun MainScaffold(
                     }
                 )
             }
+
+            composable("configuracion") {
+                ConfiguracionScreen(
+                    userData = userData,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable("historial_carreras") {
+                HistorialCarrerasScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
             composable("lista_amigos") {
                 ListaAmigos(
                     onCerrar = { navController.popBackStack() },
@@ -252,7 +248,6 @@ fun MainScaffold(
 
             composable("edit_profile") {
                 val currentUserData = userData
-
                 if (currentUserData != null) {
                     EditProfileScreen(
                         userData = currentUserData,
@@ -260,19 +255,11 @@ fun MainScaffold(
                             userData = updatedUser
                             navController.popBackStack()
                         },
-                        onCancel = {
-                            navController.popBackStack()
-                        }
+                        onCancel = { navController.popBackStack() }
                     )
                 } else {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "No se encontraron datos del perfil en Firestore",
-                            color = Color.White
-                        )
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No se encontraron datos del perfil en Firestore", color = Color.White)
                     }
                 }
             }
@@ -291,7 +278,6 @@ fun MainScaffold(
                 )
             }
 
-
             composable("buscar_amigos") {
                 BuscarAmigos(onBack = { navController.popBackStack() })
             }
@@ -299,8 +285,6 @@ fun MainScaffold(
             composable("solicitudes") {
                 Solicitudes(onBack = { navController.popBackStack() })
             }
-
-
         }
     }
 }
