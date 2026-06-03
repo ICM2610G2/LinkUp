@@ -1,8 +1,12 @@
 package com.example.myapplication.screens
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,6 +48,10 @@ fun LobbyCarreraScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { _ -> }
+
     val context = LocalContext.current
 
     DisposableEffect(sessionId) {
@@ -61,8 +69,11 @@ fun LobbyCarreraScreen(
                     isParticipant = participants?.containsKey(currentUid) == true
 
                     if (status == "active" && isParticipant) {
-                        showRaceStartNotification(context, raceName)
-                        onRaceStarted(sessionId)
+                        scope.launch {
+                            showRaceStartNotification(context, raceName)
+                            kotlinx.coroutines.delay(500)
+                            onRaceStarted(sessionId)
+                        }
                     }
                 }
             }
@@ -154,6 +165,9 @@ fun LobbyCarreraScreen(
             if (!isParticipant && status == "lobby") {
                 Button(
                     onClick = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
                         scope.launch {
                             isLoading = true
                             errorMessage = null
