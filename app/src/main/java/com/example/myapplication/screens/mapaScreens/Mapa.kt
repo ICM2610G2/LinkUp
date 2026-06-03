@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.models.Checkpoint
 import com.example.myapplication.data.models.RaceSession
@@ -51,6 +52,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.example.myapplication.repository.UserRepository
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import java.io.File
 
 @Composable
 fun Mapa(
@@ -155,16 +157,28 @@ fun MapaConUbicacion(
         )
     }
 
-    val photoLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null && selectedCheckpoint != null && state.activeSession != null) {
+    // Preparación para la cámara
+    val imageFile = remember {
+        File(context.filesDir, "checkpoint_${System.currentTimeMillis()}.jpg")
+    }
+    val cameraUri = remember {
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            imageFile
+        )
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && selectedCheckpoint != null && state.activeSession != null) {
             scope.launch {
                 isUploading = true
                 val result = raceRepository.uploadCheckpointPhoto(
                     sessionId = state.activeSession!!.id,
                     checkpointId = selectedCheckpoint!!.id,
-                    imageUri = uri
+                    imageUri = cameraUri
                 )
                 result.onSuccess {
                     Toast.makeText(context, "¡Checkpoint validado con éxito!", Toast.LENGTH_SHORT).show()
@@ -809,7 +823,7 @@ fun MapaConUbicacion(
                         if (!isCompleted) {
                             Spacer(modifier = Modifier.height(12.dp))
                             Button(
-                                onClick = { photoLauncher.launch("image/*") },
+                                onClick = { cameraLauncher.launch(cameraUri) },
                                 enabled = isWithinRange && !isUploading,
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),

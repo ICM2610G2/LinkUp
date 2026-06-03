@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.myapplication.data.models.Checkpoint
@@ -44,6 +45,15 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
+import java.io.File
+
+data class LeaderboardEntry(
+    val uid: String,
+    val name: String,
+    val completedCount: Int,
+    val lastTime: Timestamp?,
+    val isCurrentUser: Boolean
+)
 
 @Composable
 fun CarreraActivaScreen(
@@ -64,32 +74,41 @@ fun CarreraActivaScreen(
     var createdBy by remember { mutableStateOf("") }
     var status by remember { mutableStateOf("active") }
     
-    // Datos de la tabla de posiciones
     var participantsInfo by remember { mutableStateOf<Map<String, ParticipantInfo>>(emptyMap()) }
     var participantNames by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var checkpoints by remember { mutableStateOf<List<Checkpoint>>(emptyList()) }
 
-    // Estados de ubicación y validación
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     var isUploading by remember { mutableStateOf(false) }
     var pendingCheckpoint by remember { mutableStateOf<Checkpoint?>(null) }
 
-    // Launcher para validar con foto
-    val photoLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null && pendingCheckpoint != null) {
+    // Preparación para la cámara (TakePicture requiere una URI de destino)
+    val imageFile = remember {
+        File(context.filesDir, "checkpoint_validation_${System.currentTimeMillis()}.jpg")
+    }
+    val cameraUri = remember {
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            imageFile
+        )
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && pendingCheckpoint != null) {
             scope.launch {
                 isUploading = true
                 val result = raceRepository.uploadCheckpointPhoto(
                     sessionId = sessionId,
                     checkpointId = pendingCheckpoint!!.id,
-                    imageUri = uri
+                    imageUri = cameraUri
                 )
                 result.fold(
                     onSuccess = {
-                        Toast.makeText(context, "¡Checkpoint validado!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "¡Punto validado con éxito!", Toast.LENGTH_SHORT).show()
                         wikipediaViewModel.buscarLugar(pendingCheckpoint!!.name)
                         pendingCheckpoint = null
                     },
@@ -102,7 +121,6 @@ fun CarreraActivaScreen(
         }
     }
 
-    // Seguimiento de ubicación
     DisposableEffect(Unit) {
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L).build()
         val callback = object : LocationCallback() {
@@ -131,7 +149,6 @@ fun CarreraActivaScreen(
                         createdBy = session.createdBy
                         status = session.status
                         participantsInfo = session.participants
-
                         if (status == "finished") onBack()
                     }
                 }
@@ -139,7 +156,6 @@ fun CarreraActivaScreen(
         onDispose { listener.remove() }
     }
 
-    // Cargar nombres de participantes
     LaunchedEffect(participantsInfo.keys) {
         val currentNames = participantNames.toMutableMap()
         var updated = false
@@ -155,12 +171,9 @@ fun CarreraActivaScreen(
     }
 
     LaunchedEffect(raceId) {
-        if (raceId.isNotBlank()) {
-            checkpoints = raceRepository.getCheckpoints(raceId)
-        }
+        if (raceId.isNotBlank()) checkpoints = raceRepository.getCheckpoints(raceId)
     }
 
-    // Lógica de Clasificación
     val leaderboard = remember(participantsInfo, participantNames) {
         participantsInfo.map { (pId, info) ->
             LeaderboardEntry(
@@ -180,9 +193,7 @@ fun CarreraActivaScreen(
     val totalCheckpoints = checkpoints.size
     val progressValue = if (totalCheckpoints == 0) 0f else myProgress.toFloat() / totalCheckpoints.toFloat()
 
-    Box(
-        modifier = Modifier.fillMaxSize().background(Color(0xFF0A0A0A))
-    ) {
+    Box(modifier = Modifier.fillMaxSize().background(Color(0xFF0A0A0A))) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(20.dp),
@@ -192,23 +203,13 @@ fun CarreraActivaScreen(
                 IconButton(onClick = onBack) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
                 }
-
-                Text(
-                    raceName,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-
+                Text(raceName, color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineSmall)
                 Spacer(modifier = Modifier.height(8.dp))
-
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     InfoBadgeCarrera("${participantsInfo.size} jugadores", Icons.Default.Groups)
                     InfoBadgeCarrera("$myProgress/$totalCheckpoints puntos", Icons.Default.Flag)
                 }
-
                 Spacer(modifier = Modifier.height(16.dp))
-
                 LinearProgressIndicator(
                     progress = { progressValue },
                     modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
@@ -221,22 +222,11 @@ fun CarreraActivaScreen(
                 OutlinedButton(
                     onClick = {
                         scope.launch {
-                            val result = raceRepository.leaveRaceSession(sessionId)
-
-                            result.onSuccess {
-                                onBack()
-                            }
-
-
-                            result.onFailure { error ->
-                                println("Error abandonando carrera: ${error.message}")
-                            }
+                            raceRepository.leaveRaceSession(sessionId).onSuccess { onBack() }
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFFFF6B6B)
-                    ),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFF6B6B)),
                     border = BorderStroke(1.dp, Color(0xFFFF6B6B)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -244,31 +234,21 @@ fun CarreraActivaScreen(
                 }
             }
 
-            // Sección de Clasificación
-            item {
-                LeaderboardCard(leaderboard)
-            }
+            item { LeaderboardCard(leaderboard, totalCheckpoints) }
 
             item {
-                Text(
-                    "Tus Checkpoints",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
+                Text("Checkpoints de la Ruta", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             }
 
             items(checkpoints, key = { it.id }) { checkpoint ->
                 val isDone = participantsInfo[uid]?.checkpointsDone?.contains(checkpoint.id) == true
-
                 CheckpointCarreraItem(
                     checkpoint = checkpoint,
                     done = isDone,
                     userLocation = userLocation,
                     onValidate = {
                         pendingCheckpoint = checkpoint
-                        photoLauncher.launch("image/*")
+                        cameraLauncher.launch(cameraUri)
                     }
                 )
             }
@@ -283,7 +263,7 @@ fun CarreraActivaScreen(
                     ) {
                         Icon(Icons.Default.Stop, null, tint = Color.White)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Finalizar Carrera", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text("Finalizar Carrera (Admin)", color = Color.White, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -291,43 +271,22 @@ fun CarreraActivaScreen(
 
         if (isUploading) {
             Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Color(0xFFFF9800))
-            }
-        }
-
-        if (wikipediaState.isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)), shape = RoundedCornerShape(18.dp)) {
-                    Row(modifier = Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
-                        CircularProgressIndicator(color = Color(0xFFFF9800), modifier = Modifier.size(24.dp))
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text("Descubriendo lugar...", color = Color.White)
-                    }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(color = Color(0xFFFF9800))
+                    Spacer(Modifier.height(12.dp))
+                    Text("Subiendo evidencia...", color = Color.White)
                 }
             }
         }
 
         wikipediaState.place?.let { place ->
-            CulturalRewardDialog(
-                title = place.title,
-                extract = place.extract,
-                imageUrl = place.imageUrl,
-                onClose = { wikipediaViewModel.limpiar() }
-            )
+            CulturalRewardDialog(title = place.title, extract = place.extract, imageUrl = place.imageUrl, onClose = { wikipediaViewModel.limpiar() })
         }
     }
 }
 
-data class LeaderboardEntry(
-    val uid: String,
-    val name: String,
-    val completedCount: Int,
-    val lastTime: Timestamp?,
-    val isCurrentUser: Boolean
-)
-
 @Composable
-fun LeaderboardCard(entries: List<LeaderboardEntry>) {
+fun LeaderboardCard(entries: List<LeaderboardEntry>, totalCheckpoints: Int) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
@@ -338,48 +297,34 @@ fun LeaderboardCard(entries: List<LeaderboardEntry>) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.EmojiEvents, null, tint = Color(0xFFFF9800), modifier = Modifier.size(22.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Puestos", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text("Clasificación en tiempo real", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
-            
-            Spacer(Modifier.height(12.dp))
-
+            Spacer(Modifier.height(16.dp))
             entries.forEachIndexed { index, entry ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
+                Column(
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
                         .background(if (entry.isCurrentUser) Color(0x1AFF9800) else Color.Transparent)
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(horizontal = 8.dp, vertical = 8.dp)
                 ) {
-                    // Posición
-                    Box(modifier = Modifier.width(30.dp)) {
-                        when (index) {
-                            0 -> Icon(Icons.Default.Stars, "Oro", tint = Color(0xFFFFD700), modifier = Modifier.size(20.dp))
-                            1 -> Icon(Icons.Default.Stars, "Plata", tint = Color(0xFFC0C0C0), modifier = Modifier.size(20.dp))
-                            2 -> Icon(Icons.Default.Stars, "Bronce", tint = Color(0xFFCD7F32), modifier = Modifier.size(20.dp))
-                            else -> Text("${index + 1}", color = Color.Gray, fontWeight = FontWeight.Bold)
-                        }
-                    }
-
-                    Text(
-                        text = entry.name,
-                        color = if (entry.isCurrentUser) Color.White else Color.White.copy(alpha = 0.8f),
-                        modifier = Modifier.weight(1f),
-                        fontWeight = if (entry.isCurrentUser) FontWeight.Bold else FontWeight.Normal,
-                        maxLines = 1
-                    )
-
-                    // Puntos/Checkpoints
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = entry.completedCount.toString(),
-                            color = Color(0xFFFF9800),
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Icon(Icons.Default.Flag, null, tint = Color(0xFFFF9800).copy(alpha = 0.6f), modifier = Modifier.size(14.dp))
+                        Box(modifier = Modifier.width(32.dp)) {
+                            when (index) {
+                                0 -> Icon(Icons.Default.Stars, "Oro", tint = Color(0xFFFFD700), modifier = Modifier.size(22.dp))
+                                1 -> Icon(Icons.Default.Stars, "Plata", tint = Color(0xFFC0C0C0), modifier = Modifier.size(20.dp))
+                                2 -> Icon(Icons.Default.Stars, "Bronce", tint = Color(0xFFCD7F32), modifier = Modifier.size(18.dp))
+                                else -> Text("${index + 1}", color = Color.Gray, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                        Text(text = entry.name, color = Color.White, modifier = Modifier.weight(1f), fontWeight = if (entry.isCurrentUser) FontWeight.Bold else FontWeight.Normal, maxLines = 1)
+                        Text(text = "${entry.completedCount}/$totalCheckpoints", color = Color(0xFFFF9800), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
+                    Spacer(Modifier.height(4.dp))
+                    LinearProgressIndicator(
+                        progress = { if (totalCheckpoints > 0) entry.completedCount.toFloat() / totalCheckpoints else 0f },
+                        modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)),
+                        color = if (entry.isCurrentUser) Color(0xFFFF9800) else Color(0xFFFF9800).copy(alpha = 0.5f),
+                        trackColor = Color(0xFF252525)
+                    )
                 }
             }
         }
@@ -429,29 +374,32 @@ fun CheckpointCarreraItem(
             ) {
                 Icon(if (done) Icons.Default.Check else Icons.Default.Place, null, tint = if (done) Color.White else Color(0xFFFF9800))
             }
-
             Spacer(modifier = Modifier.width(12.dp))
-
             Column(modifier = Modifier.weight(1f)) {
                 Text(checkpoint.name, color = Color.White, fontWeight = FontWeight.Bold)
                 if (!done) {
                     Text(
                         text = if (userLocation != null) "A ${distance.toInt()}m de ti" else "Localizando...",
                         color = if (isWithinRange) Color.Green else Color(0xFFFF6B6B),
-                        fontSize = 12.sp
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
                     )
                 }
-                Text(checkpoint.description, color = Color.Gray, maxLines = 2, fontSize = 13.sp)
+                Text(checkpoint.description, color = Color.Gray, maxLines = 1, fontSize = 12.sp)
             }
-
             Button(
                 onClick = onValidate,
                 enabled = !done && isWithinRange,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800), disabledContainerColor = Color(0xFF252525)),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp)
             ) {
                 if (done) Text("Hecho")
-                else Icon(Icons.Default.PhotoCamera, null, modifier = Modifier.size(18.dp))
+                else {
+                    Icon(Icons.Default.PhotoCamera, null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Validar")
+                }
             }
         }
     }
