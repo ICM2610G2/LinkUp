@@ -75,18 +75,27 @@ class RaceRepository(
 
             Result.success(raceRef.id)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error creating race", e)
             Result.failure(e)
         }
     }
 
     suspend fun getPublicRaces(): List<Race> {
         return try {
-            firestore.collection("races")
+            val snapshot = firestore.collection("races")
                 .get()
                 .await()
-                .documents
-                .mapNotNull { doc -> doc.toObject(Race::class.java)?.copy(id = doc.id) }
+            
+            snapshot.documents.mapNotNull { doc -> 
+                try {
+                    doc.toObject(Race::class.java)?.copy(id = doc.id)
+                } catch (e: Exception) {
+                    Log.e("RaceRepository", "Error mapping Race document ${doc.id}", e)
+                    null
+                }
+            }
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error getting public races", e)
             emptyList()
         }
     }
@@ -95,6 +104,7 @@ class RaceRepository(
         return try {
             firestore.collection("races").document(raceId).get().await().toObject(Race::class.java)?.copy(id = raceId)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error getting race by id $raceId", e)
             null
         }
     }
@@ -103,23 +113,14 @@ class RaceRepository(
         return try {
             val uid = auth.currentUser?.uid ?: return emptyList()
 
-            val lobbySnap = firestore.collection("race_sessions")
-                .whereEqualTo("status", "lobby")
+            val snapshot = firestore.collection("race_sessions")
                 .get()
                 .await()
 
-            val activeSnap = firestore.collection("race_sessions")
-                .whereEqualTo("status", "active")
-                .get()
-                .await()
-
-            val allSessions = (lobbySnap.documents + activeSnap.documents)
-                .mapNotNull { doc ->
-                    doc.toObject(RaceSession::class.java)?.copy(id = doc.id)
-                }
-            
-            allSessions.filter { session ->
-                session.participants.containsKey(uid)
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject(RaceSession::class.java)?.copy(id = doc.id)
+            }.filter { session ->
+                session.participants.containsKey(uid) && (session.status == "lobby" || session.status == "active")
             }
 
         } catch (e: Exception) {
@@ -128,26 +129,15 @@ class RaceRepository(
         }
     }
 
-    suspend fun getSessionForRace(raceId: String): RaceSession? {
-        return try {
-            firestore.collection("race_sessions")
-                .whereEqualTo("raceId", raceId)
-                .whereEqualTo("status", "lobby")
-                .limit(1)
-                .get()
-                .await()
-                .documents
-                .firstOrNull()
-                ?.toObject(RaceSession::class.java)
-                ?.let { it.copy(id = it.id) }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
     suspend fun joinRaceSession(sessionId: String): Result<Unit> {
         return try {
             val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
+
+            // VALIDACIÓN: Solo una carrera a la vez
+            val activeSessions = getUserActiveSessions()
+            if (activeSessions.any { it.id != sessionId }) {
+                return Result.failure(Exception("No puedes unirte. Ya participas en otra carrera activa."))
+            }
 
             firestore.collection("race_sessions")
                 .document(sessionId)
@@ -164,6 +154,7 @@ class RaceRepository(
 
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error joining race session", e)
             Result.failure(e)
         }
     }
@@ -190,6 +181,7 @@ class RaceRepository(
                 createLobby(race)
             }
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error finding or joining lobby", e)
             Result.failure(e)
         }
     }
@@ -198,10 +190,15 @@ class RaceRepository(
         return try {
             val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
 
+            // VALIDACIÓN: No crear si ya tiene una carrera activa
+            val activeSessions = getUserActiveSessions()
+            if (activeSessions.isNotEmpty()) {
+                return Result.failure(Exception("No puedes crear una sesión si ya participas en otra carrera activa."))
+            }
+
             val sessionRef = firestore.collection("race_sessions").document()
 
             val sessionData = hashMapOf(
-                "id" to sessionRef.id,
                 "raceId" to race.id,
                 "raceName" to race.name,
                 "status" to "lobby",
@@ -225,6 +222,7 @@ class RaceRepository(
 
             Result.success(sessionRef.id)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error creating lobby", e)
             Result.failure(e)
         }
     }
@@ -252,38 +250,13 @@ class RaceRepository(
                 )
             ).await()
 
-            //notificar a todos los participantes
-            val raceName = snap.getString("raceName") ?: "la carrera"
-            //notifyParticipants(participants, raceName)
-
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error starting race", e)
             Result.failure(e)
         }
     }
 
-//    private suspend fun notifyParticipants(participants: Map<*, *>?, raceName: String) {
-//        if (participants == null) return
-//        for (participantId in participants.keys) {
-//            try {
-//                val userDoc = firestore.collection("users")
-//                    .document(participantId.toString())
-//                    .get()
-//                    .await()
-//                val token = userDoc.getString("fcmToken") ?: continue
-//                firestore.collection("notifications").add(
-//                    mapOf(
-//                        "token" to token,
-//                        "title" to "¡Arrancó la carrera!",
-//                        "body" to "La carrera \"$raceName\" ha comenzado. ¡Corre!",
-//                        "createdAt" to Timestamp.now()
-//                    )
-//                ).await()
-//            } catch (e: Exception) {
-//                Log.e("FCM", "Error notificando a $participantId: ${e.message}")
-//            }
-//        }
-//    }
     suspend fun getCheckpoints(raceId: String): List<Checkpoint> {
         return try {
             firestore.collection("races")
@@ -297,6 +270,44 @@ class RaceRepository(
         } catch (e: Exception) {
             emptyList()
         }
+    }
+
+    suspend fun uploadCheckpointPhoto(
+        sessionId: String,
+        checkpointId: String,
+        imageUri: Uri
+    ): Result<String> {
+        return try {
+            val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
+            val fileName = "sessions/$sessionId/checkpoints/${checkpointId}_$uid.jpg"
+            val ref = storage.reference.child(fileName)
+            
+            ref.putFile(imageUri).await()
+            val downloadUrl = ref.downloadUrl.await().toString()
+            
+            firestore.collection("race_sessions")
+                .document(sessionId)
+                .update("participants.$uid.checkpointsDone", FieldValue.arrayUnion(checkpointId))
+                .await()
+                
+            Result.success(downloadUrl)
+        } catch (e: Exception) {
+            Log.e("RaceRepository", "Error uploading photo", e)
+            Result.failure(e)
+        }
+    }
+
+    private fun calculateTotalDistanceKm(checkpoints: List<Checkpoint>): Double {
+        if (checkpoints.size < 2) return 0.0
+        var total = 0.0
+
+        for (i in 0 until checkpoints.size - 1) {
+            val a = checkpoints[i].coordinates
+            val b = checkpoints[i + 1].coordinates
+            total += haversineKm(a.latitude, a.longitude, b.latitude, b.longitude)
+        }
+
+        return total
     }
 
     suspend fun validateCheckpoint(
@@ -317,18 +328,6 @@ class RaceRepository(
         }
     }
 
-    private fun calculateTotalDistanceKm(checkpoints: List<Checkpoint>): Double {
-        if (checkpoints.size < 2) return 0.0
-        var total = 0.0
-
-        for (i in 0 until checkpoints.size - 1) {
-            val a = checkpoints[i].coordinates
-            val b = checkpoints[i + 1].coordinates
-            total += haversineKm(a.latitude, a.longitude, b.latitude, b.longitude)
-        }
-
-        return total
-    }
 
     private fun haversineKm(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
         val r = 6371.0
