@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.models.Checkpoint
 import com.example.myapplication.data.models.RaceSession
 import com.example.myapplication.data.models.User
+import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.repository.RaceRepository
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -25,13 +27,14 @@ data class MapaState(
     val friendLocations: List<FriendMapLocation> = emptyList(),
     val activeSession: RaceSession? = null,
     val checkpoints: List<Checkpoint> = emptyList(),
-    val isLoadingActiveRace: Boolean = false
+    val isLoading: Boolean = false
 )
 
 class MapaViewModel : ViewModel() {
     private val _mapaState = MutableStateFlow(MapaState())
     val mapaState = _mapaState.asStateFlow()
     private val raceRepository = RaceRepository()
+    private val friendsRepository = FriendsRepository()
 
     fun updateHasLocationPermission(newValue: Boolean) {
         _mapaState.update { it.copy(hasLocationPermission = newValue) }
@@ -53,19 +56,33 @@ class MapaViewModel : ViewModel() {
         _mapaState.update { it.copy(friendLocations = newValue) }
     }
 
-    fun cargarCarreraActiva() {
+    fun cargarDatos() {
         viewModelScope.launch {
-            _mapaState.update { it.copy(isLoadingActiveRace = true) }
+            _mapaState.update { it.copy(isLoading = true) }
+            
             val sessions = raceRepository.getUserActiveSessions()
-            // Buscamos la primera sesión que esté "active"
-            val active = sessions.find { it.status == "active" }
-
-            if (active != null) {
-                val checkpoints = raceRepository.getCheckpoints(active.raceId)
-                _mapaState.update { it.copy(activeSession = active, checkpoints = checkpoints, isLoadingActiveRace = false) }
+            val current = sessions.find { it.status == "active" || it.status == "lobby" }
+            
+            if (current?.status == "active") {
+                // CASO 1: Carrera iniciada -> Mostrar Checkpoints, Ocultar Amigos
+                val checkpoints = raceRepository.getCheckpoints(current.raceId)
+                _mapaState.update { it.copy(
+                    activeSession = current, 
+                    checkpoints = checkpoints,
+                    acceptedFriends = emptyList(),
+                    friendLocations = emptyList()
+                ) }
             } else {
-                _mapaState.update { it.copy(activeSession = null, checkpoints = emptyList(), isLoadingActiveRace = false) }
+                // CASO 2: En Lobby o Sin Carrera -> Mostrar Amigos, Ocultar Checkpoints
+                val amigos = friendsRepository.getAcceptedFriends()
+                _mapaState.update { it.copy(
+                    activeSession = current, // Podría ser null o lobby
+                    checkpoints = emptyList(),
+                    acceptedFriends = amigos
+                ) }
             }
+            
+            _mapaState.update { it.copy(isLoading = false) }
         }
     }
 }

@@ -17,8 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,12 +29,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.models.Checkpoint
 import com.example.myapplication.model.FriendMapLocation
 import com.example.myapplication.model.MapaViewModel
-import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.repository.LocationRepository
 import com.example.myapplication.repository.RaceRepository
-import com.example.myapplication.repository.UserRepository
 import com.google.android.gms.location.*
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -66,7 +61,8 @@ fun Mapa(
         if (!granted) {
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         } else {
-            viewModel.cargarCarreraActiva()
+            // Cargamos tanto la carrera como los amigos según el estado
+            viewModel.cargarDatos()
         }
     }
 
@@ -107,7 +103,7 @@ fun MapaConUbicacion(
                 )
                 result.onSuccess {
                     Toast.makeText(context, "¡Checkpoint validado con éxito!", Toast.LENGTH_SHORT).show()
-                    viewModel.cargarCarreraActiva()
+                    viewModel.cargarDatos()
                     selectedCheckpoint = null
                 }.onFailure {
                     Toast.makeText(context, "Error al subir: ${it.message}", Toast.LENGTH_SHORT).show()
@@ -147,6 +143,32 @@ fun MapaConUbicacion(
         }
     }
 
+    // Lógica de amigos (Realtime DB) - Se activa solo si hay amigos aceptados en el estado
+    DisposableEffect(state.acceptedFriends) {
+        val listeners = mutableListOf<Pair<DatabaseReference, ValueEventListener>>()
+        state.acceptedFriends.forEach { friend ->
+            val ref = realtimeDb.child("user_live").child(friend.uid).child("location")
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val visible = snapshot.child("visible").getValue(Boolean::class.java) ?: false
+                    val lat = snapshot.child("lat").getValue(Double::class.java)
+                    val lng = snapshot.child("lng").getValue(Double::class.java)
+                    
+                    val updatedList = if (visible && lat != null && lng != null) {
+                        state.friendLocations.filterNot { it.user.uid == friend.uid } + FriendMapLocation(friend, LatLng(lat, lng))
+                    } else {
+                        state.friendLocations.filterNot { it.user.uid == friend.uid }
+                    }
+                    viewModel.updateFriendLocations(updatedList)
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            }
+            ref.addValueEventListener(listener)
+            listeners.add(ref to listener)
+        }
+        onDispose { listeners.forEach { (ref, l) -> ref.removeEventListener(l) } }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.matchParentSize(),
@@ -154,7 +176,7 @@ fun MapaConUbicacion(
             properties = MapProperties(isMyLocationEnabled = true),
             uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = true)
         ) {
-            // Checkpoints
+            // Checkpoints (Solo aparecen si la carrera está iniciada)
             state.checkpoints.forEach { checkpoint ->
                 val pos = LatLng(checkpoint.coordinates.latitude, checkpoint.coordinates.longitude)
                 val isCompleted = state.activeSession?.participants?.get(auth.currentUser?.uid)
@@ -181,7 +203,7 @@ fun MapaConUbicacion(
                 )
             }
 
-            // Amigos
+            // Amigos (Solo aparecen si no hay carrera activa según el ViewModel)
             state.friendLocations.forEach { friendLocation ->
                 Marker(
                     state = MarkerState(position = friendLocation.location),
@@ -191,17 +213,24 @@ fun MapaConUbicacion(
             }
         }
 
-        // --- PANEL SUPERIOR: Nombre de Carrera o Aviso ---
+        // --- PANEL SUPERIOR: Nombre de Carrera, Lobby o Aviso ---
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .padding(top = 16.dp)
         ) {
+            val session = state.activeSession
+            val cardColor = when {
+                session?.status == "active" -> Color(0xEEFF9800) // Naranja para carrera
+                session?.status == "lobby" -> Color(0xEE2A9D8F)  // Teal para lobby
+                else -> Color(0xEE333333)                        // Gris para aviso
+            }
+            
+            val textColor = if (session != null) Color.Black else Color.White
+
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (state.activeSession != null) Color(0xEEFF9800) else Color(0xEE333333)
-                ),
+                colors = CardDefaults.cardColors(containerColor = cardColor),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Row(
@@ -209,17 +238,20 @@ fun MapaConUbicacion(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = if (state.activeSession != null) Icons.Default.DirectionsRun else Icons.Default.Info,
+                        imageVector = if (session != null) Icons.Default.DirectionsRun else Icons.Default.EmojiEvents,
                         contentDescription = null,
-                        tint = if (state.activeSession != null) Color.Black else Color.White
+                        tint = textColor
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
-                        text = state.activeSession?.let { "Carrera: ${it.raceName}" }
-                            ?: "No estás inscrito a ninguna carrera",
-                        color = if (state.activeSession != null) Color.Black else Color.White,
+                        text = when {
+                            session?.status == "active" -> "Carrera: ${session.raceName}"
+                            session?.status == "lobby" -> "Lobby: ${session.raceName} (Esperando inicio...)"
+                            else -> "No estás inscrito a ninguna carrera. ¡Inscríbete a una!"
+                        },
+                        color = textColor,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
+                        fontSize = 14.sp
                     )
                 }
             }

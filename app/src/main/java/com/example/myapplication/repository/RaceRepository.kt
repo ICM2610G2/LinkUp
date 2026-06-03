@@ -230,6 +230,7 @@ class RaceRepository(
 
             Result.success(sessionRef.id)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error creating lobby", e)
             Result.failure(e)
         }
     }
@@ -259,6 +260,32 @@ class RaceRepository(
 
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error starting race session", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun finishRaceSession(sessionId: String): Result<Unit> {
+        return try {
+            val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
+
+            val ref = firestore.collection("race_sessions").document(sessionId)
+            val snap = ref.get().await()
+
+            val createdBy = snap.getString("createdBy") ?: ""
+
+            if (uid != createdBy) return Result.failure(Exception("Solo el creador puede finalizar la carrera"))
+
+            ref.update(
+                mapOf(
+                    "status" to "finished",
+                    "endedAt" to Timestamp.now()
+                )
+            ).await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("RaceRepository", "Error finishing race session", e)
             Result.failure(e)
         }
     }
