@@ -68,7 +68,6 @@ fun Mapa(
         }
     }
 
-    // Recalcular ruta secuencial cuando cambia ubicación
     LaunchedEffect(state.userLocation, state.rutaMode) {
         if (state.rutaMode == RutaMode.SEQUENTIAL && state.userLocation != null && state.checkpoints.isNotEmpty()) {
             viewModel.calcularRutas(state.rutaMode)
@@ -180,9 +179,6 @@ fun MapaConUbicacion(
         }
     }
 
-    // ============================================================
-    // CARGAR DATOS INICIALES
-    // ============================================================
     LaunchedEffect(Unit) {
         val uid = auth.currentUser?.uid ?: return@LaunchedEffect
         val user = userRepository.getUser(uid)

@@ -66,7 +66,6 @@ fun InvitarNFC(
                     modifier = Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // NFC SECTION (READER MODE STATUS)
                     BotonNFC(
                         escaneando = state.escaneando,
                         onClick = {
@@ -86,7 +85,7 @@ fun InvitarNFC(
 
                     SeparadorO()
 
-                    // SECCIÓN DE CÓDIGO TEMPORAL
+                    // Temporal
                     if (state.generatedCode == null) {
                         Button(
                             onClick = {
@@ -175,7 +174,7 @@ fun InvitarNFC(
                         }
                     }
 
-                    // RESTAURACIÓN DE SISTEMA QR INDEPENDIENTE
+                    // QR
                     BotonOpcion(
                         icono = Icons.Default.QrCode,
                         iconoColor = Color(0xFFE9C46A),

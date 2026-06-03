@@ -5,13 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.models.Race
 import com.example.myapplication.data.models.RaceSession
+import com.example.myapplication.data.models.User
 import com.example.myapplication.repository.RaceRepository
+import com.example.myapplication.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class HomeState(
+    val user: User? = null,
     val mostrarCrearPunto: Boolean = false,
     val mostrarMenuFlotante: Boolean = false,
     val mostrarCrearCarrera: Boolean = false,
@@ -27,11 +30,15 @@ class HomeViewModel : ViewModel() {
     private val _homeState = MutableStateFlow(HomeState())
     val homeState = _homeState.asStateFlow()
     private val raceRepository = RaceRepository()
+    private val userRepository = UserRepository()
 
     fun cargarDatos() {
         viewModelScope.launch {
             _homeState.update { it.copy(isLoadingRaces = true) }
             try {
+                // Cargar datos del usuario
+                val user = userRepository.getCurrentUser()
+
                 // Cargar carreras públicas
                 val races = raceRepository.getPublicRaces()
 
@@ -39,9 +46,10 @@ class HomeViewModel : ViewModel() {
                 val activeSessions = raceRepository.getUserActiveSessions()
                 val activeSession = activeSessions.firstOrNull()
 
-                Log.d("HomeViewModel", "Datos cargados: ${races.size} rutas, sesión activa: ${activeSession?.id}")
+                Log.d("HomeViewModel", "Datos cargados: ${races.size} rutas, sesión activa: ${activeSession?.id}, usuario: ${user?.displayName}")
 
                 _homeState.update { it.copy(
+                    user = user,
                     publicRaces = races,
                     activeSession = activeSession,
                     isLoadingRaces = false

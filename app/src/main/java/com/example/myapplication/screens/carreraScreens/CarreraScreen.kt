@@ -10,9 +10,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,6 +42,7 @@ fun CarreraScreen(
     var race by remember { mutableStateOf<Race?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var isCreatingSession by remember { mutableStateOf(false) }
+    var userInAnotherRace by remember { mutableStateOf(false) }
 
     var mostrarInvitar by remember { mutableStateOf(false) }
     val invitarViewModel: InvitarAmigosViewModel = viewModel()
@@ -54,6 +57,8 @@ fun CarreraScreen(
 
     LaunchedEffect(raceId) {
         race = raceRepository.getRaceById(raceId)
+        val activeSessions = raceRepository.getUserActiveSessions()
+        userInAnotherRace = activeSessions.isNotEmpty()
         isLoading = false
     }
 
@@ -188,6 +193,30 @@ fun CarreraScreen(
 
                     Spacer(modifier = Modifier.weight(1f))
 
+                    if (userInAnotherRace) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0x22FF4444)),
+                            border = BorderStroke(1.dp, Color(0xFFFF4444).copy(alpha = 0.5f)),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Default.Warning, null, tint = Color(0xFFFF4444), modifier = Modifier.size(20.dp))
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    "Completa tu carrera activa antes de unirte a una nueva.",
+                                    color = Color.White,
+                                    fontSize = 13.sp
+                                )
+                            }
+                        }
+                    }
+
                     OutlinedButton(
                         onClick = {
                             invitarViewModel.cargarAmigos()
@@ -199,13 +228,14 @@ fun CarreraScreen(
                             .height(56.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFF9800)),
                         border = BorderStroke(1.dp, Color(0xFFFF9800)),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(16.dp),
+                        enabled = !userInAnotherRace
                     ) {
-                        Icon(Icons.Default.PersonAdd, null, tint = Color(0xFFFF9800))
+                        Icon(Icons.Default.PersonAdd, null, tint = if (userInAnotherRace) Color.Gray else Color(0xFFFF9800))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Invitar amigos",
-                            color = Color(0xFFFF9800),
+                            color = if (userInAnotherRace) Color.Gray else Color(0xFFFF9800),
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
                         )
@@ -222,12 +252,15 @@ fun CarreraScreen(
                                 isCreatingSession = false
                             }
                         },
-                        enabled = !isCreatingSession,
+                        enabled = !isCreatingSession && !userInAnotherRace,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 30.dp)
                             .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (userInAnotherRace) Color(0xFF333333) else Color(0xFFFF9800),
+                            contentColor = if (userInAnotherRace) Color.Gray else Color.White
+                        ),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         if (isCreatingSession) {
@@ -236,11 +269,14 @@ fun CarreraScreen(
                                 modifier = Modifier.size(24.dp)
                             )
                         } else {
-                            Icon(Icons.Default.PlayArrow, null, tint = Color.White)
+                            Icon(
+                                if (userInAnotherRace) Icons.Default.Lock else Icons.Default.PlayArrow,
+                                null,
+                                tint = if (userInAnotherRace) Color.Gray else Color.White
+                            )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "Iniciar Sesión / Unirse",
-                                color = Color.White,
+                                text = if (userInAnotherRace) "Ya estás en una Carrera" else "Unirse",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
                             )

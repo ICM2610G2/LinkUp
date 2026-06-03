@@ -57,7 +57,7 @@ fun Home(
                 .background(Color(0xFF0A0A0A)),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            item { HeaderSection() }
+            item { HeaderSection(state.user) }
 
             item { Spacer(modifier = Modifier.height(20.dp)) }
 
@@ -177,7 +177,7 @@ fun Home(
 }
 
 @Composable
-fun HeaderSection() {
+fun HeaderSection(user: com.example.myapplication.data.models.User?) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -215,13 +215,13 @@ fun HeaderSection() {
             Spacer(modifier = Modifier.height(4.dp))
             Row {
                 Text(
-                    text = "Explora ",
+                    text = if (user != null) "Hola, " else "Explora ",
                     color = Color.White,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Bogotá",
+                    text = user?.displayName ?: "Bogotá",
                     color = Color(0xFFFF9800),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold
@@ -232,9 +232,24 @@ fun HeaderSection() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                StatBadge("3", "Racha", Icons.Default.LocalFireDepartment, modifier = Modifier.weight(1f))
-                StatBadge("12", "Lugares", Icons.Default.Place, modifier = Modifier.weight(1f))
-                StatBadge("48", "Posición", Icons.AutoMirrored.Filled.TrendingUp, modifier = Modifier.weight(1f))
+                StatBadge(
+                    valor = user?.currentStreak?.toString() ?: "0",
+                    label = "Racha",
+                    icon = Icons.Default.LocalFireDepartment,
+                    modifier = Modifier.weight(1f)
+                )
+                StatBadge(
+                    valor = user?.totalPlacesVisited?.toString() ?: "0",
+                    label = "Lugares",
+                    icon = Icons.Default.Place,
+                    modifier = Modifier.weight(1f)
+                )
+                StatBadge(
+                    valor = user?.totalPoints?.toString() ?: "0",
+                    label = "Puntos",
+                    icon = Icons.AutoMirrored.Filled.TrendingUp,
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }

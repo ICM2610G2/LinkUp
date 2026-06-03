@@ -25,7 +25,8 @@ data class RaceSession(
 data class ParticipantInfo(
     var joinedAt: Timestamp? = null,
     var completedAt: Timestamp? = null,
-    var lastCheckpointAt: Timestamp? = null, // Para el desempate de posición
+    var lastCheckpointAt: Timestamp? = null,
     var position: Int? = null,
-    var checkpointsDone: List<String> = emptyList()
+    var checkpointsDone: List<String> = emptyList(),
+    var checkpointsPhotos: Map<String, String> = emptyMap()
 )
