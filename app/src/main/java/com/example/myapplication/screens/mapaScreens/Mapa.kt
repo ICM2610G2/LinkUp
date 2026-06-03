@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,6 +21,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +37,9 @@ import com.example.myapplication.model.ParticipantMapLocation
 import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.repository.LocationRepository
 import com.example.myapplication.repository.RaceRepository
+import com.example.myapplication.sensors.LightSensorManager
+import com.example.myapplication.sensors.NIGHT_MAP_STYLE
+import com.example.myapplication.sensors.StepSensorManager
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
@@ -109,6 +114,26 @@ fun MapaConUbicacion(
             "https://linkup-99296-default-rtdb.firebaseio.com/"
         ).reference
     }
+
+    // ── Sensor de luz ──────────────────────────────────────────────
+    val lightSensorManager = remember { LightSensorManager(context) }
+    val isDark by lightSensorManager.isDark.collectAsState()
+
+    DisposableEffect(Unit) {
+        lightSensorManager.start()
+        onDispose { lightSensorManager.stop() }
+    }
+
+    // ── Sensor de pasos ────────────────────────────────────────────
+    val stepSensorManager = remember { StepSensorManager(context) }
+    val steps by stepSensorManager.steps.collectAsState()
+    val isMoving by stepSensorManager.isMoving.collectAsState()
+
+    DisposableEffect(Unit) {
+        stepSensorManager.start()
+        onDispose { stepSensorManager.stop() }
+    }
+    // ───────────────────────────────────────────────────────────────
 
     var selectedCheckpoint by remember { mutableStateOf<Checkpoint?>(null) }
     var isUploading by remember { mutableStateOf(false) }
@@ -417,11 +442,18 @@ fun MapaConUbicacion(
     // UI DEL MAPA
     // ============================================================
     Box(modifier = Modifier.fillMaxSize()) {
+
         GoogleMap(
             modifier = Modifier.matchParentSize(),
             cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = true),
-            uiSettings = MapUiSettings(zoomControlsEnabled = true, myLocationButtonEnabled = true)
+            properties = MapProperties(
+                isMyLocationEnabled = true,
+                mapStyleOptions = if (isDark) MapStyleOptions(NIGHT_MAP_STYLE) else null
+            ),
+            uiSettings = MapUiSettings(
+                zoomControlsEnabled = false,
+                myLocationButtonEnabled = true
+            )
         ) {
             // CHECKPOINTS
             state.checkpoints.forEach { checkpoint ->
@@ -540,6 +572,16 @@ fun MapaConUbicacion(
         }
 
         // PANEL DE VALIDACIÓN DE CHECKPOINT
+        // ── Widget podómetro (esquina inferior izquierda) ──────────
+        StepWidget(
+            steps = steps,
+            isMoving = isMoving,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 16.dp, bottom = 120.dp)
+        )
+
+        // ── Panel inferior: validación de checkpoint ───────────────
         AnimatedVisibility(
             visible = selectedCheckpoint != null,
             modifier = Modifier
@@ -575,7 +617,12 @@ fun MapaConUbicacion(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Place, null, tint = Color(0xFFFF9800))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(cp.name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            Text(
+                                cp.name,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            )
                             Spacer(modifier = Modifier.weight(1f))
                             IconButton(onClick = { selectedCheckpoint = null }) {
                                 Icon(Icons.Default.Close, null, tint = Color.Gray)
@@ -596,16 +643,79 @@ fun MapaConUbicacion(
                                 shape = RoundedCornerShape(12.dp)
                             ) {
                                 if (isUploading) {
-                                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                                    CircularProgressIndicator(
+                                        color = Color.White,
+                                        modifier = Modifier.size(20.dp),
+                                        strokeWidth = 2.dp
+                                    )
                                 } else {
                                     Icon(Icons.Default.PhotoCamera, null)
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(if (isWithinRange) "Tomar Foto del Checkpoint" else "Acércate a 50m para validar")
+                                    Text(
+                                        if (isWithinRange) "Tomar Foto del Checkpoint"
+                                        else "Acércate a 50m para validar"
+                                    )
                                 }
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+// ── Widget podómetro ───────────────────────────────────────────────
+@Composable
+fun StepWidget(
+    steps: Int,
+    isMoving: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val pulse by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.18f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulse_scale"
+    )
+
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xCC1A1A1A)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = if (isMoving) Icons.Default.DirectionsWalk else Icons.Default.Accessibility,
+                contentDescription = null,
+                tint = if (isMoving) Color(0xFFFF9800) else Color(0xFF757575),
+                modifier = Modifier
+                    .size(20.dp)
+                    .scale(if (isMoving) pulse else 1f)
+            )
+            Column {
+                Text(
+                    text = "$steps",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 16.sp
+                )
+                Text(
+                    text = if (isMoving) "en marcha" else "pasos",
+                    color = if (isMoving) Color(0xFFFF9800) else Color(0xFF757575),
+                    fontSize = 9.sp,
+                    lineHeight = 9.sp
+                )
             }
         }
     }
@@ -632,9 +742,17 @@ fun MapaSinPermiso(
             ) {
                 Icon(Icons.Default.LocationOff, null, tint = Color(0xFFFF9800), modifier = Modifier.size(48.dp))
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Ubicación requerida", color = Color.White, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    "Ubicación requerida",
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium
+                )
                 Spacer(modifier = Modifier.height(12.dp))
-                Text("Para participar en carreras y ver amigos, activa los permisos.", color = Color.Gray, fontSize = 14.sp)
+                Text(
+                    "Para participar en carreras y ver amigos, activa los permisos.",
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = onRequestPermission,
