@@ -1,5 +1,12 @@
 package com.example.myapplication.screens.carreraScreens
 
+import android.location.Location
+import android.net.Uri
+import android.os.Looper
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,35 +16,35 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Flag
-import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.SportsScore
-import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.myapplication.data.models.Checkpoint
 import com.example.myapplication.model.WikipediaViewModel
 import com.example.myapplication.repository.RaceRepository
+import com.google.android.gms.location.*
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
-import coil.compose.AsyncImage
-import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun CarreraActivaScreen(
     sessionId: String,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val raceRepository = remember { RaceRepository() }
     val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -52,6 +59,55 @@ fun CarreraActivaScreen(
     var myCheckpointsDone by remember { mutableStateOf<List<String>>(emptyList()) }
     var checkpoints by remember { mutableStateOf<List<Checkpoint>>(emptyList()) }
     var status by remember { mutableStateOf("active") }
+
+    // Estados de ubicación y validación
+    var userLocation by remember { mutableStateOf<LatLng?>(null) }
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    var isUploading by remember { mutableStateOf(false) }
+    var pendingCheckpoint by remember { mutableStateOf<Checkpoint?>(null) }
+
+    // Launcher para seleccionar/tomar foto
+    val photoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null && pendingCheckpoint != null) {
+            scope.launch {
+                isUploading = true
+                val result = raceRepository.uploadCheckpointPhoto(
+                    sessionId = sessionId,
+                    checkpointId = pendingCheckpoint!!.id,
+                    imageUri = uri
+                )
+                result.fold(
+                    onSuccess = {
+                        Toast.makeText(context, "¡Punto validado!", Toast.LENGTH_SHORT).show()
+                        wikipediaViewModel.buscarLugar(pendingCheckpoint!!.name)
+                        pendingCheckpoint = null
+                    },
+                    onFailure = { error ->
+                        Toast.makeText(context, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                    }
+                )
+                isUploading = false
+            }
+        }
+    }
+
+    // Seguimiento de ubicación
+    DisposableEffect(Unit) {
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L).build()
+        val callback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                userLocation = result.lastLocation?.let { LatLng(it.latitude, it.longitude) }
+            }
+        }
+        try {
+            fusedLocationClient.requestLocationUpdates(locationRequest, callback, Looper.getMainLooper())
+        } catch (e: SecurityException) {
+            Log.e("CarreraActiva", "Sin permisos de ubicación", e)
+        }
+        onDispose { fusedLocationClient.removeLocationUpdates(callback) }
+    }
 
     DisposableEffect(sessionId) {
         val listener = FirebaseFirestore.getInstance()
@@ -71,13 +127,11 @@ fun CarreraActivaScreen(
                     myCheckpointsDone =
                         myData?.get("checkpointsDone") as? List<String> ?: emptyList()
 
-                    // Si la carrera finaliza, sacamos al usuario de la pantalla
                     if (status == "finished") {
                         onBack()
                     }
                 }
             }
-
         onDispose { listener.remove() }
     }
 
@@ -138,22 +192,10 @@ fun CarreraActivaScreen(
                 CheckpointCarreraItem(
                     checkpoint = checkpoint,
                     done = done,
+                    userLocation = userLocation,
                     onValidate = {
-                        scope.launch {
-                            val result = raceRepository.validateCheckpoint(
-                                sessionId = sessionId,
-                                checkpointId = checkpoint.id
-                            )
-
-                            result.fold(
-                                onSuccess = {
-                                    wikipediaViewModel.buscarLugar(checkpoint.name)
-                                },
-                                onFailure = { error ->
-                                    println("Error validando checkpoint: ${error.message}")
-                                }
-                            )
-                        }
+                        pendingCheckpoint = checkpoint
+                        photoLauncher.launch("image/*")
                     }
                 )
             }
@@ -179,29 +221,24 @@ fun CarreraActivaScreen(
             }
         }
 
-        // Wikipedia and Dialogs...
+        // Overlay de carga
+        if (isUploading) {
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Color(0xFFFF9800))
+            }
+        }
+
+        // Wikipedia Dialogs...
         if (wikipediaState.isLoading) {
             Card(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(24.dp),
+                modifier = Modifier.align(Alignment.Center).padding(24.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
                 shape = RoundedCornerShape(18.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularProgressIndicator(
-                        color = Color(0xFFFF9800),
-                        modifier = Modifier.size(24.dp),
-                        strokeWidth = 3.dp
-                    )
+                Row(modifier = Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(color = Color(0xFFFF9800), modifier = Modifier.size(24.dp))
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = "Consultando Wikipedia...",
-                        color = Color.White
-                    )
+                    Text(text = "Consultando Wikipedia...", color = Color.White)
                 }
             }
         }
@@ -211,42 +248,7 @@ fun CarreraActivaScreen(
                 title = place.title,
                 extract = place.extract,
                 imageUrl = place.imageUrl,
-                onClose = {
-                    wikipediaViewModel.limpiar()
-                }
-            )
-        }
-
-        wikipediaState.errorMessage?.let { error ->
-            AlertDialog(
-                onDismissRequest = {
-                    wikipediaViewModel.limpiar()
-                },
-                containerColor = Color(0xFF1A1A1A),
-                title = {
-                    Text(
-                        text = "Error consultando Wikipedia",
-                        color = Color.White
-                    )
-                },
-                text = {
-                    Text(
-                        text = error,
-                        color = Color(0xFFBDBDBD)
-                    )
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            wikipediaViewModel.limpiar()
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFFF9800)
-                        )
-                    ) {
-                        Text("Cerrar")
-                    }
-                }
+                onClose = { wikipediaViewModel.limpiar() }
             )
         }
     }
@@ -273,16 +275,26 @@ fun InfoBadgeCarrera(
 fun CheckpointCarreraItem(
     checkpoint: Checkpoint,
     done: Boolean,
+    userLocation: LatLng?,
     onValidate: () -> Unit
 ) {
+    // Cálculo de distancia
+    val results = FloatArray(1)
+    if (userLocation != null) {
+        Location.distanceBetween(
+            userLocation.latitude, userLocation.longitude,
+            checkpoint.coordinates.latitude, checkpoint.coordinates.longitude,
+            results
+        )
+    }
+    val distance = if (userLocation != null) results[0] else Float.MAX_VALUE
+    val isWithinRange = distance <= 50f
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
         shape = RoundedCornerShape(18.dp),
-        border = BorderStroke(
-            1.dp,
-            if (done) Color(0xFF22C55E) else Color(0x12FFFFFF)
-        )
+        border = BorderStroke(1.dp, if (done) Color(0xFF22C55E) else Color(0x12FFFFFF))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -291,10 +303,7 @@ fun CheckpointCarreraItem(
             Box(
                 modifier = Modifier
                     .size(42.dp)
-                    .background(
-                        if (done) Color(0xFF22C55E) else Color(0x26FF9800),
-                        CircleShape
-                    ),
+                    .background(if (done) Color(0xFF22C55E) else Color(0x26FF9800), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -308,19 +317,32 @@ fun CheckpointCarreraItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(checkpoint.name, color = Color.White, fontWeight = FontWeight.Bold)
-                Text(checkpoint.description, color = Color.Gray, maxLines = 2)
+                if (!done) {
+                    Text(
+                        text = if (userLocation != null) "Distancia: ${distance.toInt()}m" else "Calculando...",
+                        color = if (isWithinRange) Color.Green else Color(0xFFFF6B6B),
+                        fontSize = 12.sp
+                    )
+                }
+                Text(checkpoint.description, color = Color.Gray, maxLines = 2, fontSize = 13.sp)
             }
 
             Button(
                 onClick = onValidate,
-                enabled = !done,
+                enabled = !done && isWithinRange,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFFF9800),
                     disabledContainerColor = Color(0xFF252525)
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(if (done) "Listo" else "Validar")
+                if (done) {
+                    Text("Listo")
+                } else {
+                    Icon(Icons.Default.PhotoCamera, null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Validar")
+                }
             }
         }
     }
