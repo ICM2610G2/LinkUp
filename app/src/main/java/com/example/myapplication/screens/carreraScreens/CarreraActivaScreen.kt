@@ -13,6 +13,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.SportsScore
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -45,9 +47,11 @@ fun CarreraActivaScreen(
 
     var raceId by remember { mutableStateOf("") }
     var raceName by remember { mutableStateOf("Carrera activa") }
+    var createdBy by remember { mutableStateOf("") }
     var participantsCount by remember { mutableStateOf(0) }
     var myCheckpointsDone by remember { mutableStateOf<List<String>>(emptyList()) }
     var checkpoints by remember { mutableStateOf<List<Checkpoint>>(emptyList()) }
+    var status by remember { mutableStateOf("active") }
 
     DisposableEffect(sessionId) {
         val listener = FirebaseFirestore.getInstance()
@@ -57,6 +61,8 @@ fun CarreraActivaScreen(
                 if (snapshot != null && snapshot.exists()) {
                     raceId = snapshot.getString("raceId") ?: ""
                     raceName = snapshot.getString("raceName") ?: "Carrera activa"
+                    createdBy = snapshot.getString("createdBy") ?: ""
+                    status = snapshot.getString("status") ?: "active"
 
                     val participants = snapshot.get("participants") as? Map<*, *>
                     participantsCount = participants?.size ?: 0
@@ -64,6 +70,11 @@ fun CarreraActivaScreen(
                     val myData = participants?.get(uid) as? Map<*, *>
                     myCheckpointsDone =
                         myData?.get("checkpointsDone") as? List<String> ?: emptyList()
+
+                    // Si la carrera finaliza, sacamos al usuario de la pantalla
+                    if (status == "finished") {
+                        onBack()
+                    }
                 }
             }
 
@@ -75,7 +86,6 @@ fun CarreraActivaScreen(
             checkpoints = raceRepository.getCheckpoints(raceId)
         }
     }
-
 
     val completedCount = myCheckpointsDone.size
     val total = checkpoints.size
@@ -147,8 +157,29 @@ fun CarreraActivaScreen(
                     }
                 )
             }
+
+            if (uid == createdBy) {
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                raceRepository.finishRaceSession(sessionId)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F)),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Icon(Icons.Default.SportsScore, null, tint = Color.White)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Finalizar Carrera", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
         }
 
+        // Wikipedia and Dialogs...
         if (wikipediaState.isLoading) {
             Card(
                 modifier = Modifier
@@ -185,9 +216,6 @@ fun CarreraActivaScreen(
                 }
             )
         }
-
-
-
 
         wikipediaState.errorMessage?.let { error ->
             AlertDialog(
