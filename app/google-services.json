@@ -1,6 +1,10 @@
 {
   "project_info": {
     "project_number": "546132367133",
+<<<<<<< Updated upstream
+=======
+    "firebase_url": "https://linkup-99296-default-rtdb.firebaseio.com",
+>>>>>>> Stashed changes
     "project_id": "linkup-99296",
     "storage_bucket": "linkup-99296.firebasestorage.app"
   },
