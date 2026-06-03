@@ -53,6 +53,8 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
+    //para FCM
+    implementation("com.google.firebase:firebase-messaging")
 
     //api de wikipedia
     // Retrofit
