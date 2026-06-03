@@ -85,8 +85,8 @@ class RaceRepository(
             val snapshot = firestore.collection("races")
                 .get()
                 .await()
-            
-            snapshot.documents.mapNotNull { doc -> 
+
+            snapshot.documents.mapNotNull { doc ->
                 try {
                     doc.toObject(Race::class.java)?.copy(id = doc.id)
                 } catch (e: Exception) {
@@ -114,32 +114,24 @@ class RaceRepository(
             val uid = auth.currentUser?.uid ?: return emptyList()
 
             val snapshot = firestore.collection("race_sessions")
+                .whereArrayContains("participantIds", uid)
                 .get()
                 .await()
 
-<<<<<<< HEAD
             snapshot.documents.mapNotNull { doc ->
-                doc.toObject(RaceSession::class.java)?.copy(id = doc.id)
-            }.filter { session ->
-                session.participants.containsKey(uid) && (session.status == "lobby" || session.status == "active")
-=======
-            val activeSnap = firestore.collection("race_sessions")
-                .whereEqualTo("status", "active")
-                .get()
-                .await()
-
-            val allSessions = (lobbySnap.documents + activeSnap.documents)
-                .mapNotNull { doc ->
-                    doc.toObject(RaceSession::class.java)?.copy(id = doc.id)
+                try {
+                    val session = doc.toObject(RaceSession::class.java)
+                    if (session != null && session.status != "finished") {
+                        session.id = doc.id
+                        session
+                    } else null
+                } catch (e: Exception) {
+                    Log.e("RaceRepository", "Error mapping RaceSession ${doc.id}", e)
+                    null
                 }
-
-            allSessions.filter { session ->
-                session.participants.containsKey(uid)
->>>>>>> CloudFunction
             }
-
         } catch (e: Exception) {
-            Log.e("RaceRepository", "Error getUserActiveSessions: ${e.message}")
+            Log.e("RaceRepository", "Error getting user active sessions", e)
             emptyList()
         }
     }
@@ -157,19 +149,19 @@ class RaceRepository(
             firestore.collection("race_sessions")
                 .document(sessionId)
                 .update(
-                    "participants.$uid",
-                    mapOf(
+                    "participants.$uid", mapOf(
                         "joinedAt" to Timestamp.now(),
                         "completedAt" to null,
                         "position" to null,
                         "checkpointsDone" to emptyList<String>()
-                    )
+                    ),
+                    "participantIds", FieldValue.arrayUnion(uid)
                 )
                 .await()
 
             Result.success(Unit)
         } catch (e: Exception) {
-            Log.e("RaceRepository", "Error joining race session", e)
+            Log.e("RaceRepository", "Error joining race session $sessionId", e)
             Result.failure(e)
         }
     }
@@ -218,6 +210,7 @@ class RaceRepository(
                 "raceName" to race.name,
                 "status" to "lobby",
                 "createdBy" to uid,
+                "participantIds" to listOf(uid),
                 "participants" to mapOf(
                     uid to mapOf(
                         "joinedAt" to Timestamp.now(),
@@ -237,7 +230,6 @@ class RaceRepository(
 
             Result.success(sessionRef.id)
         } catch (e: Exception) {
-            Log.e("RaceRepository", "Error creating lobby", e)
             Result.failure(e)
         }
     }
@@ -267,7 +259,6 @@ class RaceRepository(
 
             Result.success(Unit)
         } catch (e: Exception) {
-            Log.e("RaceRepository", "Error starting race", e)
             Result.failure(e)
         }
     }
@@ -283,46 +274,9 @@ class RaceRepository(
                 .mapNotNull { it.toObject(Checkpoint::class.java)?.copy(id = it.id) }
                 .sortedBy { it.order }
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error getting checkpoints for race $raceId", e)
             emptyList()
         }
-    }
-
-    suspend fun uploadCheckpointPhoto(
-        sessionId: String,
-        checkpointId: String,
-        imageUri: Uri
-    ): Result<String> {
-        return try {
-            val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
-            val fileName = "sessions/$sessionId/checkpoints/${checkpointId}_$uid.jpg"
-            val ref = storage.reference.child(fileName)
-            
-            ref.putFile(imageUri).await()
-            val downloadUrl = ref.downloadUrl.await().toString()
-            
-            firestore.collection("race_sessions")
-                .document(sessionId)
-                .update("participants.$uid.checkpointsDone", FieldValue.arrayUnion(checkpointId))
-                .await()
-                
-            Result.success(downloadUrl)
-        } catch (e: Exception) {
-            Log.e("RaceRepository", "Error uploading photo", e)
-            Result.failure(e)
-        }
-    }
-
-    private fun calculateTotalDistanceKm(checkpoints: List<Checkpoint>): Double {
-        if (checkpoints.size < 2) return 0.0
-        var total = 0.0
-
-        for (i in 0 until checkpoints.size - 1) {
-            val a = checkpoints[i].coordinates
-            val b = checkpoints[i + 1].coordinates
-            total += haversineKm(a.latitude, a.longitude, b.latitude, b.longitude)
-        }
-
-        return total
     }
 
     suspend fun validateCheckpoint(
@@ -339,10 +293,48 @@ class RaceRepository(
 
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error validating checkpoint", e)
             Result.failure(e)
         }
     }
 
+    suspend fun uploadCheckpointPhoto(
+        sessionId: String,
+        checkpointId: String,
+        imageUri: Uri
+    ): Result<String> {
+        return try {
+            val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
+            val fileName = "sessions/$sessionId/checkpoints/${checkpointId}_$uid.jpg"
+            val ref = storage.reference.child(fileName)
+
+            ref.putFile(imageUri).await()
+            val downloadUrl = ref.downloadUrl.await().toString()
+
+            firestore.collection("race_sessions")
+                .document(sessionId)
+                .update("participants.$uid.checkpointsDone", FieldValue.arrayUnion(checkpointId))
+                .await()
+
+            Result.success(downloadUrl)
+        } catch (e: Exception) {
+            Log.e("RaceRepository", "Error uploading checkpoint photo", e)
+            Result.failure(e)
+        }
+    }
+
+    private fun calculateTotalDistanceKm(checkpoints: List<Checkpoint>): Double {
+        if (checkpoints.size < 2) return 0.0
+        var total = 0.0
+
+        for (i in 0 until checkpoints.size - 1) {
+            val a = checkpoints[i].coordinates
+            val b = checkpoints[i + 1].coordinates
+            total += haversineKm(a.latitude, a.longitude, b.latitude, b.longitude)
+        }
+
+        return total
+    }
 
     private fun haversineKm(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
         val r = 6371.0

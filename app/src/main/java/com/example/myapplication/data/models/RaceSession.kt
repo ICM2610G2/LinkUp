@@ -2,24 +2,28 @@ package com.example.myapplication.data.models
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.IgnoreExtraProperties
 
+@IgnoreExtraProperties
 data class RaceSession(
-    val id: String = "",
-    val raceId: String = "",
-    val raceName: String = "",
-    val status: String = "lobby",
-    val createdBy: String = "",
-    val participants: Map<String, ParticipantInfo> = emptyMap(),
-    val startedAt: Timestamp? = null,
-    val endedAt: Timestamp? = null,
-    val winnerUid: String = "",
-    val groupChatId: String = "",
-    val createdAt: Timestamp = Timestamp.now()
+    var id: String = "",
+    var raceId: String = "",
+    var raceName: String = "",
+    var status: String = "lobby",
+    var createdBy: String = "",
+    var participants: Map<String, ParticipantInfo> = emptyMap(),
+    var participantIds: List<String> = emptyList(),
+    var startedAt: Timestamp? = null,
+    var endedAt: Timestamp? = null,
+    var winnerUid: String = "",
+    var groupChatId: String = "",
+    var createdAt: Timestamp = Timestamp.now()
 )
 
+@IgnoreExtraProperties
 data class ParticipantInfo(
-    val joinedAt: Timestamp? = null,
-    val completedAt: Timestamp? = null,
-    val position: Int? = null,
-    val checkpointsDone: List<String> = emptyList()
+    var joinedAt: Timestamp? = null,
+    var completedAt: Timestamp? = null,
+    var position: Int? = null,
+    var checkpointsDone: List<String> = emptyList()
 )
