@@ -75,18 +75,27 @@ class RaceRepository(
 
             Result.success(raceRef.id)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error creating race", e)
             Result.failure(e)
         }
     }
 
     suspend fun getPublicRaces(): List<Race> {
         return try {
-            firestore.collection("races")
+            val snapshot = firestore.collection("races")
                 .get()
                 .await()
-                .documents
-                .mapNotNull { doc -> doc.toObject(Race::class.java)?.copy(id = doc.id) }
+
+            snapshot.documents.mapNotNull { doc ->
+                try {
+                    doc.toObject(Race::class.java)?.copy(id = doc.id)
+                } catch (e: Exception) {
+                    Log.e("RaceRepository", "Error mapping Race document ${doc.id}", e)
+                    null
+                }
+            }
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error getting public races", e)
             emptyList()
         }
     }
@@ -95,6 +104,7 @@ class RaceRepository(
         return try {
             firestore.collection("races").document(raceId).get().await().toObject(Race::class.java)?.copy(id = raceId)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error getting race by id $raceId", e)
             null
         }
     }
@@ -102,32 +112,27 @@ class RaceRepository(
     suspend fun getUserActiveSessions(): List<RaceSession> {
         return try {
             val uid = auth.currentUser?.uid ?: return emptyList()
-            firestore.collection("race_sessions")
-                .whereNotEqualTo("status", "finished")
-                .get()
-                .await()
-                .documents
-                .mapNotNull { it.toObject(RaceSession::class.java)?.copy(id = it.id) }
-                .filter { it.participants.containsKey(uid) }
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
 
-    suspend fun getSessionForRace(raceId: String): RaceSession? {
-        return try {
-            firestore.collection("race_sessions")
-                .whereEqualTo("raceId", raceId)
-                .whereEqualTo("status", "lobby")
-                .limit(1)
+            val snapshot = firestore.collection("race_sessions")
+                .whereArrayContains("participantIds", uid)
                 .get()
                 .await()
-                .documents
-                .firstOrNull()
-                ?.toObject(RaceSession::class.java)
-                ?.let { it.copy(id = it.id) }
+
+            snapshot.documents.mapNotNull { doc ->
+                try {
+                    val session = doc.toObject(RaceSession::class.java)
+                    if (session != null && session.status != "finished") {
+                        session.id = doc.id
+                        session
+                    } else null
+                } catch (e: Exception) {
+                    Log.e("RaceRepository", "Error mapping RaceSession ${doc.id}", e)
+                    null
+                }
+            }
         } catch (e: Exception) {
-            null
+            Log.e("RaceRepository", "Error getting user active sessions", e)
+            emptyList()
         }
     }
 
@@ -138,18 +143,19 @@ class RaceRepository(
             firestore.collection("race_sessions")
                 .document(sessionId)
                 .update(
-                    "participants.$uid",
-                    mapOf(
+                    "participants.$uid", mapOf(
                         "joinedAt" to Timestamp.now(),
                         "completedAt" to null,
                         "position" to null,
                         "checkpointsDone" to emptyList<String>()
-                    )
+                    ),
+                    "participantIds", FieldValue.arrayUnion(uid)
                 )
                 .await()
 
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error joining race session $sessionId", e)
             Result.failure(e)
         }
     }
@@ -176,6 +182,7 @@ class RaceRepository(
                 createLobby(race)
             }
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error finding or joining lobby", e)
             Result.failure(e)
         }
     }
@@ -187,11 +194,11 @@ class RaceRepository(
             val sessionRef = firestore.collection("race_sessions").document()
 
             val sessionData = hashMapOf(
-                "id" to sessionRef.id,
                 "raceId" to race.id,
                 "raceName" to race.name,
                 "status" to "lobby",
                 "createdBy" to uid,
+                "participantIds" to listOf(uid),
                 "participants" to mapOf(
                     uid to mapOf(
                         "joinedAt" to Timestamp.now(),
@@ -211,6 +218,7 @@ class RaceRepository(
 
             Result.success(sessionRef.id)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error creating lobby", e)
             Result.failure(e)
         }
     }
@@ -238,38 +246,13 @@ class RaceRepository(
                 )
             ).await()
 
-            //notificar a todos los participantes
-            val raceName = snap.getString("raceName") ?: "la carrera"
-            //notifyParticipants(participants, raceName)
-
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error starting race session", e)
             Result.failure(e)
         }
     }
 
-//    private suspend fun notifyParticipants(participants: Map<*, *>?, raceName: String) {
-//        if (participants == null) return
-//        for (participantId in participants.keys) {
-//            try {
-//                val userDoc = firestore.collection("users")
-//                    .document(participantId.toString())
-//                    .get()
-//                    .await()
-//                val token = userDoc.getString("fcmToken") ?: continue
-//                firestore.collection("notifications").add(
-//                    mapOf(
-//                        "token" to token,
-//                        "title" to "¡Arrancó la carrera!",
-//                        "body" to "La carrera \"$raceName\" ha comenzado. ¡Corre!",
-//                        "createdAt" to Timestamp.now()
-//                    )
-//                ).await()
-//            } catch (e: Exception) {
-//                Log.e("FCM", "Error notificando a $participantId: ${e.message}")
-//            }
-//        }
-//    }
     suspend fun getCheckpoints(raceId: String): List<Checkpoint> {
         return try {
             firestore.collection("races")
@@ -281,6 +264,7 @@ class RaceRepository(
                 .mapNotNull { it.toObject(Checkpoint::class.java)?.copy(id = it.id) }
                 .sortedBy { it.order }
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error getting checkpoints for race $raceId", e)
             emptyList()
         }
     }
@@ -299,6 +283,32 @@ class RaceRepository(
 
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("RaceRepository", "Error validating checkpoint", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun uploadCheckpointPhoto(
+        sessionId: String,
+        checkpointId: String,
+        imageUri: Uri
+    ): Result<String> {
+        return try {
+            val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuario no autenticado"))
+            val fileName = "sessions/$sessionId/checkpoints/${checkpointId}_$uid.jpg"
+            val ref = storage.reference.child(fileName)
+
+            ref.putFile(imageUri).await()
+            val downloadUrl = ref.downloadUrl.await().toString()
+
+            firestore.collection("race_sessions")
+                .document(sessionId)
+                .update("participants.$uid.checkpointsDone", FieldValue.arrayUnion(checkpointId))
+                .await()
+
+            Result.success(downloadUrl)
+        } catch (e: Exception) {
+            Log.e("RaceRepository", "Error uploading checkpoint photo", e)
             Result.failure(e)
         }
     }
