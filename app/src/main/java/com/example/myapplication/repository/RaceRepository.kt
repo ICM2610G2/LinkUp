@@ -117,7 +117,7 @@ class RaceRepository(
                 .mapNotNull { doc ->
                     doc.toObject(RaceSession::class.java)?.copy(id = doc.id)
                 }
-            
+
             allSessions.filter { session ->
                 session.participants.containsKey(uid)
             }
@@ -254,7 +254,7 @@ class RaceRepository(
 
             //notificar a todos los participantes
             val raceName = snap.getString("raceName") ?: "la carrera"
-            notifyParticipants(participants, raceName)
+            //notifyParticipants(participants, raceName)
 
             Result.success(Unit)
         } catch (e: Exception) {
