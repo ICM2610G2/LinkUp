@@ -117,6 +117,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.play.services.places)
+    implementation(libs.androidx.foundation)
 
     // Pruebas
     testImplementation(libs.junit)

@@ -14,9 +14,9 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -103,7 +103,12 @@ fun CrearCarrera(
                                             .padding(8.dp)
                                             .background(Color.Black.copy(alpha = 0.5f), CircleShape)
                                     ) {
-                                        Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                                        Icon(
+                                            Icons.Default.Close,
+                                            null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(20.dp)
+                                        )
                                     }
                                 } else {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -192,17 +197,23 @@ fun CrearCarrera(
                                             fontWeight = FontWeight.Bold
                                         )
                                     }
-                                    
                                     IconButton(
                                         onClick = { viewModel.setMostrarSeleccionMapa(true) },
-                                        modifier = Modifier.size(32.dp).background(Color(0xFFFF9800), CircleShape)
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .background(Color(0xFFFF9800), CircleShape)
                                     ) {
-                                        Icon(Icons.Default.Add, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                                        Icon(
+                                            Icons.Default.Add,
+                                            null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(20.dp)
+                                        )
                                     }
                                 }
-                                
+
                                 Spacer(modifier = Modifier.height(12.dp))
-                                
+
                                 if (state.checkpoints.isEmpty()) {
                                     Text(
                                         "No hay checkpoints agregados.",
@@ -212,7 +223,9 @@ fun CrearCarrera(
                                 } else {
                                     state.checkpoints.forEach { checkpoint ->
                                         Row(
-                                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 4.dp),
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
@@ -256,7 +269,6 @@ fun CrearCarrera(
                         scope.launch {
                             viewModel.updateIsLoading(true)
                             viewModel.updateErrorMessage(null)
-
                             val result = raceRepository.createRace(
                                 name = state.nombre,
                                 description = state.descripcion,
@@ -264,7 +276,6 @@ fun CrearCarrera(
                                 checkpoints = state.checkpoints,
                                 imageUri = state.imageUri
                             )
-
                             result.fold(
                                 onSuccess = {
                                     viewModel.updateIsLoading(false)

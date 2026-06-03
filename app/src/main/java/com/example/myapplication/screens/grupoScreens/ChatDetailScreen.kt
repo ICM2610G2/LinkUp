@@ -39,6 +39,7 @@ fun ChatDetailScreen(
     isGroup: Boolean,
     isReadOnly: Boolean,
     onBack: () -> Unit,
+    onAbrirCarrera: (raceId: String) -> Unit = {},
     viewModel: ChatDetailViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -46,21 +47,17 @@ fun ChatDetailScreen(
     val listState = rememberLazyListState()
     val userRepository = remember { UserRepository() }
 
-    // Estado para la foto y nombre del otro usuario (en chats 1-a-1)
     var otherUserPhotoURL by remember { mutableStateOf("") }
     var otherUserName by remember { mutableStateOf(chatName) }
     var isLoadingOtherUser by remember { mutableStateOf(true) }
 
-    // Cargar datos del otro usuario en chats 1-a-1
     LaunchedEffect(chatId, isGroup) {
         if (!isGroup) {
             isLoadingOtherUser = true
             try {
-                // Obtener el chat para conseguir los participantes
                 val participants = viewModel.getChatParticipants(chatId)
                 val currentUserId = viewModel.getCurrentUserId()
                 val otherId = participants.firstOrNull { it != currentUserId }
-
                 if (otherId != null) {
                     val user = userRepository.getUser(otherId)
                     otherUserName = user?.displayName ?: chatName
@@ -73,20 +70,17 @@ fun ChatDetailScreen(
         }
     }
 
-    // Inicializar chat
     LaunchedEffect(chatId) {
         viewModel.initChat(chatId, isReadOnly)
         viewModel.loadMessages(chatId)
     }
 
-    // Auto-scroll al último mensaje
     LaunchedEffect(state.messages.size) {
         if (state.messages.isNotEmpty()) {
             listState.animateScrollToItem(state.messages.size - 1)
         }
     }
 
-    // Configuración de cámara
     val imageFile = remember {
         File(context.filesDir, "camera_${System.currentTimeMillis()}.jpg")
     }
@@ -101,9 +95,7 @@ fun ChatDetailScreen(
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success) {
-            viewModel.sendImageMessage(chatId, cameraUri)
-        }
+        if (success) viewModel.sendImageMessage(chatId, cameraUri)
     }
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
@@ -123,7 +115,6 @@ fun ChatDetailScreen(
             .fillMaxSize()
             .background(Color(0xFF0A0A0A))
     ) {
-        // Header con nombre y foto
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -135,7 +126,6 @@ fun ChatDetailScreen(
                 Icon(Icons.Default.ArrowBack, null, tint = Color.White)
             }
 
-            // Avatar del chat - muestra foto del amigo
             Box(
                 modifier = Modifier
                     .size(44.dp)
@@ -183,9 +173,8 @@ fun ChatDetailScreen(
             }
         }
 
-        Divider(color = Color(0x22FFFFFF))
+        HorizontalDivider(color = Color(0x22FFFFFF))
 
-        // Lista de mensajes
         Box(modifier = Modifier.weight(1f)) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -202,13 +191,13 @@ fun ChatDetailScreen(
                         senderPhotoURL = message.photoURL,
                         time = message.time,
                         isMe = message.isMe,
-                        isGroup = isGroup
+                        isGroup = isGroup,
+                        onAbrirCarrera = onAbrirCarrera
                     )
                 }
             }
         }
 
-        // Input (solo si no es solo lectura)
         if (!isReadOnly) {
             Row(
                 modifier = Modifier
@@ -255,9 +244,7 @@ fun ChatDetailScreen(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 IconButton(
-                    onClick = {
-                        viewModel.sendTextMessage()
-                    },
+                    onClick = { viewModel.sendTextMessage() },
                     enabled = state.inputText.isNotBlank(),
                     modifier = Modifier
                         .size(44.dp)
@@ -278,13 +265,31 @@ fun MessageBubble(
     senderPhotoURL: String,
     time: String,
     isMe: Boolean,
-    isGroup: Boolean
+    isGroup: Boolean,
+    onAbrirCarrera: (raceId: String) -> Unit = {}
 ) {
+    val esInvitacion = text != null &&
+            text.startsWith("🏃 Te han invitado a una carrera") &&
+            text.contains("ID: ")
+
+    val raceId = if (esInvitacion) {
+        text!!.lines()
+            .firstOrNull { it.startsWith("ID: ") }
+            ?.removePrefix("ID: ")
+            ?.trim() ?: ""
+    } else ""
+
+    val raceName = if (esInvitacion) {
+        text!!.lines()
+            .firstOrNull { it.startsWith("Nombre: ") }
+            ?.removePrefix("Nombre: ")
+            ?.trim() ?: ""
+    } else ""
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
     ) {
-        // Avatar del remitente (solo para mensajes de otros en chats grupales)
         if (!isMe && isGroup) {
             Box(
                 modifier = Modifier
@@ -313,35 +318,67 @@ fun MessageBubble(
         }
 
         Column(horizontalAlignment = if (isMe) Alignment.End else Alignment.Start) {
-            // Nombre del remitente (solo en chats grupales y si no es el usuario actual)
             if (!isMe && isGroup) {
                 Text(senderName, color = Color(0xFFFF9800), fontSize = 10.sp)
             }
 
-            Box(
-                modifier = Modifier
-                    .background(
-                        if (isMe) Color(0xFFFF9800) else Color(0xFF1A1A1A),
-                        RoundedCornerShape(16.dp)
-                    )
-                    .padding(10.dp)
-            ) {
-                Column {
-                    if (imageUri != null) {
-                        AsyncImage(
-                            model = imageUri,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(180.dp)
-                                .clip(RoundedCornerShape(12.dp)),
-                            contentScale = ContentScale.Crop
+            if (esInvitacion) {
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E2E)),
+                    modifier = Modifier.widthIn(max = 260.dp)
+                ) {
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Text(
+                            "🏃 Invitación a carrera",
+                            color = Color(0xFFFF9800),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
                         )
-                        if (!text.isNullOrEmpty()) {
-                            Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            raceName,
+                            color = Color.White,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Button(
+                            onClick = { if (raceId.isNotEmpty()) onAbrirCarrera(raceId) },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Ver carrera", color = Color.White, fontWeight = FontWeight.Bold)
                         }
                     }
-                    if (!text.isNullOrEmpty()) {
-                        Text(text, color = Color.White)
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            if (isMe) Color(0xFFFF9800) else Color(0xFF1A1A1A),
+                            RoundedCornerShape(16.dp)
+                        )
+                        .padding(10.dp)
+                ) {
+                    Column {
+                        if (imageUri != null) {
+                            AsyncImage(
+                                model = imageUri,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(180.dp)
+                                    .clip(RoundedCornerShape(12.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                            if (!text.isNullOrEmpty()) {
+                                Spacer(modifier = Modifier.height(6.dp))
+                            }
+                        }
+                        if (!text.isNullOrEmpty()) {
+                            Text(text, color = Color.White)
+                        }
                     }
                 }
             }
