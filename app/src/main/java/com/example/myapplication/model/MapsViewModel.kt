@@ -19,12 +19,20 @@ data class FriendMapLocation(
     val location: LatLng
 )
 
+data class ParticipantMapLocation(
+    val uid: String,
+    val displayName: String,
+    val gameId: String = "",
+    val location: LatLng
+)
+
 data class MapaState(
     val hasLocationPermission: Boolean = false,
     val shareLocationMode: String = "always",
     val userLocation: LatLng? = null,
     val acceptedFriends: List<User> = emptyList(),
     val friendLocations: List<FriendMapLocation> = emptyList(),
+    val participantLocations: List<ParticipantMapLocation> = emptyList(),
     val activeSession: RaceSession? = null,
     val checkpoints: List<Checkpoint> = emptyList(),
     val isLoading: Boolean = false
@@ -55,8 +63,21 @@ class MapaViewModel : ViewModel() {
     fun updateFriendLocations(newValue: List<FriendMapLocation>) {
         _mapaState.update { it.copy(friendLocations = newValue) }
     }
+    fun updateParticipantLocations(newValue: List<ParticipantMapLocation>) {
+        _mapaState.update { it.copy(participantLocations = newValue) }
+    }
+    fun updateActiveSession(newValue: RaceSession?) {
+        _mapaState.update { it.copy(activeSession = newValue) }
+    }
 
+<<<<<<< Updated upstream
     fun cargarDatos() {
+=======
+    fun updateCheckpoints(newValue: List<Checkpoint>) {
+        _mapaState.update { it.copy(checkpoints = newValue) }
+    }
+    fun cargarCarreraActiva() {
+>>>>>>> Stashed changes
         viewModelScope.launch {
             _mapaState.update { it.copy(isLoading = true) }
             

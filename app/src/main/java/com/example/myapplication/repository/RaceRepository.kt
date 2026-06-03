@@ -13,6 +13,7 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 import kotlin.math.*
+import com.google.firebase.database.FirebaseDatabase
 
 class RaceRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
@@ -381,5 +382,37 @@ class RaceRepository(
                     sin(dLon / 2).pow(2.0)
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
         return r * c
+    }
+
+    suspend fun leaveRaceSession(sessionId: String): Result<Unit> {
+        return try {
+            val uid = auth.currentUser?.uid
+                ?: return Result.failure(Exception("Usuario no autenticado"))
+
+            firestore.collection("race_sessions")
+                .document(sessionId)
+                .update(
+                    mapOf(
+                        "participants.$uid" to FieldValue.delete(),
+                        "participantIds" to FieldValue.arrayRemove(uid)
+                    )
+                )
+                .await()
+
+            FirebaseDatabase.getInstance(
+                "https://linkup-99296-default-rtdb.firebaseio.com/"
+            ).reference
+                .child("live_positions")
+                .child(sessionId)
+                .child(uid)
+                .removeValue()
+                .await()
+
+            Result.success(Unit)
+
+        } catch (e: Exception) {
+            Log.e("RaceRepository", "Error leaving race session", e)
+            Result.failure(e)
+        }
     }
 }

@@ -215,6 +215,33 @@ fun CarreraActivaScreen(
                     color = Color(0xFFFF9800),
                     trackColor = Color(0xFF252525)
                 )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            val result = raceRepository.leaveRaceSession(sessionId)
+
+                            result.onSuccess {
+                                onBack()
+                            }
+
+
+                            result.onFailure { error ->
+                                println("Error abandonando carrera: ${error.message}")
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(0xFFFF6B6B)
+                    ),
+                    border = BorderStroke(1.dp, Color(0xFFFF6B6B)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Abandonar carrera")
+                }
             }
 
             // Sección de Clasificación
