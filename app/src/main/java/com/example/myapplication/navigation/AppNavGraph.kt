@@ -24,6 +24,8 @@ import com.example.myapplication.screens.LobbyCarreraScreen
 import com.example.myapplication.screens.Login
 import com.example.myapplication.screens.mapaScreens.Mapa
 import com.example.myapplication.screens.perfilScreens.Perfil
+import com.example.myapplication.screens.perfilScreens.ConfiguracionScreen
+import com.example.myapplication.screens.perfilScreens.HistorialCarrerasScreen
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
@@ -72,15 +74,12 @@ fun AppNavGraph(
             val dummyAuthManager = FirebaseAuthManager(
                 LocalContext.current as androidx.appcompat.app.AppCompatActivity
             )
-
             val dummyBiometricManager = BiometricAuthManager(
                 LocalContext.current as androidx.appcompat.app.AppCompatActivity
             )
-
             val dummyEncryptedPrefs = EncryptedPreferences(
                 LocalContext.current
             )
-
             Login(
                 onLoginSuccess = {
                     navController.navigate(Screen.Home.route) {
@@ -138,12 +137,8 @@ fun AppNavGraph(
 
         composable("crear_carrera") {
             CrearCarrera(
-                onCerrar = {
-                    navController.popBackStack()
-                },
-                onCarreraCreada = {
-                    navController.popBackStack()
-                }
+                onCerrar = { navController.popBackStack() },
+                onCarreraCreada = { navController.popBackStack() }
             )
         }
 
@@ -151,9 +146,7 @@ fun AppNavGraph(
             val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
             LobbyCarreraScreen(
                 sessionId = sessionId,
-                onBack = {
-                    navController.popBackStack()
-                },
+                onBack = { navController.popBackStack() },
                 onRaceStarted = { id ->
                     navController.navigate("carrera_activa/$id")
                 }
@@ -164,9 +157,7 @@ fun AppNavGraph(
             val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
             CarreraActivaScreen(
                 sessionId = sessionId,
-                onBack = {
-                    navController.popBackStack()
-                }
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -206,6 +197,12 @@ fun AppNavGraph(
                     onVerAmigos = {
                         navController.navigate("lista_amigos")
                     },
+                    onConfiguracion = {
+                        navController.navigate("configuracion")
+                    },
+                    onHistorialCarreras = {
+                        navController.navigate("historial_carreras")
+                    },
                     onRefresh = {
                         scope.launch {
                             userData = user?.let { userRepository.getUser(it.uid) }
@@ -223,11 +220,22 @@ fun AppNavGraph(
                         userData = updatedUser
                         navController.popBackStack()
                     },
-                    onCancel = {
-                        navController.popBackStack()
-                    }
+                    onCancel = { navController.popBackStack() }
                 )
             }
+        }
+
+        composable("configuracion") {
+            ConfiguracionScreen(
+                userData = userData,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("historial_carreras") {
+            HistorialCarrerasScreen(
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }

@@ -42,12 +42,6 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
-/**
- * Pantalla principal de Perfil
- * Muestra información del usuario: nombre, email, Game ID y estadísticas
- * Permite navegar a edición de perfil y lista de amigos
- * También maneja cierre de sesión y eliminación de cuenta
- */
 @Composable
 fun Perfil(
     user: FirebaseUser?,
@@ -56,6 +50,8 @@ fun Perfil(
     onAccountDeleted: () -> Unit,
     onEditProfile: () -> Unit,
     onVerAmigos: () -> Unit,
+    onConfiguracion: () -> Unit,
+    onHistorialCarreras: () -> Unit,
     onRefresh: () -> Unit,
     viewModel: PerfilViewModel = viewModel()
 ) {
@@ -67,22 +63,17 @@ fun Perfil(
 
     val state by viewModel.perfilState.collectAsState()
 
-    // Datos del usuario priorizando Firebase Auth (más actualizado) sobre Firestore
     val displayName = user?.displayName ?: userData?.displayName ?: "Usuario"
     val email = user?.email ?: "correo@ejemplo.com"
     val userId = user?.uid ?: userData?.uid?.take(8) ?: ""
     val photoURL = user?.photoUrl?.toString() ?: userData?.photoURL ?: ""
 
-    // Estadísticas desde Firestore
     val totalPlaces = userData?.totalPlacesVisited ?: 0
     val currentStreak = userData?.currentStreak ?: 0
     val bestStreak = userData?.bestStreak ?: 0
     val totalPoints = userData?.totalPoints ?: 0
     val gameId = userData?.gameId ?: "linkup#0000"
 
-    // ============================================================
-    // BLOQUE: Observar resultado de biometría para borrar cuenta
-    // ============================================================
     LaunchedEffect(Unit) {
         biometricManager.authResult.collect { result ->
             when (result) {
@@ -112,7 +103,6 @@ fun Perfil(
         }
     }
 
-    // UI principal
     PerfilContent(
         displayName = displayName,
         email = email,
@@ -125,6 +115,8 @@ fun Perfil(
         totalPoints = totalPoints,
         onEditClick = onEditProfile,
         onVerAmigosClick = onVerAmigos,
+        onConfiguracionClick = onConfiguracion,
+        onHistorialCarrerasClick = onHistorialCarreras,
         onLogoutClick = {
             scope.launch {
                 Log.d("Perfil", "Cerrando sesión")
@@ -135,11 +127,7 @@ fun Perfil(
         onDeleteClick = { viewModel.updateShowDeleteDialog(true) }
     )
 
-    // ============================================================
-    // DIALOGOS: Confirmación para borrar cuenta
-    // ============================================================
-
-    // Diálogo 1: Confirmación inicial
+    // ── Diálogo 1: Confirmación inicial ───────────────────────────
     if (state.showDeleteDialog) {
         Dialog(
             onDismissRequest = { viewModel.updateShowDeleteDialog(false) },
@@ -178,7 +166,6 @@ fun Perfil(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Opción 1: Usar huella digital
                     if (biometricManager.isBiometricAvailable() is BiometricAvailability.Available) {
                         Button(
                             onClick = {
@@ -198,7 +185,6 @@ fun Perfil(
                         Spacer(modifier = Modifier.height(12.dp))
                     }
 
-                    // Opción 2: Usar contraseña
                     Button(
                         onClick = {
                             viewModel.updateShowDeleteDialog(false)
@@ -222,7 +208,7 @@ fun Perfil(
         }
     }
 
-    // Diálogo 2: Ingresar contraseña para confirmar
+    // ── Diálogo 2: Contraseña ─────────────────────────────────────
     if (state.showPasswordDialog) {
         Dialog(
             onDismissRequest = {
@@ -311,10 +297,6 @@ fun Perfil(
     }
 }
 
-/**
- * Componente UI principal del perfil
- * Muestra avatar, información del usuario, estadísticas y menú de opciones
- */
 @Composable
 fun PerfilContent(
     displayName: String,
@@ -328,6 +310,8 @@ fun PerfilContent(
     totalPoints: Int,
     onEditClick: () -> Unit,
     onVerAmigosClick: () -> Unit,
+    onConfiguracionClick: () -> Unit,
+    onHistorialCarrerasClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -341,16 +325,13 @@ fun PerfilContent(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        // ============================================================
-        // HEADER: Avatar, nombre, email, ID y Game ID
-        // ============================================================
+        // ── Header ────────────────────────────────────────────────
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Avatar con imagen real desde Storage o por defecto
             Box(
                 modifier = Modifier
                     .size(90.dp)
@@ -378,7 +359,6 @@ fun PerfilContent(
 
             Spacer(modifier = Modifier.width(14.dp))
 
-            // Información del usuario
             Column(modifier = Modifier.weight(1f)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -392,7 +372,6 @@ fun PerfilContent(
                         color = Color.White,
                         modifier = Modifier.weight(1f)
                     )
-                    // Botón de editar perfil
                     IconButton(
                         onClick = onEditClick,
                         modifier = Modifier.size(36.dp)
@@ -407,16 +386,10 @@ fun PerfilContent(
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = email,
-                    fontSize = 14.sp,
-                    color = Color(0xFFBDBDBD)
-                )
+                Text(text = email, fontSize = 14.sp, color = Color(0xFFBDBDBD))
 
                 Spacer(modifier = Modifier.height(6.dp))
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = "ID: ${userId.take(8)}",
                         fontSize = 12.sp,
@@ -425,9 +398,7 @@ fun PerfilContent(
                         maxLines = 1,
                         softWrap = false
                     )
-
                     Spacer(modifier = Modifier.height(2.dp))
-
                     Text(
                         text = gameId,
                         fontSize = 12.sp,
@@ -441,50 +412,26 @@ fun PerfilContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ============================================================
-        // ESTADÍSTICAS: Tarjetas con lugares, racha, mejor racha y XP
-        // ============================================================
+        // ── Estadísticas ──────────────────────────────────────────
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            StatCard(
-                value = totalPlaces.toString(),
-                label = "Lugares",
-                icon = Icons.Default.Place,
-                modifier = Modifier.weight(1f)
-            )
-            StatCard(
-                value = currentStreak.toString(),
-                label = "Racha actual",
-                icon = Icons.Default.LocalFireDepartment,
-                modifier = Modifier.weight(1f)
-            )
-            StatCard(
-                value = bestStreak.toString(),
-                label = "Mejor racha",
-                icon = Icons.Default.Star,
-                modifier = Modifier.weight(1f)
-            )
-            StatCard(
-                value = totalPoints.toString(),
-                label = "XP",
-                icon = Icons.Default.Star,
-                modifier = Modifier.weight(1f)
-            )
+            StatCard(value = totalPlaces.toString(), label = "Lugares", icon = Icons.Default.Place, modifier = Modifier.weight(1f))
+            StatCard(value = currentStreak.toString(), label = "Racha actual", icon = Icons.Default.LocalFireDepartment, modifier = Modifier.weight(1f))
+            StatCard(value = bestStreak.toString(), label = "Mejor racha", icon = Icons.Default.Star, modifier = Modifier.weight(1f))
+            StatCard(value = totalPoints.toString(), label = "XP", icon = Icons.Default.Star, modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // ============================================================
-        // MENÚ DE OPCIONES
-        // ============================================================
+        // ── Menú ──────────────────────────────────────────────────
         MenuItem(
             icon = Icons.Default.Settings,
             title = "Configuración",
-            subtitle = "Ajustes de la cuenta",
+            subtitle = "Ajustes de la cuenta y privacidad",
             accent = accent,
-            onClick = { /* Navegar a configuración */ }
+            onClick = onConfiguracionClick
         )
 
         MenuItem(
@@ -492,31 +439,7 @@ fun PerfilContent(
             title = "Historial de carreras",
             subtitle = "Ver todas tus carreras",
             accent = accent,
-            onClick = { /* Navegar a historial */ }
-        )
-
-        MenuItem(
-            icon = Icons.Default.CameraAlt,
-            title = "Fotos guardadas",
-            subtitle = "Revisa todos tus recuerdos",
-            accent = accent,
-            onClick = { /* Navegar a fotos */ }
-        )
-
-        MenuItem(
-            icon = Icons.Default.LocationOn,
-            title = "Sensores del dispositivo",
-            subtitle = "Acelerómetro, GPS, Magnetómetro",
-            accent = accent,
-            onClick = { /* Navegar a sensores */ }
-        )
-
-        MenuItem(
-            icon = Icons.Default.PrivacyTip,
-            title = "Privacidad de ubicación",
-            subtitle = "¿Quién puede ver tu ubicación?",
-            accent = accent,
-            onClick = { /* Navegar a privacidad */ }
+            onClick = onHistorialCarrerasClick
         )
 
         MenuItem(
@@ -529,11 +452,7 @@ fun PerfilContent(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // ============================================================
-        // BOTONES DE ACCIÓN: Cerrar sesión y Borrar cuenta
-        // ============================================================
-
-        // Botón cerrar sesión
+        // ── Cerrar sesión ─────────────────────────────────────────
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -549,23 +468,13 @@ fun PerfilContent(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = null,
-                    tint = Color(0xFFFF6B6B),
-                    modifier = Modifier.size(20.dp)
-                )
+                Icon(Icons.AutoMirrored.Filled.Logout, null, tint = Color(0xFFFF6B6B), modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Cerrar sesión",
-                    color = Color(0xFFFF6B6B),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Text("Cerrar sesión", color = Color(0xFFFF6B6B), fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
 
-        // Botón borrar cuenta
+        // ── Borrar cuenta ─────────────────────────────────────────
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -581,28 +490,14 @@ fun PerfilContent(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = null,
-                    tint = Color(0xFFFF6B6B),
-                    modifier = Modifier.size(20.dp)
-                )
+                Icon(Icons.Default.Delete, null, tint = Color(0xFFFF6B6B), modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Borrar cuenta",
-                    color = Color(0xFFFF6B6B),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Text("Borrar cuenta", color = Color(0xFFFF6B6B), fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
 }
 
-/**
- * Tarjeta de estadística individual
- * Muestra un valor numérico con su respectivo icono y etiqueta
- */
 @Composable
 fun StatCard(
     value: String,
@@ -612,16 +507,12 @@ fun StatCard(
     onClick: () -> Unit = {}
 ) {
     Card(
-        modifier = modifier
-            .height(90.dp)
-            .clickable { onClick() },
+        modifier = modifier.height(90.dp).clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1C))
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
+            modifier = Modifier.fillMaxSize().padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -633,10 +524,6 @@ fun StatCard(
     }
 }
 
-/**
- * Ítem del menú lateral
- * Muestra un icono, título, subtítulo opcional y flecha de navegación
- */
 @Composable
 fun MenuItem(
     icon: ImageVector,
@@ -654,9 +541,7 @@ fun MenuItem(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF121212))
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -666,30 +551,16 @@ fun MenuItem(
                     .border(1.dp, accent.copy(alpha = 0.25f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    tint = accent,
-                    modifier = Modifier.size(20.dp)
-                )
+                Icon(imageVector = icon, contentDescription = title, tint = accent, modifier = Modifier.size(20.dp))
             }
 
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Text(text = title, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 if (subtitle != null) {
                     Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = subtitle,
-                        color = Color(0xFF9E9E9E),
-                        fontSize = 12.sp
-                    )
+                    Text(text = subtitle, color = Color(0xFF9E9E9E), fontSize = 12.sp)
                 }
             }
 
@@ -714,6 +585,8 @@ fun PerfilPreview() {
             totalPoints = 1250,
             onEditClick = {},
             onVerAmigosClick = {},
+            onConfiguracionClick = {},
+            onHistorialCarrerasClick = {},
             onLogoutClick = {},
             onDeleteClick = {}
         )
