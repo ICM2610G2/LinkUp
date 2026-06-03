@@ -34,6 +34,7 @@ import com.example.myapplication.data.models.RaceSession
 import com.example.myapplication.model.FriendMapLocation
 import com.example.myapplication.model.MapaViewModel
 import com.example.myapplication.model.ParticipantMapLocation
+import com.example.myapplication.model.RutaMode
 import com.example.myapplication.repository.FriendsRepository
 import com.example.myapplication.repository.LocationRepository
 import com.example.myapplication.repository.RaceRepository
@@ -48,6 +49,8 @@ import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.myapplication.repository.UserRepository
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 
 @Composable
 fun Mapa(
@@ -62,6 +65,13 @@ fun Mapa(
         viewModel.updateHasLocationPermission(granted)
         if (granted) {
             viewModel.cargarCarreraActiva()
+        }
+    }
+
+    // Recalcular ruta secuencial cuando cambia ubicación
+    LaunchedEffect(state.userLocation, state.rutaMode) {
+        if (state.rutaMode == RutaMode.SEQUENTIAL && state.userLocation != null && state.checkpoints.isNotEmpty()) {
+            viewModel.calcularRutas(state.rutaMode)
         }
     }
 
@@ -202,7 +212,7 @@ fun MapaConUbicacion(
                         }
                         ?.firstOrNull { it.status == "active" }
 
-                    Log.d("MAP_SESSION", " Sesión activa detectada: ${activeSession?.id}")
+                    Log.d("MAP_SESSION", "Sesión activa detectada: ${activeSession?.id}")
                     viewModel.updateActiveSession(activeSession)
 
                     if (activeSession != null) {
@@ -240,19 +250,19 @@ fun MapaConUbicacion(
 
                 viewModel.updateUserLocation(latLng)
 
-                Log.d("MAP_LOCATION", " Ubicación: lat=${location.latitude}, lng=${location.longitude}")
+                Log.d("MAP_LOCATION", "Ubicación: lat=${location.latitude}, lng=${location.longitude}")
                 Log.d("MAP_LOCATION", "activeSessionId: $activeSessionId, compartirUbicacion: $compartirUbicacion")
 
                 if (compartirUbicacion) {
                     if (activeSessionId != null) {
-                        Log.d("MAP_LOCATION", "🏁 Escribiendo en live_positions/$activeSessionId/$uid")
+                        Log.d("MAP_LOCATION", "Escribiendo en live_positions/$activeSessionId/$uid")
                         locationRepository.updateRaceLocation(
                             sessionId = activeSessionId,
                             lat = location.latitude,
                             lng = location.longitude
                         )
                     } else {
-                        Log.d("MAP_LOCATION", " Escribiendo en user_live/$uid")
+                        Log.d("MAP_LOCATION", "Escribiendo en user_live/$uid")
                         locationRepository.updateUserLocation(
                             lat = location.latitude,
                             lng = location.longitude,
@@ -273,7 +283,7 @@ fun MapaConUbicacion(
             }
 
             override fun onLocationAvailability(availability: LocationAvailability) {
-                Log.d("MAP_LOCATION", " LocationAvailability: ${availability.isLocationAvailable}")
+                Log.d("MAP_LOCATION", "LocationAvailability: ${availability.isLocationAvailable}")
             }
         }
 
@@ -299,10 +309,10 @@ fun MapaConUbicacion(
         val session = state.activeSession
         val userLocation = state.userLocation
 
-        Log.d("MAP_SESSION_CHECK", "🔄 Verificando: session=$session, userLocation=$userLocation, compartir=$compartirUbicacion")
+        Log.d("MAP_SESSION_CHECK", "Verificando: session=$session, userLocation=$userLocation, compartir=$compartirUbicacion")
 
         if (session != null && userLocation != null && compartirUbicacion) {
-            Log.d("MAP_SESSION_CHECK", "🏁 Forzando escritura inicial en live_positions")
+            Log.d("MAP_SESSION_CHECK", "Forzando escritura inicial en live_positions")
             locationRepository.updateRaceLocation(
                 sessionId = session.id,
                 lat = userLocation.latitude,
@@ -316,14 +326,14 @@ fun MapaConUbicacion(
     // ============================================================
     DisposableEffect(state.activeSession?.id) {
         val sessionId = state.activeSession?.id
-        Log.d("MAP_PARTICIPANTS", "🎯 Escuchando participantes para sesión: $sessionId")
+        Log.d("MAP_PARTICIPANTS", "Escuchando participantes para sesión: $sessionId")
 
         if (sessionId == null) {
             viewModel.updateParticipantLocations(emptyList())
             onDispose { }
         } else {
             val ref = realtimeDb.child("live_positions").child(sessionId)
-            Log.d("MAP_PARTICIPANTS", "📡 Ruta: $ref")
+            Log.d("MAP_PARTICIPANTS", "Ruta: $ref")
 
             val participantsCache = mutableMapOf<String, Pair<String, String>>()
 
@@ -334,7 +344,7 @@ fun MapaConUbicacion(
                         val user = userRepository.getUser(uid)
                         if (user != null) {
                             participantsCache[uid] = Pair(user.displayName, user.gameId)
-                            Log.d("MAP_PARTICIPANTS", "📝 Cargado: $uid -> ${user.displayName}, ${user.gameId}")
+                            Log.d("MAP_PARTICIPANTS", "Cargado: $uid -> ${user.displayName}, ${user.gameId}")
                         }
                     }
                 }
@@ -342,7 +352,7 @@ fun MapaConUbicacion(
 
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    Log.d("MAP_PARTICIPANTS", "📥 DataSnapshot recibido. Children: ${snapshot.childrenCount}")
+                    Log.d("MAP_PARTICIPANTS", "DataSnapshot recibido. Children: ${snapshot.childrenCount}")
 
                     val updatedList = snapshot.children.mapNotNull { child ->
                         val uid = child.key ?: return@mapNotNull null
@@ -364,7 +374,7 @@ fun MapaConUbicacion(
                                 participantsCache[uid]?.second ?: ""
                             }
 
-                            Log.d("MAP_PARTICIPANTS", "   - Participante: $uid, nombre=$displayName, gameId=$gameId")
+                            Log.d("MAP_PARTICIPANTS", "Participante: $uid, nombre=$displayName, gameId=$gameId")
 
                             ParticipantMapLocation(
                                 uid = uid,
@@ -377,12 +387,12 @@ fun MapaConUbicacion(
                         }
                     }
 
-                    Log.d("MAP_PARTICIPANTS", "✅ Participantes encontrados: ${updatedList.size}")
+                    Log.d("MAP_PARTICIPANTS", "Participantes encontrados: ${updatedList.size}")
                     viewModel.updateParticipantLocations(updatedList)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("MAP_PARTICIPANTS", "❌ Error: ${error.message}")
+                    Log.e("MAP_PARTICIPANTS", "Error: ${error.message}")
                 }
             }
 
@@ -455,7 +465,7 @@ fun MapaConUbicacion(
                 myLocationButtonEnabled = true
             )
         ) {
-            // CHECKPOINTS
+            // ── CHECKPOINTS ─────────────────────────────────────────
             state.checkpoints.forEach { checkpoint ->
                 val pos = LatLng(checkpoint.coordinates.latitude, checkpoint.coordinates.longitude)
                 val isCompleted = state.activeSession
@@ -464,29 +474,69 @@ fun MapaConUbicacion(
                     ?.checkpointsDone
                     ?.contains(checkpoint.id) == true
 
+                val isSelectedForRoute = state.selectedRouteCheckpoint?.id == checkpoint.id
+
                 Marker(
                     state = MarkerState(position = pos),
                     title = checkpoint.name,
-                    snippet = if (isCompleted) "✓ Completado" else "Pendiente",
+                    snippet = when {
+                        isCompleted -> "✓ Completado"
+                        isSelectedForRoute -> "📍 Ruta activa"
+                        else -> "Pendiente"
+                    },
                     icon = BitmapDescriptorFactory.defaultMarker(
-                        if (isCompleted) BitmapDescriptorFactory.HUE_GREEN else BitmapDescriptorFactory.HUE_AZURE
+                        when {
+                            isCompleted -> BitmapDescriptorFactory.HUE_GREEN
+                            isSelectedForRoute -> BitmapDescriptorFactory.HUE_YELLOW
+                            else -> BitmapDescriptorFactory.HUE_AZURE
+                        }
                     ),
                     onClick = {
-                        selectedCheckpoint = checkpoint
-                        false
+                        when (state.rutaMode) {
+                            RutaMode.SINGLE -> {
+                                // En modo SINGLE: calcular ruta a este checkpoint
+                                viewModel.selectRouteCheckpoint(checkpoint)
+                                false
+                            }
+                            else -> {
+                                // Comportamiento original: abrir panel de validación
+                                selectedCheckpoint = checkpoint
+                                false
+                            }
+                        }
                     }
                 )
 
                 Circle(
                     center = pos,
                     radius = 50.0,
-                    fillColor = if (isCompleted) Color(0x334CAF50) else Color(0x332196F3),
-                    strokeColor = if (isCompleted) Color.Green else Color.Blue,
+                    fillColor = when {
+                        isCompleted -> Color(0x334CAF50)
+                        isSelectedForRoute -> Color(0x33FFEB3B)
+                        else -> Color(0x332196F3)
+                    },
+                    strokeColor = when {
+                        isCompleted -> Color.Green
+                        isSelectedForRoute -> Color.Yellow
+                        else -> Color.Blue
+                    },
                     strokeWidth = 2f
                 )
             }
 
-            // AMIGOS (fuera de carrera)
+            // ── RUTAS ────────────────────────────────────────────────
+            state.rutaPolylines.forEachIndexed { index, points ->
+                if (points.size >= 2) {
+                    Polyline(
+                        points = points,
+                        color = if (state.rutaMode == RutaMode.SEQUENTIAL) Color(0xFF4CAF50) else Color(0xFF2196F3),
+                        width = 12f,
+                        pattern = null
+                    )
+                }
+            }
+
+            // ── AMIGOS (fuera de carrera) ────────────────────────────
             if (state.activeSession == null) {
                 state.friendLocations.forEach { friendLocation ->
                     Marker(
@@ -497,7 +547,7 @@ fun MapaConUbicacion(
                     )
                 }
             } else {
-                // PARTICIPANTES (dentro de carrera)
+                // ── PARTICIPANTES (dentro de carrera) ────────────────
                 state.participantLocations.forEach { participantLocation ->
                     Marker(
                         state = MarkerState(position = participantLocation.location),
@@ -513,7 +563,7 @@ fun MapaConUbicacion(
             }
         }
 
-        // INDICADOR DE CARRERA ACTIVA
+        // ── INDICADOR DE CARRERA ACTIVA ──────────────────────────────
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -556,7 +606,134 @@ fun MapaConUbicacion(
             }
         }
 
-        // BOTÓN TOGGLE DE UBICACIÓN
+        // ── BOTONES DE RUTA (solo cuando hay carrera activa) ─────────
+        if (state.activeSession?.status == "active") {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 80.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .background(Color(0xCC1A1A1A), RoundedCornerShape(24.dp))
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    // Botón ruta secuencial
+                    FilterChip(
+                        selected = state.rutaMode == RutaMode.SEQUENTIAL,
+                        onClick = {
+                            if (state.rutaMode == RutaMode.SEQUENTIAL) {
+                                viewModel.setRutaMode(RutaMode.NINGUNA)
+                            } else {
+                                viewModel.setRutaMode(RutaMode.SEQUENTIAL)
+                            }
+                        },
+                        label = {
+                            Text(
+                                "Secuencial",
+                                fontSize = 12.sp,
+                                color = if (state.rutaMode == RutaMode.SEQUENTIAL) Color.Black else Color.White
+                            )
+                        },
+                        leadingIcon = {
+                            if (state.isLoadingRuta && state.rutaMode == RutaMode.SEQUENTIAL) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(14.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color.Black
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Default.Navigation,
+                                    null,
+                                    modifier = Modifier.size(14.dp),
+                                    tint = if (state.rutaMode == RutaMode.SEQUENTIAL) Color.Black else Color.White
+                                )
+                            }
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = Color(0xFFFF9800),
+                            containerColor = Color(0xFF333333)
+                        )
+                    )
+
+                    // Botón ruta a checkpoint individual
+                    FilterChip(
+                        selected = state.rutaMode == RutaMode.SINGLE,
+                        onClick = {
+                            if (state.rutaMode == RutaMode.SINGLE) {
+                                viewModel.setRutaMode(RutaMode.NINGUNA)
+                            } else {
+                                viewModel.setRutaMode(RutaMode.SINGLE)
+                            }
+                        },
+                        label = {
+                            Text(
+                                "Toca un punto",
+                                fontSize = 12.sp,
+                                color = if (state.rutaMode == RutaMode.SINGLE) Color.Black else Color.White
+                            )
+                        },
+                        leadingIcon = {
+                            if (state.isLoadingRuta && state.rutaMode == RutaMode.SINGLE) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(14.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color.Black
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Default.TouchApp,
+                                    null,
+                                    modifier = Modifier.size(14.dp),
+                                    tint = if (state.rutaMode == RutaMode.SINGLE) Color.Black else Color.White
+                                )
+                            }
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = Color(0xFFFF9800),
+                            containerColor = Color(0xFF333333)
+                        )
+                    )
+                }
+
+                // Hint cuando modo SINGLE está activo y no hay checkpoint seleccionado
+                if (state.rutaMode == RutaMode.SINGLE && state.selectedRouteCheckpoint == null) {
+                    Card(
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xCC1A1A1A))
+                    ) {
+                        Text(
+                            text = "Toca un checkpoint para ver la ruta",
+                            color = Color(0xFFFF9800),
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+
+                // Hint cuando modo SINGLE está activo y hay checkpoint seleccionado
+                if (state.rutaMode == RutaMode.SINGLE && state.selectedRouteCheckpoint != null) {
+                    Card(
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xCC1A1A1A))
+                    ) {
+                        Text(
+                            text = "→ ${state.selectedRouteCheckpoint!!.name}",
+                            color = Color(0xFF2196F3),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        // ── BOTÓN TOGGLE DE UBICACIÓN ────────────────────────────────
         FloatingActionButton(
             onClick = { compartirUbicacion = !compartirUbicacion },
             modifier = Modifier
@@ -571,8 +748,7 @@ fun MapaConUbicacion(
             )
         }
 
-        // PANEL DE VALIDACIÓN DE CHECKPOINT
-        // ── Widget podómetro (esquina inferior izquierda) ──────────
+        // ── Widget podómetro (esquina inferior izquierda) ────────────
         StepWidget(
             steps = steps,
             isMoving = isMoving,
@@ -581,9 +757,10 @@ fun MapaConUbicacion(
                 .padding(start = 16.dp, bottom = 120.dp)
         )
 
-        // ── Panel inferior: validación de checkpoint ───────────────
+        // ── Panel inferior: validación de checkpoint ─────────────────
+        // Solo se muestra si NO estamos en modo SINGLE (para no confundir al usuario)
         AnimatedVisibility(
-            visible = selectedCheckpoint != null,
+            visible = selectedCheckpoint != null && state.rutaMode != RutaMode.SINGLE,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 110.dp, start = 16.dp, end = 16.dp)

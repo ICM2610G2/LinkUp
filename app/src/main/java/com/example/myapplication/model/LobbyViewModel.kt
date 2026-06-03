@@ -12,13 +12,15 @@ import kotlinx.coroutines.launch
 
 data class LobbyState(
     val raceName: String = "Cargando carrera...",
+    val raceId: String = "",
     val status: String = "lobby",
     val participantsCount: Int = 0,
     val createdBy: String = "",
     val isParticipant: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val raceStarted: Boolean = false
+    val raceStarted: Boolean = false,
+    val leftRace: Boolean = false
 )
 
 class LobbyViewModel : ViewModel() {
@@ -44,6 +46,7 @@ class LobbyViewModel : ViewModel() {
                     _state.update {
                         it.copy(
                             raceName = snapshot.getString("raceName") ?: "Carrera",
+                            raceId = snapshot.getString("raceId") ?: "",
                             status = newStatus,
                             createdBy = snapshot.getString("createdBy") ?: "",
                             participantsCount = participants?.size ?: 0,
@@ -74,6 +77,17 @@ class LobbyViewModel : ViewModel() {
                 _state.update { it.copy(errorMessage = e.message) }
             }
             _state.update { it.copy(isLoading = false) }
+        }
+    }
+
+    fun leaveRace(sessionId: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            val result = raceRepository.leaveRaceSession(sessionId)
+            result.fold(
+                onSuccess = { _state.update { it.copy(isLoading = false, leftRace = true) } },
+                onFailure = { e -> _state.update { it.copy(isLoading = false, errorMessage = e.message) } }
+            )
         }
     }
 
